@@ -3,14 +3,13 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xmlns:context="http://www.springframework.org/schema/context"
 	xmlns:tx="http://www.springframework.org/schema/tx"
-<<<<<<< HEAD
 	xsi:schemaLocation="
-           http://www.springframework.org/schema/beans
-           http://www.springframework.org/schema/beans/spring-beans.xsd
-           http://www.springframework.org/schema/context
-           http://www.springframework.org/schema/context/spring-context.xsd
-           http://www.springframework.org/schema/tx
-           http://www.springframework.org/schema/tx/spring-tx.xsd">
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context.xsd
+        http://www.springframework.org/schema/tx
+        http://www.springframework.org/schema/tx/spring-tx.xsd">
 
 	<!-- ===== Properties 로드 ===== -->
 	<context:property-placeholder
@@ -23,7 +22,6 @@
 		<property name="jdbcUrl" value="${db.url}" />
 		<property name="username" value="${db.username}" />
 		<property name="password" value="${db.password}" />
-
 		<property name="maximumPoolSize" value="10" />
 		<property name="minimumIdle" value="5" />
 		<property name="connectionTimeout" value="30000" />
@@ -36,12 +34,6 @@
 		destroy-method="close">
 		<constructor-arg ref="hikariConfig" />
 	</bean>
-
-	<!-- ===== DataSource ===== -->
-	<!-- <bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource"> 
-		<property name="driverClassName" value="${db.driver}"/> <property name="url" 
-		value="${db.url}"/> <property name="username" value="${db.username}"/> <property 
-		name="password" value="${db.password}"/> </bean> -->
 
 	<!-- ===== JdbcTemplate ===== -->
 	<bean id="jdbcTemplate"
@@ -69,37 +61,4 @@
 			expression="org.springframework.web.bind.annotation.ControllerAdvice" />
 	</context:component-scan>
 
-=======
-	xsi:schemaLocation="http://www.springframework.org/schema/beans
-           				http://www.springframework.org/schema/beans/spring-beans.xsd
-           				http://www.springframework.org/schema/context
-           				http://www.springframework.org/schema/context/spring-context.xsd
-           				http://www.springframework.org/schema/tx
-           				http://www.springframework.org/schema/tx/spring-tx.xsd">
-
-	<context:component-scan base-package="com.example.repository, com.example.service"/>
-	
-	<context:property-placeholder location="classpath:db.properties"/>
-		
-	<bean id="dataSource" class="com.zaxxer.hikari.HikariDataSource" destroy-method="close">
-		<constructor-arg ref="hikariConfig"/>
-	</bean>
-
-	<bean id="hikariConfig" class="com.zaxxer.hikari.HikariConfig">
-		<property name="driverClassName" value="com.mysql.cj.jdbc.Driver" />
-		<property name="jdbcUrl" value="${dbMyTest.url}" />
-		<property name="username" value="${dbMyTest.username}" />
-		<property name="password" value="${dbMyTest.password}" />
-		 
-		<property name="maximumPoolSize" value="10" />
-		<property name="minimumIdle" value="5" />
-		<property name="connectionTimeout" value="30000" />
-		<property name="idleTimeout" value="600000" />
-		<property name="maxLifetime" value="1800000" />
-	</bean>
-
-	<bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
-		<property name="dataSource" ref="dataSource"/>
-	</bean>
->>>>>>> branch 'member-JAC' of https://github.com/SeonyoungMin/TeamProject-JAC-CGI-MSY.git
 </beans>
