@@ -1,5 +1,5 @@
 package com.team404.service;
 
-public interface ImageService {
+public class ImageServiceImpl {
 
 }

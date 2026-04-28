@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans:beans xmlns="http://www.springframework.org/schema/mvc"
-             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-             xmlns:beans="http://www.springframework.org/schema/beans"
-             xmlns:context="http://www.springframework.org/schema/context"
-             xsi:schemaLocation="
+<beans:beans
+	xmlns="http://www.springframework.org/schema/mvc"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:beans="http://www.springframework.org/schema/beans"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="
                  http://www.springframework.org/schema/mvc
                  http://www.springframework.org/schema/mvc/spring-mvc.xsd
                  http://www.springframework.org/schema/beans
@@ -11,33 +12,29 @@
                  http://www.springframework.org/schema/context
                  http://www.springframework.org/schema/context/spring-context.xsd">
 
-    <!-- ===== Controller Component Scan ===== -->
-    <context:component-scan base-package="com.team404">
-        <context:include-filter type="annotation"
-                                expression="org.springframework.stereotype.Controller"/>
-        <context:include-filter type="annotation"
-                                expression="org.springframework.web.bind.annotation.RestController"/>
-        <context:include-filter type="annotation"
-                                expression="org.springframework.web.bind.annotation.ControllerAdvice"/>
-    </context:component-scan>
+	<!-- ===== Controller Component Scan ===== -->
+	<context:component-scan
+		base-package="com.team404">
+	</context:component-scan>
 
-    <!-- ===== MVC Annotation Driven ===== -->
-    <annotation-driven/>
+	<!-- ===== MVC Annotation Driven ===== -->
+	<annotation-driven />
 
-    <!-- ===== Static Resources ===== -->
-    <resources mapping="/resources/**" location="/resources/"/>
+	<!-- ===== Static Resources ===== -->
+	<resources mapping="/resources/**" location="/resources/" />
 
-    <!-- ===== JSP View Resolver ===== -->
-    <beans:bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
-        <beans:property name="viewClass"
-                        value="org.springframework.web.servlet.view.JstlView"/>
-        <beans:property name="prefix" value="/WEB-INF/views/"/>
-        <beans:property name="suffix" value=".jsp"/>
-        <beans:property name="order" value="1"/>
-    </beans:bean>
+	<!-- ===== JSP View Resolver ===== -->
+	<beans:bean
+		class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+		<beans:property name="viewClass"
+			value="org.springframework.web.servlet.view.JstlView" />
+		<beans:property name="prefix" value="/WEB-INF/views/" />
+		<beans:property name="suffix" value=".jsp" />
+		<beans:property name="order" value="1" />
+	</beans:bean>
 
-    <!-- ===== Multipart Resolver (web.xml multipart-config 사용) ===== -->
-    <beans:bean id="multipartResolver"
-                class="org.springframework.web.multipart.support.StandardServletMultipartResolver"/>
+	<!-- ===== Multipart Resolver (web.xml multipart-config 사용) ===== -->
+	<beans:bean id="multipartResolver"
+		class="org.springframework.web.multipart.support.StandardServletMultipartResolver" />
 
 </beans:beans>

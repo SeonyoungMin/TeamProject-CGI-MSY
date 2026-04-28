@@ -1,5 +1,5 @@
 package com.team404.repository;
 
-public interface ImageRepository {
+public class ImageRepositoryImpl {
 
 }

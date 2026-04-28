@@ -2,13 +2,16 @@ package com.team404.domain;
 
 import java.sql.Timestamp;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 public class Comment {
 
 	private int commentNo;
 	private String content;
 	private int boardNo;
 	private int authorNo;
-	private java.sql.Timestamp createdTime;
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
+	private Timestamp createdTime;
 
 	private String nickname;
 

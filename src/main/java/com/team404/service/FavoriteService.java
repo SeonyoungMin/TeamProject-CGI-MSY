@@ -1,5 +1,5 @@
 package com.team404.service;
 
-public class FavoriteService {
+public interface FavoriteService {
 
 }

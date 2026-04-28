@@ -52,13 +52,7 @@
 
 	<!-- ===== Service / DAO Component Scan (Controller 제외) ===== -->
 	<context:component-scan
-		base-package="com.team404.minimarket">
-		<context:exclude-filter type="annotation"
-			expression="org.springframework.stereotype.Controller" />
-		<context:exclude-filter type="annotation"
-			expression="org.springframework.web.bind.annotation.RestController" />
-		<context:exclude-filter type="annotation"
-			expression="org.springframework.web.bind.annotation.ControllerAdvice" />
+		base-package="com.team404">
 	</context:component-scan>
 
 </beans>
