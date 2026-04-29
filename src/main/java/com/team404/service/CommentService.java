@@ -1,15 +1,15 @@
 package com.team404.service;
 
 import java.util.List;
-
 import com.team404.domain.Comment;
 
 public interface CommentService {
-	List<Comment> findByBoard(int boardNo);
 
-	int insert(Comment c);
+	List<Comment> getComments(int boardNo);
 
-	int update(Comment c);
+	void addComment(Comment comment);
 
-	int delete(int commentNo);
+	void updateComment(Comment comment);
+
+	void deleteComment(int commentNo);
 }
