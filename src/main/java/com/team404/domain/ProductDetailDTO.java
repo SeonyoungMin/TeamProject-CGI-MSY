@@ -20,8 +20,9 @@ public class ProductDetailDTO {
 
 	// orders 테이블 데이터 (orders.product_no = product.product_no)
 	private int sellerNo;
+	private int buyerNo;
 
-	// member 테이블 데이터 (member.member_no=orders.seller_no)
+	// users 테이블 데이터 (users.users_no=orders.seller_no)
 	private String sellerNickname;
 
 	// image 테이블 데이터 (entity_type='product', is_thumbnail=1)
@@ -90,6 +91,14 @@ public class ProductDetailDTO {
 
 	public void setSellerNo(int sellerNo) {
 		this.sellerNo = sellerNo;
+	}
+	
+	public int getBuyerNo() {
+		return buyerNo;
+	}
+
+	public void setBuyerNo(int buyerNo) {
+		this.buyerNo = buyerNo;
 	}
 
 	public String getImgName() {

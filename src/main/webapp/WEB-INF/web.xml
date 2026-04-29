@@ -91,5 +91,5 @@
 		<error-code>500</error-code>
 		<location>/WEB-INF/views/error/500.jsp</location>
 	</error-page>
-
+	
 </web-app>

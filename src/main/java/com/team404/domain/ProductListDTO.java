@@ -19,6 +19,9 @@ public class ProductListDTO {
 	//orders 테이블 데이터 (orders.product_no = product.product_no)
 	private int sellerNo;
 	
+	// users.nickname
+	private String sellerNickname;  
+	
 	//image 테이블 데이터 (entity_type='product', is_thumbnail=1)
 	private String imgName;
 	private String imgPath;
@@ -81,6 +84,14 @@ public class ProductListDTO {
 
 	public void setSellerNo(int sellerNo) {
 		this.sellerNo = sellerNo;
+	}
+
+	public String getSellerNickname() {
+		return sellerNickname;
+	}
+
+	public void setSellerNickname(String sellerNickname) {
+		this.sellerNickname = sellerNickname;
 	}
 
 	public String getImgName() {
