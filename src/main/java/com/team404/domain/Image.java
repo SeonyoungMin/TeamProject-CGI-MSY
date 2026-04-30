@@ -10,7 +10,7 @@ public class Image {
 	private String filePath;
 	private String entitlyType;
 	private int entityId;
-	private int isThumnail;
+	private int isThumbnail;
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
 	private Timestamp createdTime;
 	
@@ -20,7 +20,11 @@ public class Image {
 		this.filePath = filePath;
 		this.entitlyType = entitlyType;
 		this.entityId = entityId;
-		this.isThumnail = isThumnail;
+		this.isThumbnail = isThumnail;
+	}
+
+	public Image() {
+		// TODO Auto-generated constructor stub
 	}
 
 	public Integer getImageNo() {
@@ -64,11 +68,11 @@ public class Image {
 	}
 
 	public int getIsThumnail() {
-		return isThumnail;
+		return isThumbnail;
 	}
 
 	public void setIsThumnail(int isThumnail) {
-		this.isThumnail = isThumnail;
+		this.isThumbnail = isThumnail;
 	}
 
 	public Timestamp getCreatedTime() {

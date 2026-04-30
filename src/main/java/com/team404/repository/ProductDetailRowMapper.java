@@ -5,12 +5,12 @@ import java.sql.SQLException;
 
 import org.springframework.jdbc.core.RowMapper;
 
-import com.team404.domain.ProductDetailDTO;
+import com.team404.domain.ProductDetailDto;
 
-public class ProductDetailRowMapper implements RowMapper<ProductDetailDTO> {
-	public ProductDetailDTO mapRow(ResultSet rs, int rowNum) throws SQLException {
+public class ProductDetailRowMapper implements RowMapper<ProductDetailDto> {
+	public ProductDetailDto mapRow(ResultSet rs, int rowNum) throws SQLException {
 		
-		ProductDetailDTO productDetailDto = new ProductDetailDTO();
+		ProductDetailDto productDetailDto = new ProductDetailDto();
 		productDetailDto.setProductNo(rs.getInt("product_no"));
 		productDetailDto.setProductName(rs.getString("name"));
 		productDetailDto.setCategory(rs.getString("category"));

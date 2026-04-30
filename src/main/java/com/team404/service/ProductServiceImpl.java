@@ -10,8 +10,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.team404.domain.Image;
 import com.team404.domain.Product;
-import com.team404.domain.ProductDetailDTO;
-import com.team404.domain.ProductListDTO;
+import com.team404.domain.ProductDetailDto;
+import com.team404.domain.ProductListDto;
 import com.team404.repository.ProductRepository;
 
 @Service
@@ -23,7 +23,7 @@ public class ProductServiceImpl implements ProductService {
 	private static final String UPLOAD_DIR = "C:\\team404_upload\\productImg";
 
 	// 상품 목록 조회 (+페이징)
-	public List<ProductListDTO> findAll(int startNum, int limit) {
+	public List<ProductListDto> findAll(int startNum, int limit) {
 		return productRepository.findAll(startNum, limit);
 	}
 	
@@ -33,29 +33,31 @@ public class ProductServiceImpl implements ProductService {
 	}
 
 	// 상품 상세 조회 (productNo 기준)
-	public ProductDetailDTO findProductDetail(int productNo) {
+	public ProductDetailDto findProductDetail(int productNo) {
 		return productRepository.findProductDetail(productNo);
 	}
 
 	// 상품 조건 조회(키워드 검색)
-	public List<ProductListDTO> findByKeyword(String keyword) {
+	public List<ProductListDto> findByKeyword(String keyword) {
 		return productRepository.findByKeyword(keyword);
 	}
 
 	// 카테고리별 조회
-	public List<ProductListDTO> findByCategory(String category) {
+	public List<ProductListDto> findByCategory(String category) {
 		return productRepository.findByCategory(category);
 	}
 
 	// 내 판매 목록 조회
-	public List<ProductListDTO> findBySeller(int sellerNo) {
+	public List<ProductListDto> findBySeller(int sellerNo) {
 		return productRepository.findBySeller(sellerNo);
 	}
 
 	// 상품 등록
-	public void registerProduct(Product product, List<MultipartFile> imgFiles) {
+	public void registerProduct(Product product, List<MultipartFile> imgFiles, int loginMemberNo) {
 		
 		int productNo = productRepository.insertProduct(product);
+		
+		productRepository.insertOrder(productNo, loginMemberNo);
 		
 		if (imgFiles != null && !imgFiles.isEmpty()) {
 			for (int i = 0; i < imgFiles.size(); i++) {
@@ -80,7 +82,7 @@ public class ProductServiceImpl implements ProductService {
 	}
 	
 	//상품 수정 (본인 확인 필요)
-	public void updateProduct(Product productNo, int loginMemberNo) {
+	public void updateProduct(Product productNo, List<MultipartFile> imgFiles,int loginMemberNo) {
 		int sellerNo = productRepository.findSellerNo(productNo.getProductNo());
 		
 		if (sellerNo != loginMemberNo) {
@@ -109,10 +111,7 @@ public class ProductServiceImpl implements ProductService {
 		if (sellerNo != loginMemberNo) {
 			throw new RuntimeException("본인의 상품만 상태 변경 할 수 있습니다.");
 		}
-		
-		if (!tradeStatus.equals("판매중") && !tradeStatus.equals("예약중") && !tradeStatus.equals("판매완료")) {
-			throw new RuntimeException("올바르지 않은 거래 상태입니다: " +tradeStatus);
-		}
+
 		productRepository.updateTradeStatus(productNo, tradeStatus);
 	}
 	

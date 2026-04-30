@@ -5,12 +5,12 @@ import java.sql.SQLException;
 
 import org.springframework.jdbc.core.RowMapper;
 
-import com.team404.domain.ProductListDTO;
+import com.team404.domain.ProductListDto;
 
-public class ProductListRowMapper implements RowMapper<ProductListDTO> {
-	public ProductListDTO mapRow(ResultSet rs, int rowNum) throws SQLException {
+public class ProductListRowMapper implements RowMapper<ProductListDto> {
+	public ProductListDto mapRow(ResultSet rs, int rowNum) throws SQLException {
 		
-		ProductListDTO productListDto = new ProductListDTO();
+		ProductListDto productListDto = new ProductListDto();
 		productListDto.setProductNo(rs.getInt("product_no"));
 		productListDto.setProductName(rs.getString("name"));
 		productListDto.setCategory(rs.getString("category"));
@@ -18,7 +18,7 @@ public class ProductListRowMapper implements RowMapper<ProductListDTO> {
 		productListDto.setTradeStatus(rs.getNString("trade_status"));
 		productListDto.setCreatedTime(rs.getTimestamp("created_time"));
 		productListDto.setSellerNo(rs.getInt("seller_no"));
-		productListDto.setSellerNickname(rs.getString("nickname"));
+		productListDto.setSellerNickname(rs.getString("seller_nickname"));
 		productListDto.setImgName(rs.getString("img_name"));
 		productListDto.setImgPath(rs.getString("img_path"));
 		

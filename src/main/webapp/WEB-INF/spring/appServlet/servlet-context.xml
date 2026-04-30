@@ -20,11 +20,18 @@
 
 
 	<resources mapping="/upload/**" location="file:///C:/team404_upload/" />
+	
 	<!-- ViewResolver -->
 	<beans:bean
 		class="org.springframework.web.servlet.view.InternalResourceViewResolver">
 		<beans:property name="prefix" value="/WEB-INF/views/" />
 		<beans:property name="suffix" value=".jsp" />
 	</beans:bean>
+
+    <!-- multipartResolver -->
+    <beans:bean id="multipartResolver"
+        class="org.springframework.web.multipart.support.StandardServletMultipartResolver" />
+    <beans:bean
+        class="org.springframework.web.servlet.view.InternalResourceViewResolver" />
 
 </beans:beans>

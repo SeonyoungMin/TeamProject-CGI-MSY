@@ -4,31 +4,30 @@ import java.sql.Timestamp;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 
-//전체 목록 조회  + 상품 검색 + 카테고리 조회 (메인페이지에 배너 생성) + 내 판매목록 조회
-// product + orders(seller_no(목록 조회 판매자 정보) + image(썸네일) 조인 담은 DTO
+//상세 조회 (제품 번호 기준)
+// product + orders(seller_no, buyer_no) + member(nickname) + image(썸네일) 조인 담는 DTO
 
-public class ProductListDTO {
+public class ProductDetailDto {
+
 	private int productNo;
 	private String productName;
 	private String category;
 	private long price;
+	private String description;
 	private String tradeStatus;
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
-    private Timestamp createdTime;
-	
-	//orders 테이블 데이터 (orders.product_no = product.product_no)
+	private Timestamp createdTime;
+
+	// orders 테이블 데이터 (orders.product_no = product.product_no)
 	private int sellerNo;
-	
-	// users.nickname
-	private String sellerNickname;  
-	
-	//image 테이블 데이터 (entity_type='product', is_thumbnail=1)
+	private int buyerNo;
+
+	// users 테이블 데이터 (users.users_no=orders.seller_no)
+	private String sellerNickname;
+
+	// image 테이블 데이터 (entity_type='product', is_thumbnail=1)
 	private String imgName;
 	private String imgPath;
-	
-	public ProductListDTO() {
-		super();
-	}
 
 	public int getProductNo() {
 		return productNo;
@@ -62,7 +61,15 @@ public class ProductListDTO {
 		this.price = price;
 	}
 
-	public String getTrade_status() {
+	public String getDescription() {
+		return description;
+	}
+
+	public void setDescription(String description) {
+		this.description = description;
+	}
+
+	public String getTradeStatus() {
 		return tradeStatus;
 	}
 
@@ -85,13 +92,13 @@ public class ProductListDTO {
 	public void setSellerNo(int sellerNo) {
 		this.sellerNo = sellerNo;
 	}
-
-	public String getSellerNickname() {
-		return sellerNickname;
+	
+	public int getBuyerNo() {
+		return buyerNo;
 	}
 
-	public void setSellerNickname(String sellerNickname) {
-		this.sellerNickname = sellerNickname;
+	public void setBuyerNo(int buyerNo) {
+		this.buyerNo = buyerNo;
 	}
 
 	public String getImgName() {
@@ -109,5 +116,12 @@ public class ProductListDTO {
 	public void setImgPath(String imgPath) {
 		this.imgPath = imgPath;
 	}
-	
- }
+
+	public String getSellerNickname() {
+		return sellerNickname;
+	}
+
+	public void setSellerNickname(String sellerNickname) {
+		this.sellerNickname = sellerNickname;
+	}
+}
