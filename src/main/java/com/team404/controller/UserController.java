@@ -19,6 +19,8 @@ import com.team404.domain.User;
 import com.team404.exception.NoUserFoundException;
 import com.team404.service.UserService;
 
+import jakarta.validation.Valid;
+
 @Controller
 public class UserController {
 
@@ -45,15 +47,25 @@ public class UserController {
 		return "noUserFound";
 	}
 
-	@GetMapping("/users/new")
+	@GetMapping("/signup")
 	public String getNewUserForm(@ModelAttribute("newUser") User newUser) {
-		return "newUser";
+		return "signup";
 	}
 
 	@PostMapping("/users")
-	public String submitNewUserForm(@ModelAttribute("newUser") User newUser, BindingResult bindingResult) {
-		userService.setNewUser(newUser);
-		return "redirect:/users/search";
+	public String signup(@Valid @ModelAttribute User user, BindingResult bindingResult) {
+
+		if (bindingResult.hasErrors()) {
+			return "signup";
+		}
+
+		userService.setNewUser(user);
+		return "redirect:/login";
+	}
+
+	@GetMapping("/login")
+	public String loginPage() {
+		return "login";
 	}
 
 	@GetMapping("/users/edit/{userNo}")
@@ -74,18 +86,18 @@ public class UserController {
 		userService.setDeleteUser(userNo);
 		return "redirect:/users/search";
 	}
-	
+
 	@GetMapping("/")
 	public String mainPage(Model model) {
-	    // 최근 등록된 유저(상품) 리스트를 가져오는 서비스 메서드 호출
-	    // 현재 adminSearchUser를 활용하거나 별도의 최근 리스트 호출 메서드 사용
-	    SearchDTO mainSearch = new SearchDTO(); 
-	    List<User> recentUsers = userService.adminSearchUser(mainSearch); 
-	    
-	    // main.jsp에서 사용될 'recentItems'라는 이름으로 데이터를 담습니다.
-	    model.addAttribute("recentItems", recentUsers);
-	    
-	    return "main"; // WEB-INF/views/main.jsp를 보여줍니다.
+		// 최근 등록된 유저(상품) 리스트를 가져오는 서비스 메서드 호출
+		// 현재 adminSearchUser를 활용하거나 별도의 최근 리스트 호출 메서드 사용
+		SearchDTO mainSearch = new SearchDTO();
+		List<User> recentUsers = userService.adminSearchUser(mainSearch);
+
+		// main.jsp에서 사용될 'recentItems'라는 이름으로 데이터를 담습니다.
+		model.addAttribute("recentItems", recentUsers);
+
+		return "main"; // WEB-INF/views/main.jsp를 보여줍니다.
 	}
 
 }
