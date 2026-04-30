@@ -118,8 +118,8 @@
 			<artifactId>jackson-databind</artifactId>
 			<version>${jackson.version}</version>
 		</dependency>
-
-		<!-- ===== Logback + SLF4J ===== -->
+<!--
+		 ===== Logback + SLF4J ===== 
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-api</artifactId>
@@ -139,7 +139,7 @@
 			<groupId>org.slf4j</groupId>
 			<artifactId>jcl-over-slf4j</artifactId>
 			<version>${slf4j.version}</version>
-		</dependency>
+		</dependency>-->
 
 		<!-- ===== Test ===== -->
 		<dependency>

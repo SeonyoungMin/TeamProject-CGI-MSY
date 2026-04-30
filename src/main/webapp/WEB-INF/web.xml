@@ -58,7 +58,7 @@
 
 		<load-on-startup>1</load-on-startup>
 
-		<!-- 🔥 Multipart 설정 (핵심) -->
+		<!--  Multipart 설정 (핵심) -->
 		<multipart-config>
 			<location>C:/team404_upload/temp</location>
 			<max-file-size>5000000</max-file-size>
@@ -73,16 +73,16 @@
 	</servlet-mapping>
 
 	<!-- ===== Session ===== -->
-	<session-config>
+	<!-- <session-config>
 		<session-timeout>30</session-timeout>
 		<cookie-config>
 			<http-only>true</http-only>
 		</cookie-config>
 		<tracking-mode>COOKIE</tracking-mode>
-	</session-config>
+	</session-config> -->
 
 	<!-- ===== Error Page ===== -->
-	<error-page>
+	<!-- <error-page>
 		<error-code>404</error-code>
 		<location>/WEB-INF/views/error/404.jsp</location>
 	</error-page>
@@ -91,5 +91,5 @@
 		<error-code>500</error-code>
 		<location>/WEB-INF/views/error/500.jsp</location>
 	</error-page>
-
+ -->
 </web-app>
