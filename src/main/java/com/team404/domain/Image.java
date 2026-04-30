@@ -14,16 +14,13 @@ public class Image {
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
 	private Timestamp createdTime;
 	
-	public Image(Integer imageNo, String fileName, String filePath, String entitlyType, int entityId, int isThumnail,
-			Timestamp createdTime) {
+	public Image(String fileName, String filePath, String entitlyType, int entityId, int isThumnail) {
 		super();
-		this.imageNo = imageNo;
 		this.fileName = fileName;
 		this.filePath = filePath;
 		this.entitlyType = entitlyType;
 		this.entityId = entityId;
 		this.isThumnail = isThumnail;
-		this.createdTime = createdTime;
 	}
 
 	public Integer getImageNo() {

@@ -29,7 +29,7 @@ public interface ProductService {
 		public List<ProductListDTO> findBySeller(int sellerNo);
 		
 		//상품 등록
-		public int registerProduct(Product product, List<MultipartFile> imgFiles);
+		public void registerProduct(Product product, List<MultipartFile> imgFiles);
 		
 		//상품 수정 (본인 확인 필요)
 		public void updateProduct(Product productNo, int loginMemberNo);
