@@ -178,11 +178,16 @@ public class UserRepositoryImpl implements UserRepository {
 
 	@Override
 	public void setNewUser(User newUser) {
+
 		String SQL = "INSERT INTO users(id, pw, name, nickname, age, address, phone) VALUES(?,?,?,?,?,?,?)";
 		template.update(SQL, newUser.getUserId(), newUser.getUserPw(), newUser.getUserName(), newUser.getUserNickName(),
 				newUser.getUserAge(), newUser.getUserAddress(), newUser.getUserPhone());
-//		String SQLforImg = "INSERT INTO image(file_name, file_path, entity_type) VALUES(?, ?, ?)";
-//		template.update(SQLforImg, newUser.getUserImageName(), newUser.getUserImagePath(), "user");
+
+		Integer lastId = template.queryForObject("SELECT LAST_INSERT_ID()", Integer.class);
+
+		if (lastId != null) {
+			newUser.setUserNo(lastId);
+		}
 	}
 
 	@Override
