@@ -9,6 +9,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.team404.domain.Image;
 import com.team404.repository.ImageRepository;
+import com.team404.service.ImageService;
 
 @Service
 public class ImageServiceImpl implements ImageService {
@@ -17,10 +18,9 @@ public class ImageServiceImpl implements ImageService {
 	private ImageRepository imageRepository;
 
 	private static final String ROOT = "C:/team404_upload/";
-	private static final String URL_PREFIX = "/uploads/";
+	private static final String URL_PREFIX = "/team404_upload/";
 
-	// 단일 규칙: entityType -> "{entityType}Img"
-	// 디스크 폴더명과 URL 경로 segment를 같은 곳에서 파생시켜 어긋날 수 없게 함
+	// 경로 생성 규칙 메서드
 	private String subDir(String entityType) {
 		return entityType + "Img";
 	}
@@ -34,11 +34,10 @@ public class ImageServiceImpl implements ImageService {
 	}
 
 	// =========================
-	// 업로드
+	// 1. 이미지 업로드
 	// =========================
 	@Override
 	public void upload(List<MultipartFile> files, String entityType, int entityId) {
-
 		String folderPath = diskFolder(entityType);
 
 		File dir = new File(folderPath);
@@ -47,34 +46,32 @@ public class ImageServiceImpl implements ImageService {
 		}
 
 		for (MultipartFile file : files) {
-
 			if (file == null || file.isEmpty())
 				continue;
 
 			String originName = file.getOriginalFilename();
 			String saveName = System.currentTimeMillis() + "_" + originName;
-
 			File saveFile = new File(folderPath + saveName);
 
 			try {
 				file.transferTo(saveFile);
+
+				Image img = new Image();
+				img.setFileName(originName);
+				img.setFilePath(urlPath(entityType, saveName));
+				img.setEntityType(entityType);
+				img.setEntityId(entityId);
+				img.setThumbnail(false); // 도메인의 setThumbnail(boolean) 사용
+
+				imageRepository.insert(img);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-
-			Image img = new Image();
-			img.setFileName(originName);
-			img.setFilePath(urlPath(entityType, saveName));
-			img.setEntityType(entityType);
-			img.setEntityId(entityId);
-			img.setThumbnail(false);
-
-			imageRepository.insert(img);
 		}
 	}
 
 	// =========================
-	// 조회
+	// 2. 이미지 목록 조회
 	// =========================
 	@Override
 	public List<Image> getImages(String entityType, int entityId) {
@@ -82,29 +79,45 @@ public class ImageServiceImpl implements ImageService {
 	}
 
 	// =========================
-	// 삭제
+	// 3. 이미지 삭제
 	// =========================
 	@Override
 	public void delete(int imageNo) {
+		try {
+			// DB에서 이미지 정보를 먼저 조회하여 경로(filePath)를 확보
+			Image img = imageRepository.findByImageNo(imageNo);
+
+			if (img != null) {
+				// DB 저장 경로에서 URL 접두어를 지워 실제 디스크 경로
+				String relativePath = img.getFilePath().replace(URL_PREFIX, "");
+				File file = new File(ROOT + relativePath);
+
+				if (file.exists()) {
+					file.delete(); // 실제 파일 삭제
+				}
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		// DB 데이터 삭제
 		imageRepository.delete(imageNo);
 	}
 
 	// =========================
-	// 썸네일
+	// 4. 대표 이미지(썸네일) 설정
 	// =========================
 	@Override
 	public void setThumbnail(int imageNo, String entityType, int entityId) {
-
 		imageRepository.resetThumbnail(entityType, entityId);
 		imageRepository.setThumbnail(imageNo);
 	}
 
 	// =========================
-	// 썸네일 해제
+	// 5. 대표 이미지 해제
 	// =========================
 	@Override
 	public void cancelThumbnail(String entityType, int entityId) {
 		imageRepository.resetThumbnail(entityType, entityId);
 	}
-
 }

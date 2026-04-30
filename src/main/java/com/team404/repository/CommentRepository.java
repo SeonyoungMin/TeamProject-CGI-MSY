@@ -16,4 +16,6 @@ public interface CommentRepository {
 
 	// 댓글 삭제
 	int delete(int commentNo);
+
+	Comment findByCommentNo(int commentNo);
 }

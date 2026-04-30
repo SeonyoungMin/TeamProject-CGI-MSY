@@ -81,6 +81,15 @@ public class CommentRepositoryImpl implements CommentRepository {
 	}
 
 	// =========================
+	// 특정 댓글 한 개 조회 (수정 폼용)
+	// =========================
+	@Override
+	public Comment findByCommentNo(int commentNo) {
+		String sql = "SELECT * FROM comment WHERE comment_no = ?";
+		return jdbcTemplate.queryForObject(sql, commentRowMapper, commentNo);
+	}
+
+	// =========================
 	// 댓글 삭제
 	// =========================
 	@Override

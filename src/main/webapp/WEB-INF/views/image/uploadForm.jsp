@@ -8,7 +8,7 @@
 
 	<h2>이미지 업로드 테스트</h2>
 
-	<form action="${pageContext.request.contextPath}/image/upload"
+	<form action="${pageContext.request.contextPath}/images/upload"
 		method="post" enctype="multipart/form-data">
 
 		entityType: <select name="entityType">

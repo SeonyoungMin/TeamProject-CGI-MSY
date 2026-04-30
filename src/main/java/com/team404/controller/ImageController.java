@@ -1,70 +1,73 @@
 package com.team404.controller;
 
 import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-
+import org.springframework.web.multipart.MultipartFile;
 import com.team404.domain.Image;
 import com.team404.service.ImageService;
 
-
-
-//board와 user, product 기능과 병합했을때 쓰이는 API구조 url이 지금 테스트 jsp구조와 맞지 않음 , 테스트는 완료 상태 
-
-
-
-
-@RestController
-@RequestMapping("/api/images")
+@Controller
+@RequestMapping("/images")
 public class ImageController {
 
 	@Autowired
 	private ImageService imageService;
 
-	// =========================
-	// 이미지 목록 조회
-	// =========================
-	@GetMapping
-	public List<Image> list(@RequestParam String entityType, @RequestParam int entityId) {
-
-		return imageService.getImages(entityType, entityId);
+	// 업로드 폼 페이지
+	@GetMapping("/uploadForm")
+	public String uploadForm() {
+		return "image/uploadForm";
 	}
 
-	// =========================
-	// 이미지 업로드
-	// =========================
+	// 이미지 업로드 처리 후 목록으로 이동
 	@PostMapping("/upload")
-	public void upload(@RequestParam List<org.springframework.web.multipart.MultipartFile> files,
-			@RequestParam String entityType, @RequestParam int entityId) {
+	public String upload(@RequestParam("files") List<MultipartFile> files,
+			@RequestParam("entityType") String entityType, @RequestParam("entityId") int entityId) {
 
 		imageService.upload(files, entityType, entityId);
+		return "redirect:/images/list?entityType=" + entityType + "&entityId=" + entityId;
 	}
 
-	// =========================
-	// 대표 이미지 설정
-	// =========================
-	@PutMapping("/{imageNo}/thumbnail")
-	public void setThumbnail(@PathVariable int imageNo, @RequestParam String entityType, @RequestParam int entityId) {
+	// 이미지 목록 조회 페이지
+	@GetMapping("/list")
+	public String list(@RequestParam("entityType") String entityType, @RequestParam("entityId") int entityId,
+			Model model) {
+
+		List<Image> images = imageService.getImages(entityType, entityId);
+		model.addAttribute("images", images);
+		model.addAttribute("entityType", entityType);
+		model.addAttribute("entityId", entityId);
+
+		return "image/list";
+	}
+
+	// 1. 대표 설정 기능 추가
+	@GetMapping("/thumbnail")
+	public String setThumbnail(@RequestParam("imageNo") int imageNo, @RequestParam("entityType") String entityType,
+			@RequestParam("entityId") int entityId) {
 
 		imageService.setThumbnail(imageNo, entityType, entityId);
+		return "redirect:/images/list?entityType=" + entityType + "&entityId=" + entityId;
 	}
 
-	// =========================
-	// 대표 이미지 해제
-	// =========================
-	@DeleteMapping("/thumbnail")
-	public void cancelThumbnail(@RequestParam String entityType, @RequestParam int entityId) {
+	// 2. 대표 해제 기능 추가
+	@GetMapping("/thumbnail/cancel")
+	public String cancelThumbnail(@RequestParam("entityType") String entityType,
+			@RequestParam("entityId") int entityId) {
 
 		imageService.cancelThumbnail(entityType, entityId);
+		return "redirect:/images/list?entityType=" + entityType + "&entityId=" + entityId;
 	}
 
-	// =========================
 	// 이미지 삭제
-	// =========================
-	@DeleteMapping("/{imageNo}")
-	public void delete(@PathVariable int imageNo) {
+	@PostMapping("/delete")
+	public String delete(@RequestParam("imageNo") int imageNo, @RequestParam("entityType") String entityType,
+			@RequestParam("entityId") int entityId) {
 
 		imageService.delete(imageNo);
+		return "redirect:/images/list?entityType=" + entityType + "&entityId=" + entityId;
 	}
 }

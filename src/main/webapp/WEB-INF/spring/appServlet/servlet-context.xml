@@ -15,11 +15,26 @@
 	<context:component-scan
 		base-package="com.team404" />
 
+
 	<!-- 기존 리소스 -->
 	<resources mapping="/resources/**" location="/resources/" />
 
+	<!-- 이미지 업로드 경로 상세 매핑 -->
 
-	<resources mapping="/uploads/**"
+	<!-- 유저 이미지 경로 -->
+	<resources mapping="/team404_upload/userImg/**"
+		location="file:///C:/team404_upload/userImg/" />
+
+	<!-- 게시판 이미지 경로 -->
+	<resources mapping="/team404_upload/boardImg/**"
+		location="file:///C:/team404_upload/boardImg/" />
+
+	<!-- 상품 이미지 경로 -->
+	<resources mapping="/team404_upload/productImg/**"
+		location="file:///C:/team404_upload/productImg/" />
+
+	<!-- 전체 공통 경로 설정 -->
+	<resources mapping="/team404_upload/**"
 		location="file:///C:/team404_upload/" />
 
 	<!-- ViewResolver -->

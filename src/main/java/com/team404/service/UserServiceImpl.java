@@ -31,6 +31,12 @@ public class UserServiceImpl implements UserService {
 		if (userByNo == null) {
 			throw new NoUserFoundException(userNo);
 		}
+		List<Image> images = image.getImages("user", userNo);
+		if (images != null && !images.isEmpty()) {
+
+			userByNo.setUserImagePath(images.get(0).getFilePath());
+			userByNo.setUserImageName(images.get(0).getFileName());
+		}
 		return userByNo;
 	}
 

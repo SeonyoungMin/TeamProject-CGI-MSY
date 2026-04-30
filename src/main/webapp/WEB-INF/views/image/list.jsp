@@ -9,35 +9,41 @@
 
 	<h2>이미지 목록</h2>
 
-	<a href="${pageContext.request.contextPath}/image/uploadForm">업로드로 이동</a>
+
+	<a href="${pageContext.request.contextPath}/images/uploadForm">업로드로
+		이동</a>
 
 	<hr>
 
 	<c:forEach var="img" items="${images}">
 
-		<div style="margin-bottom: 20px;">
+		<div
+			style="margin-bottom: 20px; border-bottom: 1px solid #eee; padding-bottom: 10px;">
 
 			<img src="${pageContext.request.contextPath}${img.filePath}"
 				width="200" />
 
-			<p>${img.fileName}</p>
+			<p>파일명: ${img.fileName}</p>
 
-			<p>썸네일: ${img.thumbnail}</p>
+
+			<p>썸네일 여부: ${img.Thumbnail() ? '대표 이미지' : '일반'}</p>
 
 			<c:choose>
-				<c:when test="${img.thumbnail}">
+
+				<c:when test="${img.Thumbnail()}">
 					<a
-						href="${pageContext.request.contextPath}/image/thumbnail/cancel?entityType=${entityType}&entityId=${entityId}">
+						href="${pageContext.request.contextPath}/images/thumbnail/cancel?entityType=${entityType}&entityId=${entityId}">
 						대표 해제 </a>
 				</c:when>
 				<c:otherwise>
 					<a
-						href="${pageContext.request.contextPath}/image/thumbnail?imageNo=${img.imageNo}&entityType=${entityType}&entityId=${entityId}">
+						href="${pageContext.request.contextPath}/images/thumbnail?imageNo=${img.imageNo}&entityType=${entityType}&entityId=${entityId}">
 						대표 설정 </a>
 				</c:otherwise>
 			</c:choose>
 
-			<form action="${pageContext.request.contextPath}/image/delete"
+
+			<form action="${pageContext.request.contextPath}/images/delete"
 				method="post" style="display: inline;"
 				onsubmit="return confirm('정말 삭제하시겠습니까?');">
 				<input type="hidden" name="imageNo" value="${img.imageNo}">

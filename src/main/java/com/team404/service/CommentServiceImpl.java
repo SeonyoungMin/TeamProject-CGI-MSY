@@ -32,6 +32,12 @@ public class CommentServiceImpl implements CommentService {
 		repository.update(comment);
 	}
 
+	// 하나의 댓글 조회
+	@Override
+	public Comment getComment(int commentNo) {
+		return repository.findByCommentNo(commentNo);
+	}
+
 	// 댓글 삭제
 	@Override
 	public void deleteComment(int commentNo) {

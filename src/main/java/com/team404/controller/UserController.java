@@ -66,7 +66,7 @@ public class UserController {
 	@PutMapping("/users/edit")
 	public String submitEditUserForm(@ModelAttribute("editUser") User editUser) {
 		userService.setEditUser(editUser);
-		return "redirect:/users/" + editUser.getUserNo();
+		return "redirect:/users/search/" + editUser.getUserNo();
 	}
 
 	@DeleteMapping("/users/delete/{userNo}")
