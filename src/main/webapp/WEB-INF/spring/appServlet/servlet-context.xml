@@ -19,7 +19,8 @@
 	<resources mapping="/resources/**" location="/resources/" />
 
 
-	<resources mapping="/upload/**" location="file:///C:/team404_upload/" />
+	<resources mapping="/uploads/**"
+		location="file:///C:/team404_upload/" />
 	<!-- ViewResolver -->
 	<beans:bean
 		class="org.springframework.web.servlet.view.InternalResourceViewResolver">
