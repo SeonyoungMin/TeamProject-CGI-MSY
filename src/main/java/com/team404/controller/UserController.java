@@ -53,7 +53,7 @@ public class UserController {
 	@PostMapping("/users")
 	public String submitNewUserForm(@ModelAttribute("newUser") User newUser, BindingResult bindingResult) {
 		userService.setNewUser(newUser);
-		return "redirect:/users/search";
+		return "redirect:/users/search/";
 	}
 
 	@GetMapping("/users/edit/{userNo}")

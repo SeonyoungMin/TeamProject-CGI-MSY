@@ -158,13 +158,16 @@ public class UserServiceImpl implements UserService {
 
 		// 2. 이미지 처리
 		if (editUser.getUserImageFile() != null && !editUser.getUserImageFile().isEmpty()) {
-			// 새 이미지가 업로드된 경우: 본인의 ImageService 호출
-			List<MultipartFile> imageList = Collections.singletonList(editUser.getUserImageFile());
 
-			// 필요하다면 기존 이미지를 먼저 삭제하는 로직을 ImageService에 추가하거나 호출하세요.
+			List<Image> oldImages = image.getImages("user", editUser.getUserNo());
+			for (Image oldImg : oldImages) {
+				image.delete(oldImg.getImageNo());
+			}
+
+			// 새 이미지 업로드
+			List<MultipartFile> imageList = Collections.singletonList(editUser.getUserImageFile());
 			image.upload(imageList, "user", editUser.getUserNo());
 		}
-		// 이미지가 비어있다면 기존 이미지 정보를 유지하도록 설정 (DB 설계에 따라 다름)
 
 		userRepository.setEditUser(editUser);
 	}
