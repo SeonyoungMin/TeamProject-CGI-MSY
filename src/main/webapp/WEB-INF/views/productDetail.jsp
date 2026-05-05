@@ -12,10 +12,12 @@
 	<hr>
 
 	<c:choose>
-		<c:when test="${not empty listByProductNo.imgName}">
-			<img
-				src="<c:url value='/upload/productImg/${listByProductNo.imgName}'/>"
-				width="200" height="200">
+		<c:when test="${not empty listByProductNo.images}">
+			<c:forEach var="img" items="${listByProductNo.images}">
+				<img
+					src="<c:url value='/upload/productImg/${img.fileName}'/>"
+					width="200" height="200">
+			</c:forEach>
 		</c:when>
 		<c:otherwise>
 			<p>이미지 없음</p>
@@ -28,7 +30,8 @@
 	<div>카테고리 : ${listByProductNo.category}</div>
 	<div>가격 : ${listByProductNo.price}원</div>
 	<div>설명 : ${listByProductNo.description}</div>
-	<div>거래 상태 :
+	<div>
+		거래 상태 :
 		<c:choose>
 			<c:when test="${listByProductNo.tradeStatus == '판매중'}">판매중</c:when>
 			<c:when test="${listByProductNo.tradeStatus == '예약중'}">예약중</c:when>

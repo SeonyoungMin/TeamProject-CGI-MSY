@@ -34,7 +34,10 @@ public class ProductServiceImpl implements ProductService {
 
 	// 상품 상세 조회 (productNo 기준)
 	public ProductDetailDto findProductDetail(int productNo) {
-		return productRepository.findProductDetail(productNo);
+			ProductDetailDto detail = productRepository.findProductDetail(productNo);
+			List<Image> images = productRepository.findImagesByProduct(productNo);
+			detail.setImages(images);
+			return detail;
 	}
 
 	// 상품 조건 조회(키워드 검색)

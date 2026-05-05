@@ -51,9 +51,9 @@ public class ProductRepositoryImpl implements ProductRepository {
 
 	// 상품 조건 조회 (키워드)
 	public List<ProductListDto> findByKeyword(String keyword) {
-		String SQL = "select p.product_no, p.name, p.category, p.price, p.trade_status, p.create_time, "
-				+ "o.seller_no, i.file_name as img_name, i.file_path as img_path " + "from product p "
-				+ "left join orders o on o.product_no = p.product_no "
+		String SQL = "select p.product_no, p.name, p.category, p.price, p.trade_status, p.created_time, "
+				+ "o.seller_no, u.nickname as seller_nickname, i.file_name as img_name, i.file_path as img_path " + "from product p "
+				+ "left join orders o on o.product_no = p.product_no " + "left join users u on u.user_no = o.seller_no "
 				+ "left join image i on i.entity_type = 'product' and i.entity_id = p.product_no and i.is_thumbnail = 1 "
 				+ "where p.name like ?";
 		return template.query(SQL, new ProductListRowMapper(), "%" + keyword + "%");
@@ -61,9 +61,9 @@ public class ProductRepositoryImpl implements ProductRepository {
 	
 	//카테고리 조회
 	public List<ProductListDto> findByCategory(String category) {
-		String SQL = "select p.product_no, p.name, p.category, p.price, p.trade_status, p.create_time, "
-				+ "o.seller_no, i.file_name as img_name, i.file_path as img_path " + "from product p "
-				+ "left join orders o on o.product_no = p.product_no "
+		String SQL = "select p.product_no, p.name, p.category, p.price, p.trade_status, p.created_time, "
+				+ "o.seller_no, u.nickname as seller_nickname, i.file_name as img_name, i.file_path as img_path " + "from product p "
+				+ "left join orders o on o.product_no = p.product_no " + "left join users u on u.user_no = o.seller_no "
 				+ "left join image i on i.entity_type = 'product' and i.entity_id = p.product_no and i.is_thumbnail = 1 "
 				+ "where p.category=?";
 		return template.query(SQL, new ProductListRowMapper(), category);
@@ -71,9 +71,9 @@ public class ProductRepositoryImpl implements ProductRepository {
 	
 	//내 판매목록 조회
 	public List<ProductListDto> findBySeller(int sellerNo) {
-		String SQL = "select p.product_no, p.name, p.category, p.price, p.trade_status, p.create_time, "
-				+ "o.seller_no, i.file_name as img_name, i.file_path as img_path " + "from product p "
-				+ "left join orders o on o.product_no = p.product_no "
+		String SQL = "select p.product_no, p.name, p.category, p.price, p.trade_status, p.created_time, "
+				+ "o.seller_no, u.nickname as seller_nickname, i.file_name as img_name, i.file_path as img_path " + "from product p "
+				+ "left join orders o on o.product_no = p.product_no " + "left join users u on u.user_no = o.seller_no "
 				+ "left join image i on i.entity_type = 'product' and i.entity_id = p.product_no and i.is_thumbnail = 1 "
 				+ "where o.seller_no=?";
 		return template.query(SQL, new ProductListRowMapper(), sellerNo);
@@ -109,7 +109,7 @@ public class ProductRepositoryImpl implements ProductRepository {
 	
 	//상품 삭제
 	public void deleteProduct(int productNo) {
-		String SQL = "delet from product where product_no=?";
+		String SQL = "delete from product where product_no=?";
 		template.update(SQL, productNo);
 	}
 	
@@ -135,13 +135,6 @@ public class ProductRepositoryImpl implements ProductRepository {
 	//이미지 여러개 보기에 하는 기능
 	public List<Image> findImagesByProduct(int productNo) {
 	    String SQL = "select * from image where entity_type='product' and entity_id=?";
-	    return template.query(SQL, (rs, rowNum) -> {
-	        Image image = new Image();
-	        image.setImageNo(rs.getInt("image_no"));
-	        image.setFileName(rs.getString("file_name"));
-	        image.setFilePath(rs.getString("file_path"));
-	        image.setIsThumnail(rs.getInt("is_Thumnail"));
-	        return image;
-	    }, productNo);
+	    return template.query(SQL, new ImageRowMapper() ,productNo);
 	}
 }

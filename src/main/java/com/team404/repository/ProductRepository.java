@@ -44,4 +44,7 @@ public interface ProductRepository {
 	
 	//상품 등록 orders 추가
 	public void insertOrder(int productNo, int sellerNo);
+	
+	//상세페이지 이미지 여러 장 조회
+	public List<Image> findImagesByProduct(int productNo);
 }

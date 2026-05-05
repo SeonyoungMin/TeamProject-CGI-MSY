@@ -8,12 +8,12 @@
 <title>상품 목록</title>
 </head>
 <body>
-	<a href="<c:url value="/welcome"/>">메인</a>
+	<a href="<c:url value='/welcome'/>">메인</a>
 	<h1>상품 목록</h1>
 	<hr>
 
 	<a href="<c:url value='/product/new'/>">상품 등록</a>
-	<br>
+	<br> 
 	<br>
 
 	<form action="<c:url value='/product/search'/>" method="get">
@@ -21,6 +21,7 @@
 			value="${keyword}">
 		<button type="submit">검색</button>
 	</form>
+	<a href="<c:url value='/product/mylist'/>">내 판매목록</a>
 	<br>
 
 	<a href="<c:url value='/product/category?category=의류'/>">의류</a> |
@@ -46,9 +47,9 @@
 					<a href="<c:url value='/product/${p.productNo}'/>">${p.productName}</a>
 					| ${p.category} | ${p.price}원 |
 					<c:choose>
-						<c:when test="${p.tradeStatus == '판매중'}">판매중</c:when>
-						<c:when test="${p.tradeStatus == '예약중'}">예약중</c:when>
-						<c:when test="${p.tradeStatus == '판매완료'}">판매완료</c:when>
+						<c:when test="${p.tradeStatus == 'SALE'}">판매중</c:when>
+						<c:when test="${p.tradeStatus == 'RESERVED'}">예약중</c:when>
+						<c:when test="${p.tradeStatus == 'DONE'}">판매완료</c:when>
 					</c:choose>
 					| ${p.sellerNickname}
 				</div>

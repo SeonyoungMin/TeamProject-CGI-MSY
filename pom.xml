@@ -143,11 +143,6 @@
 			<version>4.13.2</version>
 			<scope>test</scope>
 		</dependency>
-		<dependency>
-			<groupId>com.springmvc</groupId>
-			<artifactId>Application</artifactId>
-			<version>1.0.0-BUILD-SNAPSHOT</version>
-		</dependency>
 	</dependencies>
 
 	<build>

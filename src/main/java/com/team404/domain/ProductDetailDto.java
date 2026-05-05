@@ -1,6 +1,7 @@
 package com.team404.domain;
 
 import java.sql.Timestamp;
+import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 
@@ -28,6 +29,9 @@ public class ProductDetailDto {
 	// image 테이블 데이터 (entity_type='product', is_thumbnail=1)
 	private String imgName;
 	private String imgPath;
+	
+	// 상세페이지 이미지 여러장 보이게 하는 기능
+	private List<Image> images;
 
 	public int getProductNo() {
 		return productNo;
@@ -124,4 +128,13 @@ public class ProductDetailDto {
 	public void setSellerNickname(String sellerNickname) {
 		this.sellerNickname = sellerNickname;
 	}
+
+	public List<Image> getImages() {
+		return images;
+	}
+
+	public void setImages(List<Image> images) {
+		this.images = images;
+	}
+	
 }

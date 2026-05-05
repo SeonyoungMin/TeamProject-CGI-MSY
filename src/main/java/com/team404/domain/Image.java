@@ -1,6 +1,7 @@
 package com.team404.domain;
 
 import java.sql.Timestamp;
+import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 
@@ -82,11 +83,13 @@ public class Image {
 	public void setCreatedTime(Timestamp createdTime) {
 		this.createdTime = createdTime;
 	}
+	
+
 
 	@Override
 	public String toString() {
 		return "Image [imageNo=" + imageNo + ", fileName=" + fileName + ", filePath=" + filePath + ", entitlyType="
-				+ entitlyType + ", entityId=" + entityId + ", isThumnail=" + isThumnail + ", createdTime=" + createdTime
+				+ entitlyType + ", entityId=" + entityId + ", isThumnail=" + isThumbnail + ", createdTime=" + createdTime
 				+ "]";
 	}
 	

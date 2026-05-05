@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.web.multipart.MultipartFile;
 
+import com.team404.domain.Image;
 import com.team404.domain.Product;
 import com.team404.domain.ProductDetailDto;
 import com.team404.domain.ProductListDto;

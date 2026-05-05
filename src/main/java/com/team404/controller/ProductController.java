@@ -27,6 +27,11 @@ public class ProductController {
 	@Autowired
 	private ProductService productService;
 	
+	@GetMapping("/welcome")
+	public String welcome() {
+	    return "welcome"; // welcome.jsp
+	}
+	
 	//상품 전체 목록 조회 (+페이징)
 	@GetMapping("/productList")
 	public String getProductList(@RequestParam(value="pageNum", defaultValue="1") int pageNum, 
@@ -58,7 +63,7 @@ public class ProductController {
 	@GetMapping("/product/search")
 	public String searchProducts (@RequestParam("keyword") String keyword, Model model) {
 		List<ProductListDto> searchByKeyword = productService.findByKeyword(keyword);
-		model.addAttribute("searchByKeyword",searchByKeyword);
+		model.addAttribute("list",searchByKeyword);
 		model.addAttribute("keyword", keyword);
 		return "productList";
 	}
@@ -67,7 +72,7 @@ public class ProductController {
 	@GetMapping("/product/category")
 	public String getProductsByCategory (@RequestParam("category") String category, Model model) {
 		List<ProductListDto> listByCategory = productService.findByCategory(category);
-		model.addAttribute("listByCategory",listByCategory);
+		model.addAttribute("list",listByCategory);
 		model.addAttribute("category",category);
 		return "productList";
 	}
@@ -78,7 +83,8 @@ public class ProductController {
 //		if (session.getAttribute("loginMemberNo") == null) {
 //			return "redirect:/login"; //아침님이 구현한 로그인 페이지로 돌아가게끔 url경로 바꿔야함
 //		}
-		int loginMemberNo = (int) session.getAttribute("loginMemberNo");
+//		int loginMemberNo = (int) session.getAttribute("loginMemberNo");
+		int loginMemberNo = 1;
 		List<ProductListDto> mySalesList = productService.findBySeller(loginMemberNo);
 		model.addAttribute("list", mySalesList);
 		return "productList";
