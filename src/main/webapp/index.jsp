@@ -13,8 +13,8 @@
 <hr>
 
 <!-- 게시글 목록으로 이동 -->
-<a href="${pageContext.request.contextPath}/board/list">
-    게시글 보기
+<a href="${pageContext.request.contextPath}/home">
+    홈으로
 </a>
 
 </body>
