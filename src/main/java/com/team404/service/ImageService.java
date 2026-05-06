@@ -12,8 +12,11 @@ public interface ImageService {
 	// 이미지 조회
 	List<Image> getImages(String entityType, int entityId);
 
-	// 이미지 삭제
+	// 이미지 단건 삭제
 	void delete(int imageNo);
+
+	// 엔티티 단위 일괄 삭제 (파일 + DB) — 상품 삭제 시 사용
+	void deleteByEntity(String entityType, int entityId);
 
 	// 썸네일 설정
 	void setThumbnail(int imageNo, String entityType, int entityId);

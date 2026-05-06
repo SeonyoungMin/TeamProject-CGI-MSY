@@ -5,13 +5,15 @@ import java.sql.Timestamp;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
 public class Image {
-	private int imageNo;
-	private String fileName; // 원본 이름
-	private String filePath; // 실제 저장 경로
-	private String entityType; // profile / product / board
-	private int entityId; // user_no / product_no / board_no
 
-	private boolean Thumbnail;
+	private int imageNo;
+	private String fileName;
+	private String filePath;
+	private String entityType;
+	private int entityId;
+
+	private boolean thumbnail;
+
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
 	private Timestamp createdTime;
 
@@ -31,6 +33,14 @@ public class Image {
 		this.fileName = fileName;
 	}
 
+	public String getFilePath() {
+		return filePath;
+	}
+
+	public void setFilePath(String filePath) {
+		this.filePath = filePath;
+	}
+
 	public String getEntityType() {
 		return entityType;
 	}
@@ -47,12 +57,12 @@ public class Image {
 		this.entityId = entityId;
 	}
 
-	public boolean Thumbnail() {
-		return Thumbnail;
+	public boolean isThumbnail() {
+		return thumbnail;
 	}
 
-	public void setThumbnail(boolean Thumbnail) {
-		this.Thumbnail = Thumbnail;
+	public void setThumbnail(boolean thumbnail) {
+		this.thumbnail = thumbnail;
 	}
 
 	public Timestamp getCreatedTime() {
@@ -61,13 +71,5 @@ public class Image {
 
 	public void setCreatedTime(Timestamp createdTime) {
 		this.createdTime = createdTime;
-	}
-
-	public String getFilePath() {
-		return filePath;
-	}
-
-	public void setFilePath(String filePath) {
-		this.filePath = filePath;
 	}
 }

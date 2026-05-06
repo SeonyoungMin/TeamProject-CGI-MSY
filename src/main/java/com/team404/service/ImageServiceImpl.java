@@ -9,7 +9,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.team404.domain.Image;
 import com.team404.repository.ImageRepository;
-import com.team404.service.ImageService;
 
 @Service
 public class ImageServiceImpl implements ImageService {
@@ -45,12 +44,19 @@ public class ImageServiceImpl implements ImageService {
 			dir.mkdirs();
 		}
 
+		//첫 번째 이미지 자동 썸네일 지정용 — 해당 엔티티에 이미 이미지가 있으면 false
+		boolean hasExisting = !imageRepository.findByEntity(entityType, entityId).isEmpty();
+		boolean isFirstUpload = !hasExisting;
+
 		for (MultipartFile file : files) {
 			if (file == null || file.isEmpty())
 				continue;
 
 			String originName = file.getOriginalFilename();
-			String saveName = System.currentTimeMillis() + "_" + originName;
+
+			//파일명 생성 방식 entityType + entityId + timestamp로 변경
+			String saveName = entityType + "_" + entityId + "_" + System.currentTimeMillis() + "_" + originName;
+
 			File saveFile = new File(folderPath + saveName);
 
 			try {
@@ -61,7 +67,10 @@ public class ImageServiceImpl implements ImageService {
 				img.setFilePath(urlPath(entityType, saveName));
 				img.setEntityType(entityType);
 				img.setEntityId(entityId);
-				img.setThumbnail(false); // 도메인의 setThumbnail(boolean) 사용
+
+				//첫 이미지만 thumbnail = true, 나머지는 false
+				img.setThumbnail(isFirstUpload);
+				isFirstUpload = false;
 
 				imageRepository.insert(img);
 			} catch (Exception e) {
@@ -79,7 +88,7 @@ public class ImageServiceImpl implements ImageService {
 	}
 
 	// =========================
-	// 3. 이미지 삭제
+	// 3. 이미지 단건 삭제
 	// =========================
 	@Override
 	public void delete(int imageNo) {
@@ -105,7 +114,33 @@ public class ImageServiceImpl implements ImageService {
 	}
 
 	// =========================
-	// 4. 대표 이미지(썸네일) 설정
+	// 4. [NEW] 엔티티 단위 일괄 삭제 — 상품/유저/게시글 삭제 시 호출
+	// =========================
+	@Override
+	public void deleteByEntity(String entityType, int entityId) {
+		List<Image> images = imageRepository.findByEntity(entityType, entityId);
+
+		// 1) 디스크의 실제 파일 삭제
+		for (Image img : images) {
+			try {
+				String relativePath = img.getFilePath().replace(URL_PREFIX, "");
+				File file = new File(ROOT + relativePath);
+				if (file.exists()) {
+					file.delete();
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+
+		// 2) DB 레코드 일괄 삭제 (단건 delete 재사용 — 트랜잭션 처리는 호출측에서)
+		for (Image img : images) {
+			imageRepository.delete(img.getImageNo());
+		}
+	}
+
+	// =========================
+	// 5. 대표 이미지(썸네일) 설정
 	// =========================
 	@Override
 	public void setThumbnail(int imageNo, String entityType, int entityId) {
@@ -114,7 +149,7 @@ public class ImageServiceImpl implements ImageService {
 	}
 
 	// =========================
-	// 5. 대표 이미지 해제
+	// 6. 대표 이미지 해제
 	// =========================
 	@Override
 	public void cancelThumbnail(String entityType, int entityId) {

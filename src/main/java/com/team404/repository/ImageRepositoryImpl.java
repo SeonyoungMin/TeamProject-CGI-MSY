@@ -28,7 +28,7 @@ public class ImageRepositoryImpl implements ImageRepository {
 	public void insert(Image image) {
 		String sql = "INSERT INTO image (file_name, file_path, entity_type, entity_id, is_thumbnail) VALUES (?, ?, ?, ?, ?)";
 		jdbcTemplate.update(sql, image.getFileName(), image.getFilePath(), image.getEntityType(), image.getEntityId(),
-				image.Thumbnail());
+				image.isThumbnail());
 	}
 
 	@Override
