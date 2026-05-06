@@ -1,38 +1,27 @@
 package com.team404.domain;
 
 import java.sql.Timestamp;
-import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 
 public class Image {
-	private Integer imageNo;
+
+	private int imageNo;
 	private String fileName;
 	private String filePath;
-	private String entitlyType;
+	private String entityType;
 	private int entityId;
-	private int isThumbnail;
+
+	private boolean thumbnail;
+
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
 	private Timestamp createdTime;
-	
-	public Image(String fileName, String filePath, String entitlyType, int entityId, int isThumnail) {
-		super();
-		this.fileName = fileName;
-		this.filePath = filePath;
-		this.entitlyType = entitlyType;
-		this.entityId = entityId;
-		this.isThumbnail = isThumnail;
-	}
 
-	public Image() {
-		// TODO Auto-generated constructor stub
-	}
-
-	public Integer getImageNo() {
+	public int getImageNo() {
 		return imageNo;
 	}
 
-	public void setImageNo(Integer imageNo) {
+	public void setImageNo(int imageNo) {
 		this.imageNo = imageNo;
 	}
 
@@ -52,12 +41,12 @@ public class Image {
 		this.filePath = filePath;
 	}
 
-	public String getEntitlyType() {
-		return entitlyType;
+	public String getEntityType() {
+		return entityType;
 	}
 
-	public void setEntitlyType(String entitlyType) {
-		this.entitlyType = entitlyType;
+	public void setEntityType(String entityType) {
+		this.entityType = entityType;
 	}
 
 	public int getEntityId() {
@@ -68,12 +57,12 @@ public class Image {
 		this.entityId = entityId;
 	}
 
-	public int getIsThumnail() {
-		return isThumbnail;
+	public boolean isThumbnail() {
+		return thumbnail;
 	}
 
-	public void setIsThumnail(int isThumnail) {
-		this.isThumbnail = isThumnail;
+	public void setThumbnail(boolean thumbnail) {
+		this.thumbnail = thumbnail;
 	}
 
 	public Timestamp getCreatedTime() {
@@ -83,16 +72,10 @@ public class Image {
 	public void setCreatedTime(Timestamp createdTime) {
 		this.createdTime = createdTime;
 	}
-	
 
-
-	@Override
-	public String toString() {
-		return "Image [imageNo=" + imageNo + ", fileName=" + fileName + ", filePath=" + filePath + ", entitlyType="
-				+ entitlyType + ", entityId=" + entityId + ", isThumnail=" + isThumbnail + ", createdTime=" + createdTime
-				+ "]";
+	public void setIsThumbnail(int int1) {
+		// TODO Auto-generated method stub
+		
 	}
-	
-	
-	
 }
+

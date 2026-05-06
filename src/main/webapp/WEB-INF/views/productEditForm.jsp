@@ -30,8 +30,9 @@
 		<div>
 			현재 이미지 :
 			<c:choose>
-				<c:when test="${not empty update.imgName}">
-					<img src="<c:url value='/upload/productImg/${update.imgName}'/>" width="100" height="100">
+				<c:when test="${not empty update.imgPath}">
+					<img src="<c:url value='${update.imgPath}'/>" width="100" height="100" alt="${update.imgName}">
+
 				</c:when>
 				<c:otherwise>없음</c:otherwise>
 			</c:choose>

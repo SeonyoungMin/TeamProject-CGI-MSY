@@ -14,9 +14,14 @@
 	<c:choose>
 		<c:when test="${not empty listByProductNo.images}">
 			<c:forEach var="img" items="${listByProductNo.images}">
+<<<<<<< HEAD
 				<img
 					src="<c:url value='/upload/productImg/${img.fileName}'/>"
 					width="200" height="200">
+=======
+				<img src="<c:url value='${img.filePath}'/>" width="200" height="200"
+					alt="${img.fileName}">
+>>>>>>> branch 'main' of https://github.com/SeonyoungMin/TeamProject-JAC-CGI-MSY.git
 			</c:forEach>
 		</c:when>
 		<c:otherwise>

@@ -14,9 +14,9 @@ public class ImageRowMapper implements RowMapper<Image> {
 		image.setImageNo(rs.getInt("image_no"));
 		image.setFileName(rs.getString("file_name"));
 		image.setFilePath(rs.getString("file_path"));
-		image.setEntitlyType(rs.getString("entity_type"));
+		image.setEntityType(rs.getString("entity_type"));
 		image.setEntityId(rs.getInt("entity_id"));
-		image.setIsThumnail(rs.getInt("is_thumbnail"));
+		image.setIsThumbnail(rs.getInt("is_thumbnail"));
 		image.setCreatedTime(rs.getTimestamp("created_time"));
 		return image;
 	}

@@ -40,9 +40,9 @@
 		<c:otherwise>
 			<c:forEach var="p" items="${list}">
 				<div>
-					<c:if test="${not empty p.imgName}">
-						<img src="<c:url value='/upload/productImg/${p.imgName}'/>"
-							width="50" height="50">
+					<c:if test="${not empty p.imgPath}">
+						<img src="<c:url value='${p.imgPath}'/>"
+							width="50" height="50" alt="${p.imgName}">
 					</c:if>
 					<a href="<c:url value='/product/${p.productNo}'/>">${p.productName}</a>
 					| ${p.category} | ${p.price}원 |

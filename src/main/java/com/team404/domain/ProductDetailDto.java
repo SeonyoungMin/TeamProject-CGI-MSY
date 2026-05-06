@@ -29,8 +29,9 @@ public class ProductDetailDto {
 	// image 테이블 데이터 (entity_type='product', is_thumbnail=1)
 	private String imgName;
 	private String imgPath;
-	
-	// 상세페이지 이미지 여러장 보이게 하는 기능
+
+
+	// 상세페이지 이미지 여러장 — 공통 Image 도메인 사용 (ProductImage 제거)
 	private List<Image> images;
 
 	public int getProductNo() {
@@ -96,7 +97,7 @@ public class ProductDetailDto {
 	public void setSellerNo(int sellerNo) {
 		this.sellerNo = sellerNo;
 	}
-	
+
 	public int getBuyerNo() {
 		return buyerNo;
 	}
@@ -136,5 +137,5 @@ public class ProductDetailDto {
 	public void setImages(List<Image> images) {
 		this.images = images;
 	}
-	
+
 }

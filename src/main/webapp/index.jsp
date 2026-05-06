@@ -1,28 +1,21 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8"%>
-<!DOCTYPE html>
+<%@ page contentType="text/html;charset=UTF-8"%>
 <html>
 <head>
-<title>업로드 테스트</title>
+<title>MINIMARKET</title>
 </head>
+
 <body>
 
-	<h2>이미지 업로드</h2>
+<h1>MINIMARKET</h1>
 
-	<form action="${pageContext.request.contextPath}/uploadImage"
-		method="post" enctype="multipart/form-data">
+<p>환영합니다</p>
 
-		<select name="type">
-			<option value="user">user</option>
-			<option value="product">product</option>
-			<option value="board">board</option>
-		</select> <br>
-		<br> <input type="file" name="file" /> <br>
-		<br>
-		<button type="submit">업로드</button>
+<hr>
 
-	</form>
-
-	<p>${msg}</p>
+<!-- 게시글 목록으로 이동 -->
+<a href="${pageContext.request.contextPath}/board/list">
+    게시글 보기
+</a>
 
 </body>
 </html>
