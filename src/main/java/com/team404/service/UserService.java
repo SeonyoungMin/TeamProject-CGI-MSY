@@ -9,15 +9,18 @@ import com.team404.domain.SearchDTO;
 import com.team404.domain.User;
 
 public interface UserService {
-		
-	// 전체 유저 조회 + 페이징 기능 구현 예정
-	List<User> getAllUsers();
-	
+
+	// 페이징용 — 전체 행 수
+	int countAll();
+
+	// 전체 유저 조회 (페이징)
+	List<User> getAllUsers(SearchDTO searchDTO, int pageNumber, int limit);
+
 	// 유저 번호로 조회
 	User getUserByNo(int userNo);
-	
-	// 개별 R 메서드를 검색 DTO 활용한 통합검색 메서드로!
-	List<User> adminSearchUser(SearchDTO searchDTO);
+
+	// 검색 DTO 통합검색 (페이징, 결과 개수는 SearchDTO.totalRows 에 채워짐)
+	List<User> adminSearchUser(SearchDTO searchDTO, int pageNumber, int limit);
 	
 	// 유저 ID로 조회
 	User getUserById(String userId);

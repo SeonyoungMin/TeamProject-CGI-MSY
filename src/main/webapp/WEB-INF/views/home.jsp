@@ -1,5 +1,5 @@
 <%@ page contentType="text/html; charset=UTF-8" language="java"%>
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="c" uri="jakarta.tags.core"%>
 <meta charset="UTF-8">
 
 <style>
@@ -128,8 +128,11 @@
 				<button
 					style="width: 160px; height: 45px; background: #121212; color: white; border: none; cursor: pointer;">상품
 					둘러보기</button>
-				<button
-					style="width: 160px; height: 45px; margin-left: 10px; background: white; border: 1px solid #ddd; cursor: pointer;">글쓰기</button>
+				<a href="${pageContext.request.contextPath}/register">
+					<button
+						style="width: 160px; height: 45px; margin-left: 10px; background: white; border: 1px solid #ddd; cursor: pointer;">
+						글쓰기</button>
+				</a>
 			</div>
 		</div>
 
@@ -168,7 +171,7 @@ var ctx = "${pageContext.request.contextPath}";
 
 function loadProducts(page) {
     var pageNum = page || 1;
-    // 백틱 대신 문자열 연결(+)을 사용하여 JSP 파싱 에러 방지
+    
     var url = ctx + "/productList?pageNum=" + pageNum + "&dataOnly=true"; 
     
     fetch(url)
