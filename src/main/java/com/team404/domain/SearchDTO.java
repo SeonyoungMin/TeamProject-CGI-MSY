@@ -3,8 +3,9 @@ package com.team404.domain;
 import java.time.LocalDateTime;
 
 public class SearchDTO {
-	
+
 	private String searchMode;
+	private int totalRows;
 	private String userId;
 	private String userName;
 	private String userNickName;
@@ -20,8 +21,19 @@ public class SearchDTO {
 	private Integer maxBuyCount;
 	private Integer minSellCount;
 	private Integer maxSellCount;
-	
+
+	// 검색 결과 총 개수 (페이지네이션 계산용)
+
 	public SearchDTO() {
+		this.searchMode = "info";
+	}
+
+	public int getTotalRows() {
+		return totalRows;
+	}
+
+	public void setTotalRows(int totalRows) {
+		this.totalRows = totalRows;
 	}
 
 	public String getSearchMode() {
@@ -55,7 +67,7 @@ public class SearchDTO {
 	public void setUserNickName(String userNickName) {
 		this.userNickName = userNickName;
 	}
-	
+
 	public Integer getStartUserAge() {
 		return startUserAge;
 	}
@@ -79,7 +91,7 @@ public class SearchDTO {
 	public void setUserAddress(String userAddress) {
 		this.userAddress = userAddress;
 	}
-	
+
 	public String getUserPhone() {
 		return userPhone;
 	}
@@ -151,5 +163,5 @@ public class SearchDTO {
 	public void setMaxSellCount(Integer maxSellCount) {
 		this.maxSellCount = maxSellCount;
 	}
-	
+
 }

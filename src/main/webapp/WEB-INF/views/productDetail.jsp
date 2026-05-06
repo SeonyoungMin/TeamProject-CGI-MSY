@@ -1,5 +1,5 @@
 <%@ page contentType="text/html; charset=UTF-8" language="java"%>
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="c" uri="jakarta.tags.core"%>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
 <meta charset="UTF-8">
 
@@ -245,6 +245,23 @@
 						<span id="favHeart">♡</span> 찜하기
 					</button>
 				</div>
+
+				<%-- 본인이 올린 상품일 때만 수정/삭제 노출 --%>
+				<c:if
+					test="${sessionScope.loginUser != null && sessionScope.loginUser.userNo == listByProductNo.sellerNo}">
+					<div class="action-group" style="margin-top: 15px;">
+						<a
+							href="<c:url value='/product/${listByProductNo.productNo}/edit'/>"
+							style="flex: 1; height: 45px; line-height: 45px; text-align: center; background: #fff; border: 1px solid #121212; color: #121212; text-decoration: none; border-radius: 6px;">수정</a>
+						<form
+							action="<c:url value='/product/${listByProductNo.productNo}'/>"
+							method="post" style="flex: 1; margin: 0;">
+							<input type="hidden" name="_method" value="DELETE">
+							<button type="submit" onclick="return confirm('삭제하시겠습니까?')"
+								style="width: 100%; height: 45px; background: #fff; border: 1px solid #e74c3c; color: #e74c3c; border-radius: 6px; cursor: pointer;">삭제</button>
+						</form>
+					</div>
+				</c:if>
 			</div>
 		</div>
 
@@ -262,8 +279,10 @@
 
 	<script>
     const productNo = "${listByProductNo.productNo}";
-    const userNo = "${sessionScope.loginUser.userNo}"; 
+    const userNo = "${sessionScope.loginUser.userNo}";
+    const userRole = "${sessionScope.loginUser.userRole}";
     const ctx = "${pageContext.request.contextPath}";
+    const isAdmin = (userRole === "ROLE_ADMIN");
 
     function checkLoginAndRedirect() {
         if (!userNo || userNo === "") {
@@ -301,9 +320,18 @@
             method: 'POST',
             headers: {'Content-Type': 'application/x-www-form-urlencoded'},
             body: "userNo=" + userNo + "&boardNo=" + productNo
-        }).then(() => {
+        }).then(res => {
+            // 서버 실패 시 UI를 토글하지 않음 — 콘솔/네트워크탭에서 원인 확인 가능
+            if (!res.ok) {
+                console.error("favorite request failed:", res.status, res.statusText);
+                alert("찜 처리에 실패했습니다 (status " + res.status + "). 콘솔의 네트워크 탭을 확인해주세요.");
+                return;
+            }
             btn.classList.toggle('active');
             document.getElementById('favHeart').innerText = isActive ? '♡' : '♥';
+        }).catch(err => {
+            console.error("favorite network error:", err);
+            alert("네트워크 오류로 찜 처리에 실패했습니다.");
         });
     }
 
@@ -312,14 +340,61 @@
             .then(res => res.json())
             .then(data => {
                 const list = document.getElementById('commentList');
-                list.innerHTML = data.map(c => 
-                    '<div class="comment-list-item">' +
+                const myUserNo = userNo ? parseInt(userNo) : null;
+
+                list.innerHTML = data.map(c => {
+                    const isOwner = (myUserNo !== null && myUserNo === c.authorNo);
+                    // 본인 → 수정 + 삭제, 관리자 → 삭제만 (본인이면서 관리자여도 중복 방지)
+                    let actions = '';
+                    if (isOwner) {
+                        actions =
+                            '<button onclick="editComment(' + c.commentNo + ')" style="margin-right:5px;">수정</button>' +
+                            '<button onclick="deleteComment(' + c.commentNo + ')">삭제</button>';
+                    } else if (isAdmin) {
+                        actions = '<button onclick="deleteComment(' + c.commentNo + ')">삭제</button>';
+                    }
+
+                    return '<div class="comment-list-item" id="comment-' + c.commentNo + '">' +
                         '<strong>' + (c.nickname || '익명') + '</strong> ' +
                         '<span style="font-size:12px; color:#999; margin-left:10px;">' + c.createdTime + '</span>' +
-                        '<p style="margin-top:10px;">' + c.content + '</p>' +
-                    '</div>'
-                ).join('');
+                        '<p style="margin-top:10px;" id="comment-content-' + c.commentNo + '">' + c.content + '</p>' +
+                        '<div style="margin-top:5px;">' + actions + '</div>' +
+                    '</div>';
+                }).join('');
             });
+    }
+
+    function editComment(commentNo) {
+        const contentEl = document.getElementById('comment-content-' + commentNo);
+        const oldContent = contentEl.innerText;
+        const newContent = prompt("수정할 내용:", oldContent);
+        if (newContent === null || newContent.trim() === "" || newContent === oldContent) return;
+
+        fetch(ctx + "/comments/" + commentNo, {
+            method: 'PUT',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ content: newContent })
+        }).then(res => {
+            if (!res.ok) {
+                alert("수정 실패 (status " + res.status + ")");
+                return;
+            }
+            loadComments();
+        });
+    }
+
+    function deleteComment(commentNo) {
+        if (!confirm("댓글을 삭제하시겠습니까?")) return;
+
+        fetch(ctx + "/comments/" + commentNo, {
+            method: 'DELETE'
+        }).then(res => {
+            if (!res.ok) {
+                alert("삭제 실패 (status " + res.status + ")");
+                return;
+            }
+            loadComments();
+        });
     }
 
     function addComment() {

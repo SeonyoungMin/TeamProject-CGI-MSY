@@ -8,17 +8,26 @@ import com.team404.domain.User;
 
 public interface UserRepository {
 
-	// 전체 유저 조회 + 페이징 기능 구현 예정
-	List<User> getAllUsers();
+	// 페이징용 — 전체 행 수
+	int countAll();
+
+	// 페이징용 — 정보 검색 결과 총 행 수
+	int countForInfo(SearchDTO searchDTO);
+
+	// 페이징용 — 조건 검색 결과 총 행 수
+	int countForCondition(SearchDTO searchDTO);
+
+	// 전체 유저 조회 (페이징)
+	List<User> getAllUsers(int startNumber, int limit);
 
 	// 유저 번호로 조회
 	User getUserByNo(int userNo);
 
-	// Admin 유저 정보 검색
-	List<User> searchUserByInfo(SearchDTO searchDTO);
-	
-	// Admin 유저 조건 검색
-	List<User> searchUserByCondition(SearchDTO searchDTO);
+	// Admin 유저 정보 검색 (페이징)
+	List<User> searchUserByInfo(SearchDTO searchDTO, int startNumber, int limit);
+
+	// Admin 유저 조건 검색 (페이징)
+	List<User> searchUserByCondition(SearchDTO searchDTO, int startNumber, int limit);
 
 	// 유저 ID로 조회
 	User getUserById(String userId);
@@ -43,13 +52,13 @@ public interface UserRepository {
 
 	// 유저 판매 횟수로 조회
 	List<User> getUserBySellCount(int minCount, int maxCount);
-	
+
 	// 유저 회원가입
 	void setNewUser(User newUser);
-	
+
 	// 유저 회원정보수정
 	void setEditUser(User editUser);
-	
+
 	// 유저 회원탈퇴
 	void setDeleteUser(int userNo);
 

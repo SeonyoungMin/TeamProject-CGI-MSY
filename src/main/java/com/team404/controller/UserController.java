@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import com.team404.domain.ProductListDto;
 import com.team404.domain.SearchDTO;
 import com.team404.domain.User;
 import com.team404.exception.NoUserFoundException;
@@ -27,16 +28,70 @@ import jakarta.validation.Valid;
 @Controller
 public class UserController {
 
+	// DB의 users.role 컬럼에서 관리자에 해당하는 값. DB 값이 다르면 여기 한 줄만 변경.
+	private static final String ROLE_ADMIN = "ROLE_ADMIN";
+
 	@Autowired
 	UserService userService;
 	@Autowired
 	private ProductService productService;
 
+	// 관리자 외 접근 차단 헬퍼 — null/일반회원 모두 /home 으로 보냄
+	private boolean isAdmin(HttpSession session) {
+		User loginUser = (User) session.getAttribute("loginUser");
+		return loginUser != null && ROLE_ADMIN.equals(loginUser.getUserRole());
+	}
+
+	// 기존 /users/search 진입은 분리된 신규 엔드포인트로 보냄
 	@GetMapping("/users/search")
-	public String getUsersBySearch(@ModelAttribute("searchDTO") SearchDTO searchDTO, Model model) {
-		List<User> userBySearch = userService.adminSearchUser(searchDTO);
+	public String redirectLegacySearch(HttpSession session) {
+		if (!isAdmin(session)) {
+			return "redirect:/home";
+		}
+		return "redirect:/users/search/allUsers";
+	}
+
+	// 관리자 — 전체 회원 목록 (페이징)
+	@GetMapping("/users/search/allUsers")
+	public String getAllUsers(@ModelAttribute("searchDTO") SearchDTO searchDTO, Model model,
+			@RequestParam(defaultValue = "1", value = "pageNumber") int pageNumber,
+			@RequestParam(defaultValue = "10", value = "limit") int limit, HttpSession session) {
+
+		if (!isAdmin(session)) {
+			return "redirect:/home";
+		}
+
+		List<User> allUsers = userService.getAllUsers(searchDTO, pageNumber, limit);
+		int countAll = userService.countAll();
+		int totalPages = (countAll % limit) == 0 ? countAll / limit : (countAll / limit) + 1;
+
+		model.addAttribute("users", allUsers);
+		model.addAttribute("totalPages", totalPages);
+		model.addAttribute("currentPage", pageNumber);
+		model.addAttribute("limit", limit);
+		return "allUsers";
+	}
+
+	// 관리자 — 검색 결과 (페이징)
+	@GetMapping("/users/search/searchMode")
+	public String getUsersBySearch(@ModelAttribute("searchDTO") SearchDTO searchDTO, Model model,
+			@RequestParam(defaultValue = "1", value = "pageNumber") int pageNumber,
+			@RequestParam(defaultValue = "5", value = "limit") int limit, HttpSession session) {
+
+		if (!isAdmin(session)) {
+			return "redirect:/home";
+		}
+
+		List<User> userBySearch = userService.adminSearchUser(searchDTO, pageNumber, limit);
+		int totalRows = searchDTO.getTotalRows();
+		int totalPages = (totalRows % limit) == 0 ? totalRows / limit : (totalRows / limit) + 1;
+
 		model.addAttribute("users", userBySearch);
-		return "users";
+		model.addAttribute("count", totalRows);
+		model.addAttribute("totalPages", totalPages);
+		model.addAttribute("currentPage", pageNumber);
+		model.addAttribute("limit", limit);
+		return "usersBySearch";
 	}
 
 	@GetMapping("/users/search/{userNo}")
@@ -66,6 +121,11 @@ public class UserController {
 
 		userService.setNewUser(user);
 		return "redirect:/login";
+	}
+
+	@GetMapping("/register")
+	public String registerPage() {
+		return "register";
 	}
 
 	@GetMapping("/login")
@@ -109,7 +169,7 @@ public class UserController {
 	@GetMapping("/home")
 	public String homePage(Model model) {
 		// home.jsp에서 사용할 상품 리스트를 가져옴
-		List<com.team404.domain.ProductListDto> productList = productService.findAll(0, 10);
+		List<ProductListDto> productList = productService.findAll(0, 10);
 
 		// 모델에 데이터를 담아 home.jsp로 전달
 		model.addAttribute("productList", productList);
@@ -138,13 +198,7 @@ public class UserController {
 
 	@GetMapping("/")
 	public String mainPage(Model model) {
-		// findAll(시작번호, 가져올개수)
-		List<com.team404.domain.ProductListDto> productList = productService.findAll(0, 10);
-
-		// main.jsp에서 <c:forEach items="${productList}">로 쓸 수 있게 담기
-		model.addAttribute("productList", productList);
-
-		return "main";
+		return "redirect:/home";
 	}
 
 	@GetMapping("/mypage")

@@ -20,6 +20,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.team404.domain.Product;
 import com.team404.domain.ProductDetailDto;
 import com.team404.domain.ProductListDto;
+import com.team404.domain.User;
 import com.team404.service.ProductService;
 
 import jakarta.servlet.http.HttpSession;
@@ -29,6 +30,11 @@ public class ProductController {
 
 	@Autowired
 	private ProductService productService;
+
+	// 세션에서 로그인 사용자 꺼내기 — null 이면 비로그인
+	private User getLoginUser(HttpSession session) {
+		return (User) session.getAttribute("loginUser");
+	}
 
 	@GetMapping("/welcome")
 	public String welcome() {
@@ -104,49 +110,40 @@ public class ProductController {
 		return "productList";
 	}
 
-	// 내 판매 목록 조회
+	// 내 판매 목록 조회 — 로그인 필요
 	@GetMapping("/product/mylist")
 	public String getMySalesList(Model model, HttpSession session) {
-//		if (session.getAttribute("loginMemberNo") == null) {
-//			return "redirect:/login"; //아침님이 구현한 로그인 페이지로 돌아가게끔 url경로 바꿔야함
-//		}
-//		int loginMemberNo = (int) session.getAttribute("loginMemberNo");
-		int loginMemberNo = 1;
-		List<ProductListDto> mySalesList = productService.findBySeller(loginMemberNo);
+		User loginUser = getLoginUser(session);
+		if (loginUser == null) {
+			return "redirect:/login?redirect=/product/mylist";
+		}
+		List<ProductListDto> mySalesList = productService.findBySeller(loginUser.getUserNo());
 		model.addAttribute("list", mySalesList);
 		return "productList";
 	}
 
-	// 상품 등록 폼 (본인 확인 필요)
+	// 상품 등록 폼 — 로그인 필요
 	@GetMapping("/product/new")
 	public String registerForm(@ModelAttribute("newProduct") Product product, HttpSession session, Model model) {
-////		if (session.getAttribute("loginMemberNo") == null) {
-////			return "redirect:/login";
-////		}
-//		int loginMemberNo = (int) session.getAttribute("loginMemberNo");
-//		String loginNickname = (String) session.getAttribute("loginNickname");
-//		
-//		model.addAttribute("sellerNo", loginMemberNo);
-//		model.addAttribute("sellerNickName", loginNickname);
-		model.addAttribute("sellerNo", 1);
-		model.addAttribute("sellerNickName", "관리자");
-
+		User loginUser = getLoginUser(session);
+		if (loginUser == null) {
+			return "redirect:/login?redirect=/product/new";
+		}
+		model.addAttribute("sellerNo", loginUser.getUserNo());
+		model.addAttribute("sellerNickName", loginUser.getUserNickName());
 		return "productAddForm";
 	}
 
-	// 상품 등록 처리
+	// 상품 등록 처리 — 로그인 필요
 	@PostMapping("/product")
 	public String registerProduct(@RequestParam("productName") String name, @RequestParam("category") String category,
 			@RequestParam("price") long price,
 			@RequestParam(value = "description", required = false) String description,
 			@RequestParam(value = "imgFiles", required = false) List<MultipartFile> imgFiles, HttpSession session) {
-//		if (session.getAttribute("loginMemberNo") == null) {
-//			return "redirect:/login";
-//		}
-
-//		int loginMemberNo = (int) session.getAttribute("loginMemberNo");
-
-		int loginMemberNo = 1;
+		User loginUser = getLoginUser(session);
+		if (loginUser == null) {
+			return "redirect:/login?redirect=/product/new";
+		}
 
 		Product product = new Product();
 		product.setProductName(name);
@@ -154,60 +151,55 @@ public class ProductController {
 		product.setPrice(price);
 		product.setDescription(description);
 
-		productService.registerProduct(product, imgFiles, loginMemberNo);
+		productService.registerProduct(product, imgFiles, loginUser.getUserNo());
 		return "redirect:/productList";
 	}
 
-	// 상품 수정 폼 (본인 확인 필요)
+	// 상품 수정 폼 — 로그인 필요 (본인 검증은 service)
 	@GetMapping("/product/{productNo}/edit")
 	public String requestUpdateProduct(@PathVariable("productNo") int productNo, Model model, HttpSession session) {
-//		if (session.getAttribute("loginMemberNo") == null) {
-//			return "redirect:/login";
-//		}
+		if (getLoginUser(session) == null) {
+			return "redirect:/login?redirect=/product/" + productNo + "/edit";
+		}
 		ProductDetailDto updateForm = productService.findProductDetail(productNo);
 		model.addAttribute("update", updateForm);
 		return "productEditForm";
 	}
 
-	// 상품 수정 처리
+	// 상품 수정 처리 — 로그인 필요
 	@PutMapping("/product/{productNo}")
 	public String submitUpdateProduct(@PathVariable("productNo") int productNo,
 			@ModelAttribute("product") Product product,
 			@RequestParam(value = "imgFiles", required = false) List<MultipartFile> imgFiles, HttpSession session) {
-//		if (session.getAttribute("loginMemberNo") == null) {
-//			return "redirect:/login";
-//		}
-//		int loginMemberNo =(int) session.getAttribute("loginMemberNo");
-
-		int loginMemberNo = 1;
+		User loginUser = getLoginUser(session);
+		if (loginUser == null) {
+			return "redirect:/login";
+		}
 		product.setProductNo(productNo);
-		productService.updateProduct(product, imgFiles, loginMemberNo);
+		productService.updateProduct(product, imgFiles, loginUser.getUserNo());
 		return "redirect:/product/" + productNo;
 	}
 
-	// 상품 삭제 (본인 확인 필요)
+	// 상품 삭제 — 로그인 필요
 	@DeleteMapping("/product/{productNo}")
 	public String requestDeleteProduct(@PathVariable("productNo") int productNo, HttpSession session) {
-//		if (session.getAttribute("loginMemberNo") == null) {
-//			return "redirect:/login";
-//		}
-//		int loginMemberNo = (int) session.getAttribute("loginMemberNo");
-		int loginMemberNo = 1;
-		productService.deleteProduct(productNo, loginMemberNo);
+		User loginUser = getLoginUser(session);
+		if (loginUser == null) {
+			return "redirect:/login";
+		}
+		productService.deleteProduct(productNo, loginUser.getUserNo());
 		return "redirect:/productList";
-
 	}
 
-	// 상품 거래 상태 변경 (본인 확인 필요)
+	// 상품 거래 상태 변경 — 로그인 필요
 	@PostMapping("/product/{productNo}/status")
 	public String updateTradeStatus(@PathVariable("productNo") int productNo,
 			@RequestParam("status") String tradeStatus, HttpSession session) {
-//		if (session.getAttribute("loginMemberNo") == null) {
-//			return "redirect:/login";
-//		}
-//		int loginMemberNo = (int) session.getAttribute("loginMemberNo");
-		int loginMemberNo = 1;
-		productService.updateTradeStatus(productNo, tradeStatus, loginMemberNo);
+		User loginUser = getLoginUser(session);
+		if (loginUser == null) {
+			return "redirect:/login";
+		}
+		productService.updateTradeStatus(productNo, tradeStatus, loginUser.getUserNo());
 		return "redirect:/product/" + productNo;
 	}
 
