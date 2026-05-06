@@ -1,10 +1,8 @@
 package com.team404.service;
 
-
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
-
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -36,7 +34,7 @@ public class UserServiceImpl implements UserService {
 
 			userByNo.setUserImagePath(images.get(0).getFilePath());
 			userByNo.setUserImageName(images.get(0).getFileName());
-		
+
 		}
 		return userByNo;
 	}
@@ -67,8 +65,7 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	public User getUserById(String userId) {
-		// TODO Auto-generated method stub
-		return null;
+		return userRepository.getUserById(userId);
 	}
 
 	@Override
@@ -145,7 +142,7 @@ public class UserServiceImpl implements UserService {
 			List<MultipartFile> imageList = Collections.singletonList(newUser.getUserImageFile());
 
 			image.upload(imageList, "user", newUser.getUserNo());
-			
+
 		}
 	}
 
