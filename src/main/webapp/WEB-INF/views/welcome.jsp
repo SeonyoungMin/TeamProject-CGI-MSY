@@ -17,6 +17,9 @@
 	<br>
 	<br>
 	<a href="<c:url value='/product/new'/>">상품 등록하기</a>
+	<br>
+	<br>
+	<a href="<c:url value='/home'/>">홈으로</a>
 
 </body>
 </html>

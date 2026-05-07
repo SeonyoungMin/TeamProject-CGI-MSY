@@ -16,13 +16,13 @@ public class ImageController {
 	@Autowired
 	private ImageService imageService;
 
-	// 업로드 폼 페이지
+	// 업로드 폼
 	@GetMapping("/uploadForm")
 	public String uploadForm() {
 		return "image/uploadForm";
 	}
 
-	// 이미지 업로드 처리 후 목록으로 이동
+	// 업로드 처리 후 목록으로
 	@PostMapping("/upload")
 	public String upload(@RequestParam("files") List<MultipartFile> files,
 			@RequestParam("entityType") String entityType, @RequestParam("entityId") int entityId) {
@@ -31,7 +31,7 @@ public class ImageController {
 		return "redirect:/images/list?entityType=" + entityType + "&entityId=" + entityId;
 	}
 
-	// 이미지 목록 조회 페이지
+	// 이미지 목록
 	@GetMapping("/list")
 	public String list(@RequestParam("entityType") String entityType, @RequestParam("entityId") int entityId,
 			Model model) {
@@ -44,7 +44,7 @@ public class ImageController {
 		return "image/list";
 	}
 
-	// 1. 대표 설정 기능 추가
+	// 대표 이미지로 지정
 	@GetMapping("/thumbnail")
 	public String setThumbnail(@RequestParam("imageNo") int imageNo, @RequestParam("entityType") String entityType,
 			@RequestParam("entityId") int entityId) {
@@ -53,7 +53,7 @@ public class ImageController {
 		return "redirect:/images/list?entityType=" + entityType + "&entityId=" + entityId;
 	}
 
-	// 2. 대표 해제 기능 추가
+	// 대표 이미지 해제
 	@GetMapping("/thumbnail/cancel")
 	public String cancelThumbnail(@RequestParam("entityType") String entityType,
 			@RequestParam("entityId") int entityId) {

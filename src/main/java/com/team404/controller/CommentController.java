@@ -1,76 +1,106 @@
 package com.team404.controller;
 
-import java.io.IOException;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.team404.domain.Comment;
 import com.team404.domain.User;
 import com.team404.service.CommentService;
 
-import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
+
 @Controller
-@RequestMapping("/comments")
 public class CommentController {
 
 	@Autowired
-	private CommentService service;
+	private CommentService commentService;
 
-	private User getLoginUser(HttpSession session) {
-		return (User) session.getAttribute("loginUser");
-	}
-
-	@GetMapping("/view")
-	public String commentPage() {
-		return "comment"; // WEB-INF/views/comment.jsp
-	}
-
-	// 댓글 목록 조회 (AJAX) — 비로그인도 조회 가능
-	@GetMapping
+	// AJAX: 특정 상품의 댓글 목록을 JSON으로 돌려줌
+	@GetMapping("/comment/list")
 	@ResponseBody
 	public List<Comment> list(@RequestParam("boardNo") int boardNo) {
-		return service.getComments(boardNo);
+		return commentService.getComments(boardNo);
 	}
 
-	// 댓글 작성 — 로그인 필요
-	@PostMapping
+	// AJAX: 댓글 등록
+	@PostMapping("/comment/add")
 	@ResponseBody
-	public void insert(@RequestBody Comment comment, HttpSession session, HttpServletResponse response)
-			throws IOException {
-		if (getLoginUser(session) == null) {
-			response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "login required");
-			return;
+	public String add(@RequestParam("boardNo") int boardNo,
+			@RequestParam("content") String content,
+			HttpSession session) {
+
+		User loginUser = (User) session.getAttribute("loginUser");
+		if (loginUser == null) {
+			return "login";
 		}
-		service.addComment(comment);
+
+		Comment c = new Comment();
+		c.setBoardNo(boardNo);
+		c.setContent(content);
+		c.setAuthorNo(loginUser.getUserNo());
+		commentService.addComment(c);
+		return "ok";
 	}
 
-	// 댓글 수정 — 로그인 필요
-	@PutMapping("/{commentNo}")
-	@ResponseBody
-	public void update(@PathVariable("commentNo") int commentNo, @RequestBody Comment comment,
-			HttpSession session, HttpServletResponse response) throws IOException {
-		if (getLoginUser(session) == null) {
-			response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "login required");
-			return;
+	// 댓글 수정 폼 — 작성자 본인만 진입 가능
+	@GetMapping("/comment/{commentNo}/edit")
+	public String editForm(@PathVariable("commentNo") int commentNo, Model model, HttpSession session) {
+		User loginUser = (User) session.getAttribute("loginUser");
+		if (loginUser == null) {
+			return "redirect:/login";
 		}
-		comment.setCommentNo(commentNo);
-		service.updateComment(comment);
+		Comment comment = commentService.getComment(commentNo);
+		if (comment.getAuthorNo() != loginUser.getUserNo()) {
+			return "redirect:/product/" + comment.getBoardNo();
+		}
+		model.addAttribute("comment", comment);
+		return "commentUpdateForm";
 	}
 
-	// 댓글 삭제 — 로그인 필요
-	@DeleteMapping("/{commentNo}")
-	@ResponseBody
-	public void delete(@PathVariable("commentNo") int commentNo, HttpSession session, HttpServletResponse response)
-			throws IOException {
-		if (getLoginUser(session) == null) {
-			response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "login required");
-			return;
+	// 댓글 수정 처리
+	@PostMapping("/comment/{commentNo}/edit")
+	public String edit(@PathVariable("commentNo") int commentNo,
+			@RequestParam("content") String content,
+			@RequestParam("boardNo") int boardNo,
+			HttpSession session) {
+
+		User loginUser = (User) session.getAttribute("loginUser");
+		if (loginUser == null) {
+			return "redirect:/login";
 		}
-		service.deleteComment(commentNo);
+		Comment comment = commentService.getComment(commentNo);
+		if (comment.getAuthorNo() != loginUser.getUserNo()) {
+			return "redirect:/product/" + boardNo;
+		}
+		comment.setContent(content);
+		commentService.updateComment(comment);
+		return "redirect:/product/" + boardNo;
+	}
+
+	// 댓글 삭제 처리
+	@PostMapping("/comment/{commentNo}/delete")
+	public String delete(@PathVariable("commentNo") int commentNo,
+			@RequestParam("boardNo") int boardNo,
+			HttpSession session) {
+
+		User loginUser = (User) session.getAttribute("loginUser");
+		if (loginUser == null) {
+			return "redirect:/login";
+		}
+		Comment comment = commentService.getComment(commentNo);
+		if (comment.getAuthorNo() != loginUser.getUserNo()) {
+			return "redirect:/product/" + boardNo;
+		}
+		commentService.deleteComment(commentNo);
+		return "redirect:/product/" + boardNo;
 	}
 }

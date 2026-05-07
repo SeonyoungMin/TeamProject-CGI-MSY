@@ -5,16 +5,14 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.team404.domain.ProductListDto;
 import com.team404.domain.SearchDTO;
@@ -28,21 +26,93 @@ import jakarta.servlet.http.HttpSession;
 @Controller
 public class UserController {
 
-	// DB의 users.role 컬럼에서 관리자에 해당하는 값. DB 값이 다르면 여기 한 줄만 변경.
 	private static final String ROLE_ADMIN = "ROLE_ADMIN";
 
 	@Autowired
-	UserService userService;
+	private UserService userService;
+
 	@Autowired
 	private ProductService productService;
 
-	// 관리자 외 접근 차단 헬퍼 — null/일반회원 모두 /home 으로 보냄
+	// 로그인한 사용자가 관리자인지 검사
 	private boolean isAdmin(HttpSession session) {
 		User loginUser = (User) session.getAttribute("loginUser");
 		return loginUser != null && ROLE_ADMIN.equals(loginUser.getUserRole());
 	}
 
-	// 기존 /users/search 진입은 분리된 신규 엔드포인트로 보냄
+	@GetMapping("/")
+	public String mainPage() {
+		return "redirect:/home";
+	}
+
+	// 홈
+	@GetMapping("/home")
+	public String home(Model model) {
+		List<ProductListDto> productList = productService.findAll(0, 6);
+		model.addAttribute("productList", productList);
+		return "home";
+	}
+
+	// 회원가입
+	@GetMapping("/signup")
+	public String signupForm() {
+		return "signup";
+	}
+
+	// 회원가입 처리 — User 객체에 폼 값 자동 바인딩
+	@PostMapping("/users")
+	public String signup(@ModelAttribute User user) {
+		userService.setNewUser(user);
+		return "redirect:/login";
+	}
+
+	// 로그인
+	@GetMapping("/login")
+	public String loginForm(@RequestParam(value = "redirect", required = false) String redirect, Model model) {
+		// 로그인 후 원래 가려던 페이지로 보내기 위해 redirect 값을 폼에 hidden으로 넘김
+		model.addAttribute("redirect", redirect);
+		return "login";
+	}
+
+	// 로그인 처리 — 아이디/비밀번호 일치하면 세션에 저장
+	@PostMapping("/login")
+	public String login(@RequestParam("userId") String userId, @RequestParam("userPw") String userPw,
+			@RequestParam(value = "redirect", required = false) String redirect, HttpSession session) {
+
+		User user = userService.getUserById(userId);
+
+		if (user != null && user.getUserPw().equals(userPw)) {
+			session.setAttribute("loginUser", user);
+			// redirect 파라미터가 있으면 그쪽으로, 없으면 홈으로
+			if (redirect != null && !redirect.isEmpty()) {
+				return "redirect:" + redirect;
+			}
+			return "redirect:/home";
+		}
+		return "redirect:/login";
+	}
+
+	// 로그아웃 — 세션 비우고 홈으로
+	@GetMapping("/logout")
+	public String logout(HttpSession session) {
+		session.invalidate();
+		return "redirect:/home";
+	}
+
+	// 마이페이지 — 내 정보 + 내가 등록한 상품 보여줌
+	@GetMapping("/mypage")
+	public String myPage(HttpSession session, Model model) {
+		User loginUser = (User) session.getAttribute("loginUser");
+		if (loginUser == null) {
+			return "redirect:/login";
+		}
+		List<ProductListDto> myProducts = productService.findBySeller(loginUser.getUserNo());
+		model.addAttribute("user", loginUser);
+		model.addAttribute("myProducts", myProducts);
+		return "myPage";
+	}
+
+	// 관리자 검색 진입점 — 전체 회원 목록으로 보냄
 	@GetMapping("/users/search")
 	public String redirectLegacySearch(HttpSession session) {
 		if (!isAdmin(session)) {
@@ -51,7 +121,6 @@ public class UserController {
 		return "redirect:/users/search/allUsers";
 	}
 
-	// 관리자 — 전체 회원 목록 (페이징)
 	@GetMapping("/users/search/allUsers")
 	public String getAllUsers(@ModelAttribute("searchDTO") SearchDTO searchDTO, Model model,
 			@RequestParam(defaultValue = "1", value = "pageNumber") int pageNumber,
@@ -72,7 +141,6 @@ public class UserController {
 		return "allUsers";
 	}
 
-	// 관리자 — 검색 결과 (페이징)
 	@GetMapping("/users/search/searchMode")
 	public String getUsersBySearch(@ModelAttribute("searchDTO") SearchDTO searchDTO, Model model,
 			@RequestParam(defaultValue = "1", value = "pageNumber") int pageNumber,
@@ -95,129 +163,57 @@ public class UserController {
 	}
 
 	@GetMapping("/users/search/{userNo}")
-	public String getUserByNo(@PathVariable("userNo") int userNo, Model model) {
+	public String getUserByNo(@PathVariable("userNo") int userNo, Model model, HttpSession session) {
+		if (!isAdmin(session)) {
+			return "redirect:/home";
+		}
 		User userByNo = userService.getUserByNo(userNo);
 		model.addAttribute("user", userByNo);
 		return "user";
 	}
 
-	@ExceptionHandler(value = { NoUserFoundException.class })
-	public String noUserFoundHandler(NoUserFoundException exception, Model model) {
-		model.addAttribute("invalidUserNo", exception.getUserNo());
-		return "noUserFound";
-	}
-
-	@GetMapping("/signup")
-	public String getNewUserForm(@ModelAttribute("newUser") User newUser) {
-		return "signup";
-	}
-
-	@PostMapping("/users")
-	public String signup(@ModelAttribute User user, BindingResult bindingResult) {
-
-		if (bindingResult.hasErrors()) {
-			return "signup";
-		}
-
-		userService.setNewUser(user);
-		return "redirect:/login";
-	}
-
-	@GetMapping("/register")
-	public String registerPage() {
-		return "register";
-	}
-
-	@GetMapping("/login")
-	public String loginPage(@RequestParam(value = "redirect", required = false) String redirect, Model model) {
-		model.addAttribute("redirect", redirect); // 주소창에 있던 redirect 값을 JSP로 보냅니다.
-		return "login";
-	}
-
-	// 로그인 처리
-	@PostMapping("/login")
-	public String loginProcess(@RequestParam("userId") String userId, @RequestParam("userPw") String userPw,
-			@RequestParam(value = "redirect", required = false) String redirect, HttpSession session) {
-
-		User user = userService.getUserById(userId);
-
-		// 콘솔창
-		System.out.println("찾은 유저 정보: " + user);
-		if (user != null) {
-			System.out.println("DB 비번: " + user.getUserPw());
-			System.out.println("입력 비번: " + userPw);
-		}
-
-		if (user != null && user.getUserPw().equals(userPw)) {
-			session.setAttribute("loginUser", user);
-			if (redirect != null && !redirect.isEmpty()) {
-				return "redirect:" + redirect;
-			}
-			return "redirect:/home";
-		} else {
-			System.out.println("로그인 조건 불일치로 실패 처리됨");
-			return "redirect:/login?redirect=" + redirect;
-		}
-	}
-
-	@GetMapping("/logout")
-	public String logout(HttpSession session) {
-		session.invalidate();
-		return "redirect:/login";
-	}
-
-	@GetMapping("/home")
-	public String homePage(Model model) {
-		// home.jsp에서 사용할 상품 리스트를 가져옴
-		List<ProductListDto> productList = productService.findAll(0, 10);
-
-		// 모델에 데이터를 담아 home.jsp로 전달
-		model.addAttribute("productList", productList);
-
-		return "home"; // WEB-INF/views/home.jsp를 호출
-	}
-
+	// 회원 정보 수정 폼 — 본인 또는 관리자만 진입
 	@GetMapping("/users/edit/{userNo}")
-	public String getEditUserForm(@PathVariable("userNo") int userNo, Model model) {
+	public String getEditUserForm(@PathVariable("userNo") int userNo, Model model, HttpSession session) {
+		User loginUser = (User) session.getAttribute("loginUser");
+		if (loginUser == null) {
+			return "redirect:/login";
+		}
+		if (loginUser.getUserNo() != userNo && !isAdmin(session)) {
+			return "redirect:/home";
+		}
 		User userByNo = userService.getUserByNo(userNo);
 		model.addAttribute("editUser", userByNo);
 		return "editUser";
 	}
 
+	// 회원 정보 수정 처리
 	@PutMapping("/users/edit")
 	public String submitEditUserForm(@ModelAttribute("editUser") User editUser) {
 		userService.setEditUser(editUser);
 		return "redirect:/users/search/" + editUser.getUserNo();
 	}
 
+	// 회원 삭제 (관리자 전용)
 	@DeleteMapping("/users/delete/{userNo}")
-	public String submitDeleteUserForm(@PathVariable("userNo") int userNo) {
+	public String submitDeleteUserForm(@PathVariable("userNo") int userNo, HttpSession session) {
+		if (!isAdmin(session)) {
+			return "redirect:/home";
+		}
 		userService.setDeleteUser(userNo);
 		return "redirect:/users/search";
 	}
 
-	@GetMapping("/")
-	public String mainPage(Model model) {
-		return "redirect:/home";
+	// register.jsp — 테스트용
+	@GetMapping("/register")
+	public String registerPage() {
+		return "register";
 	}
 
-	@GetMapping("/mypage")
-	public String myPage(HttpSession session, Model model) {
-
-		User loginUser = (User) session.getAttribute("loginUser");
-
-		if (loginUser == null) {
-			return "redirect:/login";
-		}
-
-		// 유저 정보
-		model.addAttribute("user", loginUser);
-
-		// 내가 등록한 상품
-		List<ProductListDto> myProducts = productService.findBySeller(loginUser.getUserNo());
-
-		model.addAttribute("myProducts", myProducts);
-
-		return "myPage";
+	// 잘못된 회원번호로 접근 시 noUserFound 로 보냄
+	@ExceptionHandler(NoUserFoundException.class)
+	public String noUserFoundHandler(NoUserFoundException exception, Model model) {
+		model.addAttribute("invalidUserNo", exception.getUserNo());
+		return "noUserFound";
 	}
 }

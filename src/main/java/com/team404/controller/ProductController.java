@@ -1,29 +1,25 @@
 package com.team404.controller;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.team404.domain.Product;
 import com.team404.domain.ProductDetailDto;
 import com.team404.domain.ProductListDto;
 import com.team404.domain.User;
+import com.team404.service.FavoriteService;
 import com.team404.service.ProductService;
 
 import jakarta.servlet.http.HttpSession;
+
 
 @Controller
 public class ProductController {
@@ -31,94 +27,84 @@ public class ProductController {
 	@Autowired
 	private ProductService productService;
 
-	// 세션에서 로그인 사용자 꺼내기 — null 이면 비로그인
-	private User getLoginUser(HttpSession session) {
-		return (User) session.getAttribute("loginUser");
-	}
+	@Autowired
+	private FavoriteService favoriteService;
 
-	@GetMapping("/welcome")
-	public String welcome() {
-		return "welcome"; // welcome.jsp
-	}
-
+	// 상품 전체 목록
 	@GetMapping("/productList")
-	public String getProductList(@RequestParam(value = "pageNum", defaultValue = "1") int pageNum,
-			@RequestParam(value = "limit", defaultValue = "6") int limit, Model model) {
-
-		int start = (pageNum - 1) * limit;
-
-		List<ProductListDto> list = productService.findAll(start, limit);
-
-		int total = productService.countAll();
-
-		int totalPages = (int) Math.ceil((double) total / limit);
-
+	public String list(Model model) {
+		List<ProductListDto> list = productService.findAll(0, 100);
 		model.addAttribute("list", list);
-		model.addAttribute("currentPage", pageNum);
-		model.addAttribute("totalPages", totalPages);
-
 		return "productList";
 	}
 
-	// 상품 상세 조회
-	@GetMapping("/product/{productNo}")
-	public String getProduct(@PathVariable("productNo") int productNo, Model model) {
-		ProductDetailDto listByProductNo = productService.findProductDetail(productNo);
-		model.addAttribute("listByProductNo", listByProductNo);
-		return "productDetail";
-	}
-
-	// 상품 조건 조회
+	// 검색어로 상품 찾기
 	@GetMapping("/product/search")
-	public String searchProducts(@RequestParam("keyword") String keyword, Model model) {
-		List<ProductListDto> searchByKeyword = productService.findByKeyword(keyword);
-		model.addAttribute("list", searchByKeyword);
+	public String search(@RequestParam("keyword") String keyword, Model model) {
+		model.addAttribute("list", productService.findByKeyword(keyword));
 		model.addAttribute("keyword", keyword);
 		return "productList";
 	}
 
-	// 카테고리별 조회
+	// 카테고리별 상품 보기
 	@GetMapping("/product/category")
-	public String getProductsByCategory(@RequestParam("category") String category, Model model) {
-		List<ProductListDto> listByCategory = productService.findByCategory(category);
-		model.addAttribute("list", listByCategory);
+	public String category(@RequestParam("category") String category, Model model) {
+		model.addAttribute("list", productService.findByCategory(category));
 		model.addAttribute("category", category);
 		return "productList";
 	}
 
-	// 내 판매 목록 조회 — 로그인 필요
+	// 내가 등록한 상품 (로그인 필요)
 	@GetMapping("/product/mylist")
-	public String getMySalesList(Model model, HttpSession session) {
-		User loginUser = getLoginUser(session);
+	public String myList(Model model, HttpSession session) {
+		User loginUser = (User) session.getAttribute("loginUser");
 		if (loginUser == null) {
-			return "redirect:/login?redirect=/product/mylist";
+			return "redirect:/login";
 		}
-		List<ProductListDto> mySalesList = productService.findBySeller(loginUser.getUserNo());
-		model.addAttribute("list", mySalesList);
+		model.addAttribute("list", productService.findBySeller(loginUser.getUserNo()));
 		return "productList";
 	}
 
-	// 상품 등록 폼 — 로그인 필요
-	@GetMapping("/product/new")
-	public String registerForm(@ModelAttribute("newProduct") Product product, HttpSession session, Model model) {
-		User loginUser = getLoginUser(session);
-		if (loginUser == null) {
-			return "redirect:/login?redirect=/product/new";
+	// 상품 상세 — 로그인한 사용자라면 찜 여부도 함께 조회
+	@GetMapping("/product/{productNo}")
+	public String detail(@PathVariable("productNo") int productNo, Model model, HttpSession session) {
+		ProductDetailDto product = productService.findProductDetail(productNo);
+		User loginUser = (User) session.getAttribute("loginUser");
+
+		boolean favorite = false;
+		if (loginUser != null) {
+			favorite = favoriteService.exists(loginUser.getUserNo(), productNo);
 		}
-		model.addAttribute("sellerNo", loginUser.getUserNo());
-		model.addAttribute("sellerNickName", loginUser.getUserNickName());
+
+		model.addAttribute("product", product);
+		model.addAttribute("loginUser", loginUser);
+		model.addAttribute("favorite", favorite);
+		return "productDetail";
+	}
+
+	// 상품 등록 폼 (로그인 필요)
+	@GetMapping("/product/new")
+	public String addForm(HttpSession session, Model model) {
+		User loginUser = (User) session.getAttribute("loginUser");
+		if (loginUser == null) {
+			return "redirect:/login";
+		}
+		model.addAttribute("loginUser", loginUser);
 		return "productAddForm";
 	}
 
-	// 상품 등록 처리 — 로그인 필요
+	// 상품 등록 처리 — 입력값으로 Product 객체를 만들어 서비스에 넘김
 	@PostMapping("/product")
-	public String registerProduct(@RequestParam("productName") String name, @RequestParam("category") String category,
+	public String add(@RequestParam("productName") String name,
+			@RequestParam("category") String category,
 			@RequestParam("price") long price,
 			@RequestParam(value = "description", required = false) String description,
-			@RequestParam(value = "imgFiles", required = false) List<MultipartFile> imgFiles, HttpSession session) {
-		User loginUser = getLoginUser(session);
+			@RequestParam(value = "imgFiles", required = false) List<MultipartFile> imgFiles,
+			HttpSession session) {
+
+		User loginUser = (User) session.getAttribute("loginUser");
 		if (loginUser == null) {
-			return "redirect:/login?redirect=/product/new";
+			return "redirect:/login";
 		}
 
 		Product product = new Product();
@@ -132,52 +118,55 @@ public class ProductController {
 		return "redirect:/home";
 	}
 
-	// 상품 수정 폼 — 로그인 필요 (본인 검증은 service)
+	// 상품 수정 폼 — 작성자 본인만 진입 가능
 	@GetMapping("/product/{productNo}/edit")
-	public String requestUpdateProduct(@PathVariable("productNo") int productNo, Model model, HttpSession session) {
-		if (getLoginUser(session) == null) {
-			return "redirect:/login?redirect=/product/" + productNo + "/edit";
-		}
-		ProductDetailDto updateForm = productService.findProductDetail(productNo);
-		model.addAttribute("update", updateForm);
-		return "productEditForm";
-	}
-
-	// 상품 수정 처리 — 로그인 필요
-	@PutMapping("/product/{productNo}")
-	public String submitUpdateProduct(@PathVariable("productNo") int productNo,
-			@ModelAttribute("product") Product product,
-			@RequestParam(value = "imgFiles", required = false) List<MultipartFile> imgFiles, HttpSession session) {
-		User loginUser = getLoginUser(session);
+	public String editForm(@PathVariable("productNo") int productNo, Model model, HttpSession session) {
+		User loginUser = (User) session.getAttribute("loginUser");
 		if (loginUser == null) {
 			return "redirect:/login";
 		}
+		ProductDetailDto product = productService.findProductDetail(productNo);
+		if (product.getSellerNo() != loginUser.getUserNo()) {
+			return "redirect:/product/" + productNo;
+		}
+		model.addAttribute("product", product);
+		return "productEditForm";
+	}
+
+	// 상품 수정 처리
+	@PostMapping("/product/{productNo}/edit")
+	public String edit(@PathVariable("productNo") int productNo,
+			@RequestParam("productName") String name,
+			@RequestParam("category") String category,
+			@RequestParam("price") long price,
+			@RequestParam(value = "description", required = false) String description,
+			@RequestParam(value = "imgFiles", required = false) List<MultipartFile> imgFiles,
+			HttpSession session) {
+
+		User loginUser = (User) session.getAttribute("loginUser");
+		if (loginUser == null) {
+			return "redirect:/login";
+		}
+
+		Product product = new Product();
 		product.setProductNo(productNo);
+		product.setProductName(name);
+		product.setCategory(category);
+		product.setPrice(price);
+		product.setDescription(description);
+
 		productService.updateProduct(product, imgFiles, loginUser.getUserNo());
 		return "redirect:/product/" + productNo;
 	}
 
-	// 상품 삭제 — 로그인 필요
-	@DeleteMapping("/product/{productNo}")
-	public String requestDeleteProduct(@PathVariable("productNo") int productNo, HttpSession session) {
-		User loginUser = getLoginUser(session);
+	// 상품 삭제
+	@PostMapping("/product/{productNo}/delete")
+	public String delete(@PathVariable("productNo") int productNo, HttpSession session) {
+		User loginUser = (User) session.getAttribute("loginUser");
 		if (loginUser == null) {
 			return "redirect:/login";
 		}
 		productService.deleteProduct(productNo, loginUser.getUserNo());
-		return "redirect:/productList";
+		return "redirect:/home";
 	}
-
-	// 상품 거래 상태 변경 — 로그인 필요
-	@PostMapping("/product/{productNo}/status")
-	public String updateTradeStatus(@PathVariable("productNo") int productNo,
-			@RequestParam("status") String tradeStatus, HttpSession session) {
-		User loginUser = getLoginUser(session);
-		if (loginUser == null) {
-			return "redirect:/login";
-		}
-		productService.updateTradeStatus(productNo, tradeStatus, loginUser.getUserNo());
-		return "redirect:/product/" + productNo;
-	}
-
 }

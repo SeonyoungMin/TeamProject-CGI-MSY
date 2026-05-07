@@ -1,36 +1,33 @@
-<%@ page contentType="text/html; charset=UTF-8"%>
+<%@ page contentType="text/html; charset=UTF-8" language="java"%>
+<%@ taglib prefix="c" uri="jakarta.tags.core"%>
+<c:set var="ctx" value="${pageContext.request.contextPath}" />
+
+<!DOCTYPE html>
 <html>
 <head>
+<meta charset="UTF-8">
 <title>댓글 수정</title>
 </head>
 <body>
-	<h2>댓글 수정하기</h2>
-	<form id="updateForm">
-		<input type="hidden" id="commentNo" value="${comment.commentNo}">
-		<textarea id="content" rows="5" cols="50">${comment.content}</textarea>
-		<br>
-		<button type="button" onclick="submitUpdate()">수정 완료</button>
-		<button type="button" onclick="history.back()">취소</button>
+
+<%@ include file="/WEB-INF/views/header.jsp"%>
+
+<div class="app-container" style="max-width:600px;">
+	<h2 class="section-title">댓글 수정</h2>
+
+	<form class="card" action="${ctx}/comment/${comment.commentNo}/edit" method="post">
+		<input type="hidden" name="boardNo" value="${comment.boardNo}">
+
+		<label class="form-label">내용</label>
+		<textarea class="form-input" name="content" required>${comment.content}</textarea>
+
+		<div style="display:flex; gap:10px;">
+			<button type="submit" class="btn btn-primary btn-block">수정 완료</button>
+			<a href="${ctx}/product/${comment.boardNo}" class="btn btn-block">취소</a>
+		</div>
 	</form>
+</div>
 
-	<script>
-        function submitUpdate() {
-            const commentNo = document.getElementById("commentNo").value;
-            const content = document.getElementById("content").value;
-
-       
-            fetch(`${pageContext.request.contextPath}/comments/\${commentNo}`, {
-                method: "PUT",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ content: content })
-            })
-            .then(res => {
-                if(res.ok) {
-                    alert("수정되었습니다.");
-                    location.href = `${pageContext.request.contextPath}/comments?boardNo=${comment.boardNo}`;
-                }
-            });
-        }
-    </script>
+<%@ include file="/WEB-INF/views/footer.jsp"%>
 </body>
 </html>
