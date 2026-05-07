@@ -1,6 +1,11 @@
 <%@ page contentType="text/html; charset=UTF-8" language="java"%>
 <%@ taglib prefix="c" uri="jakarta.tags.core"%>
+
+<!DOCTYPE html>
+<html>
+<head>
 <meta charset="UTF-8">
+<title>상품 목록</title>
 
 <style>
 .category-nav {
@@ -109,121 +114,171 @@
 	padding: 6px 12px;
 	cursor: pointer;
 	border-radius: 4px;
+	border: 1px solid #ccc;
+	background: white;
+	text-decoration: none;
+	color: black;
+}
+
+.current-page {
+	background: #121212;
+	color: white;
+	border: 2px solid #121212;
 }
 </style>
+</head>
 
-<div class="page">
+<body>
+
 	<%@ include file="/WEB-INF/views/header.jsp"%>
 
 	<div class="category-nav">
-		<a href="#">전체</a> <a href="#">전자기기</a> <a href="#">의류</a> <a href="#">가구</a>
-		<a href="#">도서</a>
+		<a href="${pageContext.request.contextPath}/productList">전체</a> <a
+			href="${pageContext.request.contextPath}/product/category?category=전자기기">전자기기</a>
+		<a
+			href="${pageContext.request.contextPath}/product/category?category=의류">의류</a>
+		<a
+			href="${pageContext.request.contextPath}/product/category?category=가구">가구</a>
+		<a
+			href="${pageContext.request.contextPath}/product/category?category=도서">도서</a>
 	</div>
 
 	<div class="content">
+
 		<div class="banner"
 			style="text-align: center; padding: 50px 20px; background: #EDEBE7;">
+
 			<h1 style="font-size: 32px; margin-bottom: 10px;">쉽고 안전한 중고거래</h1>
+
 			<div style="margin-top: 20px;">
+
 				<button
-					style="width: 160px; height: 45px; background: #121212; color: white; border: none; cursor: pointer;">상품
-					둘러보기</button>
-				<a href="${pageContext.request.contextPath}/register">
-					<button
-						style="width: 160px; height: 45px; margin-left: 10px; background: white; border: 1px solid #ddd; cursor: pointer;">
-						글쓰기</button>
-				</a>
+					onclick="location.href='${pageContext.request.contextPath}/productList'"
+					style="width: 160px; height: 45px; background: #121212; color: white; border: none; cursor: pointer;">
+
+					상품 둘러보기</button>
+
+				<button
+					onclick="location.href='${pageContext.request.contextPath}/product/new'"
+					style="width: 160px; height: 45px; margin-left: 10px; background: white; border: 1px solid #ddd; cursor: pointer;">
+
+					글쓰기</button>
+
 			</div>
 		</div>
 
 		<div class="main-container">
+
 			<div class="left-content">
+
 				<section>
+
 					<div
 						style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+
 						<h3 style="margin: 0;">최근 등록 상품</h3>
-						<a href="${pageContext.request.contextPath}/productList"
-							style="font-size: 13px; color: #888; text-decoration: none;">전체보기
-							></a>
+
 					</div>
-					<div id="productList" class="product-list"></div>
-					<div id="pagination" style="text-align: center; margin-top: 40px;"></div>
+
+					<div class="product-list">
+
+						<c:choose>
+
+							<c:when test="${empty productList}">
+
+								<div style="grid-column: span 3; text-align: center;">등록된
+									상품이 없습니다.</div>
+
+							</c:when>
+
+							<c:otherwise>
+
+								<c:forEach var="p" items="${productList}">
+
+									<div class="card"
+										onclick="location.href='${pageContext.request.contextPath}/product/${p.productNo}'">
+
+										<div class="thumb">
+
+											<c:choose>
+
+												<c:when test="${not empty p.imgPath}">
+
+													<img src="${pageContext.request.contextPath}${p.imgPath}"
+														style="width: 100%; height: 100%; object-fit: cover;">
+
+												</c:when>
+
+												<c:otherwise>
+
+													<div
+														style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; color: #aaa;">
+
+														이미지 없음</div>
+
+												</c:otherwise>
+
+											</c:choose>
+
+										</div>
+
+										<div class="card-info">
+
+											<div class="title">${p.productName}</div>
+
+											<div class="location">${p.sellerNickname}</div>
+
+											<div class="price">${p.price}원</div>
+
+										</div>
+
+									</div>
+
+								</c:forEach>
+
+							</c:otherwise>
+
+						</c:choose>
+
+					</div>
+
+					<div style="text-align: center; margin-top: 40px;">
+
+						<c:forEach begin="1" end="${totalPages}" var="i">
+
+							<a
+								href="${pageContext.request.contextPath}/productList?pageNum=${i}"
+								class="page-btn ${i == currentPage ? 'current-page' : ''}">
+
+								${i} </a>
+
+						</c:forEach>
+
+					</div>
+
 				</section>
+
 			</div>
+
 			<aside class="right-content">
+
 				<div class="sidebar-box">
 					<h4>문의게시글</h4>
 					<div class="sidebar-item">어떻게 결제 하나요?</div>
 				</div>
+
 				<div class="sidebar-box">
 					<h4>공지사항</h4>
 					<div class="sidebar-item">시스템 점검 안내</div>
 				</div>
+
 			</aside>
+
 		</div>
+
 	</div>
+
 	<%@ include file="/WEB-INF/views/footer.jsp"%>
-</div>
 
-<script>
-// JSP 변수를 자바스크립트 변수로 먼저 할당
-var ctx = "${pageContext.request.contextPath}"; 
-
-function loadProducts(page) {
-    var pageNum = page || 1;
-    
-    var url = ctx + "/productList?pageNum=" + pageNum + "&dataOnly=true"; 
-    
-    fetch(url)
-        .then(function(res) { return res.json(); })
-        .then(function(data) {
-            var list = document.getElementById("productList");
-            list.innerHTML = ""; 
-
-            if (data.list && data.list.length > 0) {
-                data.list.forEach(function(p) {
-                    var imageSrc = p.imgPath ? ctx + p.imgPath : 'https://via.placeholder.com/150';
-                    var priceStr = p.price ? p.price.toLocaleString() : '0';
-                    var nickname = p.sellerNickname || '지역 정보 없음';
-                    
-                  
-                    var html = '<div class="card" onclick="location.href=\'' + ctx + '/product/' + p.productNo + '\'">' +
-                                    '<div class="thumb">' +
-                                        '<img src="' + imageSrc + '" style="width:100%; height:100%; object-fit:cover;">' +
-                                    '</div>' +
-                                    '<div class="card-info">' +
-                                        '<div class="title">' + p.productName + '</div>' +
-                                        '<div class="location">' + nickname + '</div>' +
-                                        '<div class="price">' + priceStr + '원</div>' +
-                                    '</div>' +
-                                '</div>';
-                    list.innerHTML += html;
-                });
-            } else {
-                list.innerHTML = "<p style='grid-column: span 3; text-align:center;'>등록된 상품이 없습니다.</p>";
-            }
-            renderPagination(data.totalPages, data.currentPage);
-        })
-        .catch(function(err) { console.error("로드 실패:", err); });
-}
-
-function renderPagination(total, current) {
-    var pageEl = document.getElementById("pagination");
-    pageEl.innerHTML = ""; 
-
-    for (var i = 1; i <= total; i++) {
-        var isCurrent = (i === current);
-        var borderStyle = isCurrent ? '2px solid #121212' : '1px solid #ccc';
-        var bgColor = isCurrent ? '#121212' : 'white';
-        var textColor = isCurrent ? 'white' : 'black';
-        
-        var btn = '<button class="page-btn" onclick="loadProducts(' + i + ')" ' +
-                  'style="border:' + borderStyle + '; background:' + bgColor + '; color:' + textColor + ';">' + i + '</button>';
-        pageEl.innerHTML += btn;
-    }
-}
-
-window.onload = function() {
-    loadProducts(1);
-};
-</script>
+</body>
+</html>

@@ -41,47 +41,23 @@ public class ProductController {
 		return "welcome"; // welcome.jsp
 	}
 
-	// 상품 전체 목록 조회 (+페이징)
 	@GetMapping("/productList")
-	@ResponseBody
-	public Object getProductList(@RequestParam(value = "pageNum", defaultValue = "1") int pageNum,
-			@RequestParam(value = "limit", defaultValue = "6") int limit,
-			@RequestParam(value = "dataOnly", required = false) String dataOnly, Model model) {
-
-		Map<String, Object> data = getProductData(pageNum, limit);
-
-		// =========================
-		// ⭐ 데이터만 요청 (AJAX)
-		// =========================
-		if ("true".equals(dataOnly)) {
-			return data;
-		}
-
-		// =========================
-		// ⭐ 화면 요청 (JSP)
-		// =========================
-		model.addAllAttributes(data);
-		return "productList";
-	}
-
-	// =========================
-	// ⭐ 공통 로직 분리
-	// =========================
-	private Map<String, Object> getProductData(int pageNum, int limit) {
+	public String getProductList(@RequestParam(value = "pageNum", defaultValue = "1") int pageNum,
+			@RequestParam(value = "limit", defaultValue = "6") int limit, Model model) {
 
 		int start = (pageNum - 1) * limit;
 
 		List<ProductListDto> list = productService.findAll(start, limit);
+
 		int total = productService.countAll();
 
 		int totalPages = (int) Math.ceil((double) total / limit);
 
-		Map<String, Object> map = new HashMap<>();
-		map.put("list", list);
-		map.put("currentPage", pageNum);
-		map.put("totalPages", totalPages);
+		model.addAttribute("list", list);
+		model.addAttribute("currentPage", pageNum);
+		model.addAttribute("totalPages", totalPages);
 
-		return map;
+		return "productList";
 	}
 
 	// 상품 상세 조회
@@ -150,9 +126,10 @@ public class ProductController {
 		product.setCategory(category);
 		product.setPrice(price);
 		product.setDescription(description);
+		product.setSellerNo(loginUser.getUserNo());
 
 		productService.registerProduct(product, imgFiles, loginUser.getUserNo());
-		return "redirect:/productList";
+		return "redirect:/home";
 	}
 
 	// 상품 수정 폼 — 로그인 필요 (본인 검증은 service)

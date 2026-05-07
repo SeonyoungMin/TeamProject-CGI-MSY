@@ -174,7 +174,7 @@
 						<span style="font-size: 14px; margin-right: 5px;"> <b>${sessionScope.loginUser.userNickName}</b>님
 						</span>
 						<a href="${ctx}/logout" class="btn btn-login">로그아웃</a>
-						<a href="${ctx}/register" class="btn btn-write">+ 글쓰기</a>
+						<a href="${ctx}/register" class="btn btn-write">글쓰기</a>
 					</c:otherwise>
 				</c:choose>
 			</div>

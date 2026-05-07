@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.team404.domain.ProductListDto;
 import com.team404.domain.SearchDTO;
@@ -23,7 +24,6 @@ import com.team404.service.ProductService;
 import com.team404.service.UserService;
 
 import jakarta.servlet.http.HttpSession;
-import jakarta.validation.Valid;
 
 @Controller
 public class UserController {
@@ -113,7 +113,7 @@ public class UserController {
 	}
 
 	@PostMapping("/users")
-	public String signup(@Valid @ModelAttribute User user, BindingResult bindingResult) {
+	public String signup(@ModelAttribute User user, BindingResult bindingResult) {
 
 		if (bindingResult.hasErrors()) {
 			return "signup";
@@ -205,9 +205,18 @@ public class UserController {
 	public String myPage(HttpSession session, Model model) {
 
 		User loginUser = (User) session.getAttribute("loginUser");
+
 		if (loginUser == null) {
 			return "redirect:/login";
 		}
+
+		// 유저 정보
+		model.addAttribute("user", loginUser);
+
+		// 내가 등록한 상품
+		List<ProductListDto> myProducts = productService.findBySeller(loginUser.getUserNo());
+
+		model.addAttribute("myProducts", myProducts);
 
 		return "myPage";
 	}

@@ -114,7 +114,7 @@ textarea.form-control {
 	<div class="register-container">
 		<h2 class="register-title">새 글 쓰기</h2>
 
-		<form action="${pageContext.request.contextPath}/product/register"
+		<form action="${pageContext.request.contextPath}/product"
 			method="post" enctype="multipart/form-data">
 
 			<!-- 게시글 타입 선택 -->
@@ -131,7 +131,7 @@ textarea.form-control {
 
 			<!-- 제목 -->
 			<div class="form-group">
-				<label class="form-label">제목</label> <input type="text" name="name"
+				<label class="form-label">제목</label> <input type="text" name="productNsame"
 					class="form-control" placeholder="제목을 입력하세요" required>
 			</div>
 
