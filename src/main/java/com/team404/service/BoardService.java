@@ -12,7 +12,10 @@ public interface BoardService {
 	public void registerBoard(Board board, int loginMemberNo);
  
 	// 문의글 전체목록 조회
-	public List<BoardListDto> findAllInquiry();
+	public List<BoardListDto> findAllInquiry(int startNum, int limit);
+	
+	// 전체 조회 페이징
+	public int countAllInquiry();
  
 	//  문의글 상세 조회
 	public BoardDetailDto findBoardDetail(int boardNo);
@@ -22,4 +25,5 @@ public interface BoardService {
  
 	// 문의글 삭제 (본인 확인)
 	public void deleteBoard(int boardNo, int loginMemberNo);
+
 }

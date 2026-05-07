@@ -13,7 +13,9 @@ public interface BoardRepository {
 	public int insertBoard(Board board);
 	
 	//문의글 전체 조회
-	public List<BoardListDto> findAllBoard();
+	public List<BoardListDto> findAllBoard(int startNum, int limit);
+	//전체 조회 페이징
+	public int countAllBoard();
 	
 	//문의글 상세 조회 
 	public BoardDetailDto findBoardDetail(int boardNo);

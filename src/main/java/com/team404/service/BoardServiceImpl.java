@@ -23,8 +23,13 @@ public class BoardServiceImpl implements BoardService{
 	}
  
 	// 문의글 전체목록 조회
-	public List<BoardListDto> findAllInquiry() {
-		return boardRepository.findAllBoard();
+	public List<BoardListDto> findAllInquiry(int startNum, int limit) {
+		return boardRepository.findAllBoard(startNum, limit);
+	}
+	
+	// 전체 조회 페이징
+	public int countAllInquiry() {
+		return boardRepository.countAllBoard();
 	}
  
 	//  문의글 상세 조회

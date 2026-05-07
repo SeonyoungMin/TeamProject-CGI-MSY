@@ -22,15 +22,18 @@ public class BoardRepositoryImpl implements BoardRepository {
 
 	// 문의글 등록
 	public int insertBoard(Board board) {
-		String SQL = "insert into board (title, category, content, author_no, created_time "
-				+ "values(?, ?, ?, ?, NOW())";
+		String SQL = "insert into board (title, content, author_no, created_time) "
+				+ "values(?, ?, ?, NOW())";
 		KeyHolder keyHolder = new GeneratedKeyHolder();
 		template.update(con -> {
 			PreparedStatement ps = con.prepareStatement(SQL, Statement.RETURN_GENERATED_KEYS);
 			ps.setString(1, board.getTitle());
-			ps.setString(2, board.getCategory());
-			ps.setString(3, board.getContent());
-			ps.setInt(4, board.getAuthorNo());
+//			ps.setString(2, board.getCategory());
+			ps.setString(2, board.getContent());
+			ps.setInt(3, board.getAuthorNo());
+			//boardType이 비어있다면 기본값으로 'inquiry'를 넣어주는 방어코드 /나중을 대비해서 만듦
+			String type = (board.getBoardType() == null) ? "inquiry" : board.getBoardType();
+	        ps.setString(4, type);
 			return ps;
 		}, keyHolder);
 
@@ -38,12 +41,19 @@ public class BoardRepositoryImpl implements BoardRepository {
 	}
 
 	// 문의글 전체 조회
-	public List<BoardListDto> findAllBoard() {
-		String SQL = "select b.board_no, b.title, b.created_time, " + "u.nickname as author_nickname" + "from board b"
-				+ "left join users u on u.user_no = b.author_no" + "where b.board_type = 'inquiry' "
-				+ "order by b.created_time desc";
-		return template.query(SQL, new BoardListRowMapper());
+	public List<BoardListDto> findAllBoard(int startNum, int limit) {
+		String SQL = "select b.board_no, b.title, b.created_time, " + "u.nickname as author_nickname " + "from board b "
+				+ "left join users u on u.user_no = b.author_no " + "where b.board_type = 'inquiry' "
+				+ "order by b.created_time desc limit ?, ?";
+		return template.query(SQL, new BoardListRowMapper(), startNum, limit);
 	}
+	
+	//전체조회 페이징
+	public int countAllBoard() {
+		String SQL = "select count(*) from board";
+		return template.queryForObject(SQL, Integer.class);
+	}
+
 
 	// 문의글 상세 조회
 	public BoardDetailDto findBoardDetail(int boardNo) {
@@ -56,6 +66,7 @@ public class BoardRepositoryImpl implements BoardRepository {
 	// 문의글 수정 (본인 확인 필요)
 	public void updateBoard(Board board) {
 		String SQL = "update board set title = ?, content = ? where board_no = ?";
+		board.getBoardNo();
 		template.update(SQL, board.getTitle(), board.getContent());
 	}
 

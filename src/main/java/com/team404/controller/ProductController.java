@@ -169,7 +169,7 @@ public class ProductController {
 		return "redirect:/productList";
 		
 	}
-	
+	 
 	//상품 거래 상태 변경 (본인 확인 필요)
 	@PostMapping("/product/{productNo}/status")
 	public String updateTradeStatus(@PathVariable("productNo") int productNo, @RequestParam("status") String tradeStatus, HttpSession session) {
@@ -181,5 +181,6 @@ public class ProductController {
 		productService.updateTradeStatus(productNo, tradeStatus, loginMemberNo);
 		return "redirect:/product/" + productNo;
 	}
+	
 	
 }
