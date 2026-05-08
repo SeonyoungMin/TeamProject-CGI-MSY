@@ -1,10 +1,8 @@
 package com.team404.service;
 
-
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
-
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -26,6 +24,11 @@ public class UserServiceImpl implements UserService {
 	private ImageService image;
 
 	@Override
+	public int countAll() {
+		return userRepository.countAll();
+	}
+
+	@Override
 	public User getUserByNo(int userNo) {
 		User userByNo = userRepository.getUserByNo(userNo);
 		if (userByNo == null) {
@@ -36,39 +39,42 @@ public class UserServiceImpl implements UserService {
 
 			userByNo.setUserImagePath(images.get(0).getFilePath());
 			userByNo.setUserImageName(images.get(0).getFileName());
-		
+
 		}
 		return userByNo;
 	}
 
 	@Override
-	public List<User> adminSearchUser(SearchDTO searchDTO) {
+	public List<User> adminSearchUser(SearchDTO searchDTO, int pageNumber, int limit) {
 		List<User> userBySearch = null;
+		int startNumber = limit * (pageNumber - 1);
 
 		if (searchDTO.getSearchMode() == null) {
-			userBySearch = userRepository.getAllUsers();
-		} else {
-			switch (searchDTO.getSearchMode()) {
-			case "info":
-				userBySearch = userRepository.searchUserByInfo(searchDTO);
-				break;
-			case "condition":
-				userBySearch = userRepository.searchUserByCondition(searchDTO);
-			}
+			return userBySearch;
 		}
 
+		switch (searchDTO.getSearchMode()) {
+		case "info":
+			userBySearch = userRepository.searchUserByInfo(searchDTO, startNumber, limit);
+			searchDTO.setTotalRows(userRepository.countForInfo(searchDTO));
+			break;
+		case "condition":
+			userBySearch = userRepository.searchUserByCondition(searchDTO, startNumber, limit);
+			searchDTO.setTotalRows(userRepository.countForCondition(searchDTO));
+			break;
+		}
 		return userBySearch;
 	}
 
 	@Override
-	public List<User> getAllUsers() {
-		return null;
+	public List<User> getAllUsers(SearchDTO searchDTO, int pageNumber, int limit) {
+		int startNumber = limit * (pageNumber - 1);
+		return userRepository.getAllUsers(startNumber, limit);
 	}
 
 	@Override
 	public User getUserById(String userId) {
-		// TODO Auto-generated method stub
-		return null;
+		return userRepository.getUserById(userId);
 	}
 
 	@Override
@@ -145,7 +151,7 @@ public class UserServiceImpl implements UserService {
 			List<MultipartFile> imageList = Collections.singletonList(newUser.getUserImageFile());
 
 			image.upload(imageList, "user", newUser.getUserNo());
-			
+
 		}
 	}
 
