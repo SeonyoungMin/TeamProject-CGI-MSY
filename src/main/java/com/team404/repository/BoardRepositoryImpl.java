@@ -22,8 +22,8 @@ public class BoardRepositoryImpl implements BoardRepository {
 
 	// 문의글 등록
 	public int insertBoard(Board board) {
-		String SQL = "insert into board (title, content, author_no, created_time) "
-				+ "values(?, ?, ?, NOW())";
+		String SQL = "insert into board (title, content, author_no, board_type, created_time) "
+				+ "values(?, ?, ?, ?, NOW())";
 		KeyHolder keyHolder = new GeneratedKeyHolder();
 		template.update(con -> {
 			PreparedStatement ps = con.prepareStatement(SQL, Statement.RETURN_GENERATED_KEYS);
@@ -50,7 +50,7 @@ public class BoardRepositoryImpl implements BoardRepository {
 	
 	//전체조회 페이징
 	public int countAllBoard() {
-		String SQL = "select count(*) from board";
+		String SQL = "select count(*) from board where board_type = 'inquiry'";
 		return template.queryForObject(SQL, Integer.class);
 	}
 
@@ -58,7 +58,7 @@ public class BoardRepositoryImpl implements BoardRepository {
 	// 문의글 상세 조회
 	public BoardDetailDto findBoardDetail(int boardNo) {
 		String SQL = "select b.board_no, b.title, b.content, " + "b.author_no, b.created_time, "
-				+ "u.nickname as author_nickname " + "from board b" + "left join users u on u.user_no = b.author_no "
+				+ "u.nickname as author_nickname " + "from board b " + "left join users u on u.user_no = b.author_no "
 				+ "where b.board_no = ?";
 		return template.queryForObject(SQL, new BoardDetailRowMapper(), boardNo);
 	}
@@ -67,7 +67,7 @@ public class BoardRepositoryImpl implements BoardRepository {
 	public void updateBoard(Board board) {
 		String SQL = "update board set title = ?, content = ? where board_no = ?";
 		board.getBoardNo();
-		template.update(SQL, board.getTitle(), board.getContent());
+		template.update(SQL, board.getTitle(), board.getContent(), board.getBoardNo());
 	}
 
 	public int findAuthorNo(int boardNo) { // 본인 확인용

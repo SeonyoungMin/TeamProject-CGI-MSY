@@ -11,20 +11,20 @@
 	<h3>수정 하기</h3>
 	<hr>
 
-	<form action="/board/${boardNo}/edit" method="post">
+	<form action="<c:url value='/boardList/${board.boardNo}'/>" method="post">
 	<input type="hidden" name="_method" value="PUT">
 		<div>
-			제목 : <input type="text" name="title" required>${board.title}
+			제목 : <input type="text" name="title" value="${board.title}" required>${board.title}
 		</div>
 		<div>
-			작성자 : <input type="text" value="${authorNickname}" readonly>
+			작성자 : <input type="text" value="${board.authorNickname}" readonly>
 		</div>
 		<div>
 			문의내용 :
 			<textarea name="content" rows="7" cols="40" required>${board.content}</textarea>
 		</div>
 		<button type="submit">수정</button>
-		<a href="/board/${boardNo}">취소</a>
+		<a href="<c:url value='/boardList/${board.boardNo}'/>">취소</a>
 	</form>
 </body>
 </html>

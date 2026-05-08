@@ -17,7 +17,7 @@
 		<c:otherwise>
 			<c:forEach var="b" items="${list}">
 				<div>
-					${b.boardNo} |<a href="/boardList/${b.boardNo}">${b.title}</a>
+					${b.boardNo} |<a href="<c:url value='/boardList/${b.boardNo}'/>" />${b.title}</a>
 					|${b.authorNickname} |${b.createdTime}
 				</div>
 				<hr>
@@ -27,6 +27,7 @@
 
 	<a href="<c:url value='/boardList/addForm'/>">문의글 등록</a>
 
+	<hr>
 	<c:if test="${not empty list}">
 		<c:forEach var="i" begin="1" end="${totalPages}">
 			<c:choose>

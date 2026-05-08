@@ -11,6 +11,7 @@
 	<h3>문의 하기</h3>
 	<hr>
 	<form action="<c:url value='/board'/>" method="post">
+		<input type="hidden" name="authorNo" value="${authorNo}">
 		<div>
 			제목 : <input type="text" name="title" required>
 		</div>

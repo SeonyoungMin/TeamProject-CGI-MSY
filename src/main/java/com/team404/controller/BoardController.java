@@ -25,25 +25,26 @@ public class BoardController {
 
 	@Autowired
 	private BoardService boardService;
-	
+
 	// 문의글 전체 목록 조회 --> 전체, 필터링 : 재활용
 	@GetMapping("/boardList")
-	public String getBoardList(@RequestParam(value="pageNum", defaultValue="1") int pageNum, @RequestParam(value="limit", defaultValue="10") int limit, Model model) {
-		
-		int startNum = limit * (pageNum-1);
-		
+	public String getBoardList(@RequestParam(value = "pageNum", defaultValue = "1") int pageNum,
+			@RequestParam(value = "limit", defaultValue = "10") int limit, Model model) {
+
+		int startNum = limit * (pageNum - 1);
+
 		List<BoardListDto> list = boardService.findAllInquiry(startNum, limit);
-		
+
 		int totalNum = boardService.countAllInquiry();
-		
-		int totalPages = (totalNum % limit) == 0 ? totalNum / limit : (totalNum / limit) +1;
-		
+
+		int totalPages = (totalNum % limit) == 0 ? totalNum / limit : (totalNum / limit) + 1;
+
 		model.addAttribute("list", list);
 		model.addAttribute("totalPages", totalPages);
 		model.addAttribute("currentPage", pageNum);
 		return "boardList";
 	}
-	
+
 	// 문의글 상세 조회
 	@GetMapping("/boardList/{boardNo}")
 	public String getBoard(@PathVariable("boardNo") int boardNo, Model model) {
@@ -51,7 +52,7 @@ public class BoardController {
 		model.addAttribute("board", dto);
 		return "boardDetail";
 	}
-	
+
 	// 문의글 등록, 수정(modelAttribute) : 재활용
 	// 등록 폼
 	@GetMapping("/boardList/addForm")
@@ -62,15 +63,14 @@ public class BoardController {
 //		int loginMemberNo = (int) session.getAttribute("loginMemberNo");
 //		String loginNickname = (String) session.getAttribute("loginNickname");
 //		
-		int loginMemberNo = 1;
+		int loginMemberNo = 3;
 		String loginNickname = "가이니";
 		model.addAttribute("authorNo", loginMemberNo);
 		model.addAttribute("authorNickname", loginNickname);
-		
-		
+
 		return "boardAddForm";
 	}
-	
+
 	// 등록 처리
 	@PostMapping("/board")
 	public String registerBoard(@ModelAttribute Board board, HttpSession session) {
@@ -79,12 +79,12 @@ public class BoardController {
 //		}
 //		int loginMemberNo = (int) session.getAttribute("loginMemberNo");
 
-		int loginMemberNo = 1;
+		int loginMemberNo = 3;
 		board.setAuthorNo(loginMemberNo);
 		boardService.registerBoard(board, loginMemberNo);
 		return "redirect:/boardList";
 	}
-	
+
 	// 수정 폼
 	@GetMapping("/boardList/{boardNo}/edit")
 	public String updateForm(@PathVariable("boardNo") int boardNo, HttpSession session, Model model) {
@@ -94,44 +94,45 @@ public class BoardController {
 //		int loginMemberNo = (int) session.getAttribute("loginMemberNo");
 //		String loginNickname = (String) session.getAttribute("loginNickname");
 //		
-		int loginMemberNo = 1;
+		int loginMemberNo = 3;
 		String loginNickname = "가이니";
-		model.addAttribute("authorNo", loginMemberNo);
-		model.addAttribute("authorNickname", loginNickname);
-		
 
-		boardService.findBoardDetail(boardNo);
-		
+
+		BoardDetailDto board = boardService.findBoardDetail(boardNo);
+		model.addAttribute("board", board);
+
 		return "boardEditForm";
 	}
-	
-	//수정 처리
-	@PutMapping("/board/{boardNo}")
+
+	// 수정 처리
+	@PutMapping("/boardList/{boardNo}")
 	public String updateBoard(@PathVariable("boardNo") int boardNo, @ModelAttribute Board board, HttpSession session) {
 //		if (session.getAttribute("loginMemberNo") == null) {
 //			return "redirect:/login";
 //		}
 //		int loginMemberNo = (int) session.getAttribute("loginMemberNo");
-		int loginMemberNo = 1;
-		
+		int loginMemberNo = 3;
+
 		board.setBoardNo(boardNo);
 		boardService.updateBoard(board, loginMemberNo);
-		
-		return "redirect:/board/" + boardNo;
+
+		System.out.println("수정 완료");
+		return "redirect:/boardList/" + boardNo;
 	}
-	
-	//삭제
-	@DeleteMapping("/board/{boardNo}")
+
+	// 삭제
+	@DeleteMapping("/boardList/{boardNo}")
 	public String deleteBoard(@PathVariable("boardNo") int boardNo, HttpSession session) {
 //		if (session.getAttribute("loginMemberNo") == null) {
 //			return "redirect:/login";
 //		}
 //		int loginMemberNo = (int) session.getAttribute("loginMemberNo");
 
-		int loginMemberNo = 1;
+		int loginMemberNo = 3;
 		boardService.deleteBoard(boardNo, loginMemberNo);
-		
+		System.out.println("삭제 완료");
+
 		return "redirect:/boardList";
 	}
-	
+
 }
