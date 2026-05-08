@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans:beans
+	xmlns="http://www.springframework.org/schema/mvc"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:beans="http://www.springframework.org/schema/beans"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="
+               http://www.springframework.org/schema/beans   http://www.springframework.org/schema/beans/spring-beans.xsd
+               http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+               http://www.springframework.org/schema/mvc     http://www.springframework.org/schema/mvc/spring-mvc.xsd">
+
+	<!-- Controller 자동 인식 -->
+	<annotation-driven />
+
+	<context:component-scan
+		base-package="com.team404" />
+
+
+	<!-- 기존 리소스 -->
+	<resources mapping="/resources/**" location="/resources/" />
+
+	<!-- 이미지 업로드 경로 상세 매핑 -->
+
+
+	<resources mapping="/upload/**" location="file:///C:/team404_upload/" />
+
+	<!-- 유저 이미지 경로 -->
+	<resources mapping="/team404_upload/userImg/**"
+		location="file:///C:/team404_upload/userImg/" />
+
+	<!-- 게시판 이미지 경로 -->
+	<resources mapping="/team404_upload/boardImg/**"
+		location="file:///C:/team404_upload/boardImg/" />
+
+	<!-- 상품 이미지 경로 -->
+	<resources mapping="/team404_upload/productImg/**"
+		location="file:///C:/team404_upload/productImg/" />
+
+	<!-- 전체 공통 경로 설정 -->
+	<resources mapping="/team404_upload/**"
+		location="file:///C:/team404_upload/" />
+
+	<!-- ViewResolver -->
+	<beans:bean
+		class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+		<beans:property name="prefix" value="/WEB-INF/views/" />
+		<beans:property name="suffix" value=".jsp" />
+	</beans:bean>
+
+
+    <!-- multipartResolver -->
+    <beans:bean id="multipartResolver"
+        class="org.springframework.web.multipart.support.StandardServletMultipartResolver" />
+    <beans:bean
+        class="org.springframework.web.servlet.view.InternalResourceViewResolver" />
+
+</beans:beans>

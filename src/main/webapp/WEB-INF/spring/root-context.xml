@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context.xsd
+        http://www.springframework.org/schema/tx
+        http://www.springframework.org/schema/tx/spring-tx.xsd">
+
+	<!-- ===== Properties 로드 ===== -->
+	<context:property-placeholder
+		location="classpath:db.properties" />
+
+	<!-- ===== Hikari 설정 ===== -->
+	<bean id="hikariConfig" class="com.zaxxer.hikari.HikariConfig">
+		<property name="driverClassName"
+			value="com.mysql.cj.jdbc.Driver" />
+		<property name="jdbcUrl" value="${db.url}" />
+		<property name="username" value="${db.username}" />
+		<property name="password" value="${db.password}" />
+		<property name="maximumPoolSize" value="10" />
+		<property name="minimumIdle" value="5" />
+		<property name="connectionTimeout" value="30000" />
+		<property name="idleTimeout" value="600000" />
+		<property name="maxLifetime" value="1800000" />
+	</bean>
+
+	<!-- ===== DataSource (Hikari) ===== -->
+	<bean id="dataSource" class="com.zaxxer.hikari.HikariDataSource"
+		destroy-method="close">
+		<constructor-arg ref="hikariConfig" />
+	</bean>
+
+	<!-- ===== JdbcTemplate ===== -->
+	<bean id="jdbcTemplate"
+		class="org.springframework.jdbc.core.JdbcTemplate">
+		<property name="dataSource" ref="dataSource" />
+	</bean>
+
+	<!-- ===== Transaction Manager ===== -->
+	<bean id="transactionManager"
+		class="org.springframework.jdbc.support.JdbcTransactionManager">
+		<property name="dataSource" ref="dataSource" />
+	</bean>
+
+	<tx:annotation-driven
+		transaction-manager="transactionManager" />
+
+	<!-- ===== Service / DAO Component Scan (Controller 제외) ===== -->
+	<context:component-scan
+		base-package="com.team404">
+	</context:component-scan>
+
+</beans>
