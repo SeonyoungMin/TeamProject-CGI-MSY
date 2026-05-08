@@ -125,7 +125,10 @@ input {
 
 		<!-- 상단 -->
 		<div class="header">
-			<div class="logo">team404</div>
+			<div class="logo">
+				<a href="home" style="text-decoration: none; color: black;">
+					team404 </a>
+			</div>
 		</div>
 
 		<!-- 중앙 -->
