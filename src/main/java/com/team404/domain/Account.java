@@ -8,17 +8,21 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 //orders 테이블 + product 테이블 JOIN
 public class Account {
 
-	//orders
+	// orders
 	private int orderNo;
 	private long price;
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
 	private Timestamp createdTime;
 	private String memo;
-	
-	//product
+
+	// product
 	private String productName;
+
+	// users
+	private String partnerNickname;
 	
-	
+	// 'SELL' or 'BUY'
+	private String type;
 
 	public Account() {
 	}
@@ -62,5 +66,21 @@ public class Account {
 	public void setProductName(String productName) {
 		this.productName = productName;
 	}
-	
+
+	public String getPartnerNickname() {
+		return partnerNickname;
+	}
+
+	public void setPartnerNickname(String partnerNickname) {
+		this.partnerNickname = partnerNickname;
+	}
+
+	public String getType() {
+		return type;
+	}
+
+	public void setType(String type) {
+		this.type = type;
+	}
+
 }

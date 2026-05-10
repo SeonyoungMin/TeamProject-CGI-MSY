@@ -16,6 +16,8 @@ public class AccountRowMapper implements RowMapper<Account> {
 		account.setCreatedTime(rs.getTimestamp("created_time"));
 		account.setMemo(rs.getString("memo"));
 		account.setProductName(rs.getString("productName"));
+		account.setPartnerNickname(rs.getString("partnerNickname"));
+		account.setType(rs.getString("type"));
 		
 		return account;
 	}
