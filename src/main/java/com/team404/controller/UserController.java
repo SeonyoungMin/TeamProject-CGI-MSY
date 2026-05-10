@@ -40,7 +40,7 @@ public class UserController {
 	// 관리자 외 접근 차단 헬퍼 — null/일반회원 모두 /home 으로 보냄
 	private boolean isAdmin(HttpSession session) {
 		User loginUser = (User) session.getAttribute("loginUser");
-		return loginUser != null && ROLE_ADMIN.equals(loginUser.getUserRole());
+		return loginUser != null && ROLE_ADMIN.equals(loginUser.getUserRole()); 
 	}
 
 	// 기존 /users/search 진입은 분리된 신규 엔드포인트로 보냄
