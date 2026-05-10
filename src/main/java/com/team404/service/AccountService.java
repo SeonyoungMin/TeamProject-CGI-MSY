@@ -6,9 +6,13 @@ import com.team404.domain.Account;
 
 public interface AccountService {
  
-	public List<Account> findAllByBuyer(int orderNo, int startNum, int limit);
+	public List<Account> findAllByUser(int userNo, int startNum, int limit);
 	
-	public int countAllByBuyer(int buyerNo);
+	public int countAllByBuyer(int userNo);
 	
 	public void updateMemo(int orderNo, String memo);
+	
+	public long getTotalBuy(int userNo);
+	
+	public long getTotalSell(int userNo);
 }

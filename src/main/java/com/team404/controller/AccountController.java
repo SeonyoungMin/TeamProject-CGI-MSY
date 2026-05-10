@@ -29,18 +29,28 @@ public class AccountController {
 //	}
 //	int loginMemberNo = (int) session.getAttribute("loginMemberNo");
 		int loginMemberNo = 3;
-	
+			
 	int startNum = limit * (pageNum - 1);
 	
-	List<Account> list = accountService.findAllByBuyer(loginMemberNo, startNum, limit);
+	List<Account> list = accountService.findAllByUser(loginMemberNo, startNum, limit);
 	
 	int totalNum = accountService.countAllByBuyer(loginMemberNo);
 	
 	int totalPages = (totalNum % limit) == 0 ? totalNum / limit : (totalNum / limit) +1;
 	
+	long totalBuy = accountService.getTotalBuy(loginMemberNo);
+	
+	long totalSell = accountService.getTotalSell(loginMemberNo);
+	
+	// 순수익
+	long netProfit = totalSell - totalBuy;
+	
 	model.addAttribute("list",list);
 	model.addAttribute("totalPage",totalPages);
 	model.addAttribute("currentPage", pageNum);
+	model.addAttribute("totalBuy", totalBuy);
+	model.addAttribute("totalSell", totalSell);
+	model.addAttribute("netProfit", netProfit);
 	
 	return "accountList";
 	}
