@@ -3,8 +3,126 @@
 <%@ taglib prefix="c" uri="jakarta.tags.core"%>
 <c:set var="ctx" value="${pageContext.request.contextPath}" />
 
+<!-- jQuery (찜/댓글 AJAX용) -->
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
 <style>
-/* 상단 얇은 메뉴바 */
+/* ===== 공통 ===== */
+* {
+	box-sizing: border-box;
+}
+
+body {
+	margin: 0;
+	font-family: 'Malgun Gothic', sans-serif;
+	background: #fafafa;
+	color: #222;
+}
+
+a {
+	text-decoration: none;
+	color: inherit;
+}
+
+/* 가운데 정렬 컨테이너 */
+.app-container {
+	max-width: 1100px;
+	margin: 30px auto;
+	padding: 0 20px;
+}
+
+/* 섹션 제목 */
+.section-title {
+	font-size: 22px;
+	font-weight: bold;
+	margin: 0 0 20px 0;
+	padding-bottom: 10px;
+	border-bottom: 2px solid #121212;
+}
+
+/* 카드 */
+.card {
+	background: #fff;
+	border: 1px solid #eee;
+	border-radius: 8px;
+	padding: 20px;
+	margin-bottom: 20px;
+}
+
+/* input */
+.form-input, input[type="text"].form-input, input[type="password"].form-input,
+	input[type="number"].form-input, select.form-input, textarea.form-input
+	{
+	width: 100%;
+	padding: 10px 12px;
+	border: 1px solid #ddd;
+	border-radius: 4px;
+	font-size: 14px;
+	background: #fff;
+	margin-bottom: 12px;
+}
+
+textarea.form-input {
+	min-height: 120px;
+	resize: vertical;
+}
+
+label.form-label {
+	display: block;
+	font-size: 13px;
+	font-weight: bold;
+	margin-bottom: 6px;
+	color: #333;
+}
+
+/* 버튼 */
+.btn {
+	display: inline-block;
+	padding: 10px 18px;
+	border: 1px solid #ddd;
+	border-radius: 4px;
+	background: #fff;
+	color: #333;
+	font-size: 14px;
+	cursor: pointer;
+	text-align: center;
+}
+
+.btn:hover {
+	background: #f5f5f5;
+}
+
+.btn-primary {
+	background: #121212;
+	border-color: #121212;
+	color: #fff;
+}
+
+.btn-primary:hover {
+	background: #000;
+}
+
+.btn-line {
+	background: #fff;
+	border-color: #121212;
+	color: #121212;
+}
+
+.btn-danger {
+	background: #fff;
+	border-color: #e74c3c;
+	color: #e74c3c;
+}
+
+.btn-danger:hover {
+	background: #fdecea;
+}
+
+.btn-block {
+	width: 100%;
+}
+
+/* ===== Header ===== */
 .top-bar {
 	display: flex;
 	justify-content: space-between;
@@ -16,12 +134,10 @@
 }
 
 .top-bar a {
-	text-decoration: none;
 	color: #888;
 	margin-right: 15px;
 }
 
-/* 메인 헤더 */
 .main-header {
 	display: flex;
 	align-items: center;
@@ -35,11 +151,9 @@
 	font-size: 28px;
 	font-weight: bold;
 	color: #000;
-	text-decoration: none;
 	flex: 1;
 }
 
-/* 검색창 영역 */
 .search-container {
 	flex: 2;
 	display: flex;
@@ -48,136 +162,77 @@
 
 .search-bar {
 	width: 80%;
-	padding: 10px 20px;
+	padding: 10px 16px;
 	border: 1px solid #ddd;
-	border-radius: 5px;
+	border-radius: 4px;
 	background: #f5f5f5;
 	outline: none;
-	transition: 0.2s;
 }
 
-.search-bar:focus {
-	background: #fff;
-	border-color: #000;
-}
-
-/* 오른쪽 메뉴 영역 */
 .header-right {
 	flex: 2;
 	display: flex;
 	align-items: center;
 	justify-content: flex-end;
-	gap: 20px;
+	gap: 12px;
+	white-space: nowrap;
 }
 
 .nav-link {
-	text-decoration: none;
-	color: #333;
 	font-size: 14px;
-	font-weight: 500;
+	color: #333;
 }
 
 .nav-link:hover {
-	color: #000;
 	text-decoration: underline;
 }
 
-/* 관리자 전용 링크 스타일 */
 .admin-link {
-	color: #e74c3c !important; /* 관리자 강조 색상 */
-	font-weight: bold !important;
-}
-
-.btn-group {
-	display: flex;
-	gap: 10px;
-	align-items: center;
-}
-
-.btn {
-	padding: 8px 18px;
-	border-radius: 4px;
-	font-size: 14px;
-	text-decoration: none;
-	cursor: pointer;
-	transition: 0.2s;
-}
-
-.btn-login {
-	border: 1px solid #ddd;
-	color: #333;
-}
-
-.btn-login:hover {
-	background: #f5f5f5;
-}
-
-.btn-join {
-	background: #000;
-	color: #fff;
-	border: 1px solid #000;
-}
-
-.btn-write {
-	border: 1px solid #333;
-	color: #333;
-	background: #fff;
+	color: #e74c3c;
 	font-weight: bold;
-}
-
-.btn-write:hover {
-	background: #333;
-	color: #fff;
 }
 </style>
 
 <header>
-	<!-- 상단 링크 -->
 	<div class="top-bar">
 		<div>
-			<a href="${ctx}/board/notice">공지사항</a> <a href="${ctx}/board/qna">문의게시판</a>
+			<a href="${ctx}/home">홈</a> <a href="${ctx}/productList">상품 목록</a>
 		</div>
-		<div>
-			<span>EN | <b>KR</b></span>
-		</div>
+		<div>TEAM 404</div>
 	</div>
 
-	<!-- 메인 네비게이션 -->
 	<div class="main-header">
-
 		<a href="${ctx}/home" class="logo">team404</a>
 
-		<div class="search-container">
-			<input type="text" class="search-bar" placeholder="상품명, 카테고리 검색">
-		</div>
+		<form class="search-container" action="${ctx}/product/search"
+			method="get">
+			<input type="text" name="keyword" class="search-bar"
+				placeholder="상품명 검색" value="${keyword}">
+		</form>
 
 		<div class="header-right">
-			<c:if test="${not empty sessionScope.loginUser}">
-				<!-- 일반 유저 메뉴 -->
-				<a href="${ctx}/favorite" class="nav-link">찜 목록</a>
-				<a href="${ctx}/mypage" class="nav-link">마이페이지</a>
-
-
-				<c:if test="${sessionScope.loginUser.userRole == 'ROLE_ADMIN'}">
-					<a href="${ctx}/users/search/allUsers" class="nav-link admin-link">계정
-						관리</a>
-				</c:if>
+			<c:if test="${empty sessionScope.loginUser}">
+				<a href="${ctx}/login" class="btn">로그인</a>
+				<a href="${ctx}/signup" class="btn btn-primary">회원가입</a>
 			</c:if>
 
-			<div class="btn-group">
-				<c:choose>
-					<c:when test="${empty sessionScope.loginUser}">
-						<a href="${ctx}/login" class="btn btn-login">로그인</a>
-						<a href="${ctx}/signup" class="btn btn-join">회원가입</a>
-					</c:when>
-					<c:otherwise>
-						<span style="font-size: 14px; margin-right: 5px;"> <b>${sessionScope.loginUser.userNickName}</b>님
-						</span>
-						<a href="${ctx}/logout" class="btn btn-login">로그아웃</a>
-						<a href="${ctx}/register" class="btn btn-write">+ 글쓰기</a>
-					</c:otherwise>
-				</c:choose>
-			</div>
+			<c:if test="${not empty sessionScope.loginUser}">
+				<span
+					style="font-size: 14px; font-weight: bold; margin-right: 10px;">
+					${sessionScope.loginUser.userNickName}님 </span>
+
+				<a href="${ctx}/favorite" class="nav-link">찜목록</a>
+				<a href="${ctx}/mypage" class="nav-link">마이페이지</a>
+
+				<c:if test="${sessionScope.loginUser.userRole == 'ROLE_ADMIN'}">
+					<a href="${ctx}/users/search/allUsers" class="nav-link admin-link">계정관리</a>
+				</c:if>
+
+				<form action="${ctx}/logout" method="post"
+					style="display: inline; margin: 0;">
+					<button type="submit" class="btn">로그아웃</button>
+				</form>
+			</c:if>
 		</div>
 	</div>
 </header>

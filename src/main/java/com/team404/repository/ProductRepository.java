@@ -45,5 +45,5 @@ public interface ProductRepository {
 	public int findSellerNo(int productNo);
 
 	// 상품 등록 orders 추가
-	public void insertOrder(int productNo, int sellerNo);
+	public void insertOrder(int productNo, int sellerNo, int buyerNo);
 }
