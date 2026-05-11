@@ -20,6 +20,10 @@
 
 		<label class="form-label">상품명</label>
 		<input type="text" class="form-input" name="productName" value="${product.productName}" required>
+		
+		<label class="form-label">판매자 번호</label>
+		<input type="text" class="form-input" name="sellerNo" value="${product.sellerNo}" required>
+		
 
 		<label class="form-label">카테고리</label>
 		<select class="form-input" name="category">
@@ -31,21 +35,29 @@
 			<option value="기타" ${product.category == '기타' ? 'selected' : ''}>기타</option>
 		</select>
 
+
+        <label class="form-label">상품 상태</label>
+<select class="form-input" name="tradeStatus" required>
+    <option value="판매중" ${product.tradeStatus == '판매중' ? 'selected' : ''}>판매중</option>
+    <option value="예약중" ${product.tradeStatus == '예약중' ? 'selected' : ''}>예약중</option>
+    <option value="완료" ${product.tradeStatus == '완료' ? 'selected' : ''}>판매완료</option>
+</select>
+
+
 		<label class="form-label">가격</label>
 		<input type="number" class="form-input" name="price" value="${product.price}" required min="0">
+		
+		<label class="form-label">상품번호</label>
+		<input type="number" class="form-input" name=productNo value="${product.productNo}" required min="0">
+		
+		
 
 		<label class="form-label">설명</label>
 		<textarea class="form-input" name="description">${product.description}</textarea>
+		
+		
 
-		<label class="form-label">현재 대표 이미지</label>
-		<c:if test="${not empty product.imgPath}">
-			<img src="${ctx}${product.imgPath}" style="width:120px; height:120px; object-fit:cover; border:1px solid #ddd; border-radius:4px;">
-		</c:if>
-		<c:if test="${empty product.imgPath}">
-			<div style="color:#999;">등록된 이미지 없음</div>
-		</c:if>
-
-		<label class="form-label" style="margin-top:15px;">이미지 추가</label>
+		<label class="form-label">이미지 추가</label>
 		<input type="file" class="form-input" name="imgFiles" multiple>
 
 		<div style="margin-top:20px; display:flex; gap:10px;">
@@ -53,6 +65,29 @@
 			<a href="${ctx}/product/${product.productNo}" class="btn btn-block">취소</a>
 		</div>
 	</form>
+
+	<!-- 등록된 이미지 목록 + 대표 지정 (수정 폼 밖에 두는 게 안전 — 별도 form) -->
+	<c:if test="${not empty product.images}">
+		<h3 class="section-title">등록된 이미지</h3>
+		<div class="card" style="display:flex; gap:15px; flex-wrap:wrap;">
+			<c:forEach var="img" items="${product.images}">
+				<div style="text-align:center;">
+					<img src="${ctx}${img.filePath}" style="width:120px; height:120px; object-fit:cover; border:1px solid #ddd; border-radius:4px;">
+					<div style="margin-top:6px;">
+						<c:if test="${img.thumbnail}">
+							<span style="font-size:12px; color:#121212; font-weight:bold;">★ 대표 이미지</span>
+						</c:if>
+						<c:if test="${not img.thumbnail}">
+							<form action="${ctx}/product/${product.productNo}/thumbnail" method="post" style="margin:0;">
+								<input type="hidden" name="imageNo" value="${img.imageNo}">
+								<button type="submit" class="btn" style="font-size:12px; padding:4px 10px;">대표로 지정</button>
+							</form>
+						</c:if>
+					</div>
+				</div>
+			</c:forEach>
+		</div>
+	</c:if>
 
 </div>
 

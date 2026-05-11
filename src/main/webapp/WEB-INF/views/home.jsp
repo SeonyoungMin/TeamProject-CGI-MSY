@@ -7,7 +7,7 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>team404 - 홈</title>
+<title>홈</title>
 </head>
 <body>
 
@@ -32,13 +32,56 @@
 			href="${ctx}/product/new" class="btn">글쓰기</a>
 	</div>
 
+	<!-- 이달의 판매왕 / 소비왕 -->
+	<div class="app-container" style="margin-top: 20px; margin-bottom: 0;">
+		<div
+			style="background: #fff; border: 1px solid #eee; border-radius: 6px; padding: 10px 16px; font-size: 13px; display: flex; align-items: center; gap: 14px; margin-bottom: 8px;">
+			<strong style="color: #121212;">이달의 판매왕</strong>
+			<c:choose>
+				<c:when test="${empty topSellers}">
+					<span style="color: #888;">아직 기록이 없습니다.</span>
+				</c:when>
+				<c:otherwise>
+					<c:forEach var="r" items="${topSellers}" varStatus="loop">
+						<span> <span style="color: #999;">${loop.index + 1}위</span>
+							<strong>${r.nickname}</strong> <span style="color: #888;">(${r.tradeCount}건)</span>
+						</span>
+						<c:if test="${not loop.last}">
+							<span style="color: #ddd;">|</span>
+						</c:if>
+					</c:forEach>
+				</c:otherwise>
+			</c:choose>
+			<hr>
+			<strong style="color: #121212;">이달의 소비왕</strong>
+			<c:choose>
+				<c:when test="${empty topBuyers}">
+					<span style="color: #888;">아직 기록이 없습니다.</span>
+				</c:when>
+				<c:otherwise>
+					<c:forEach var="r" items="${topBuyers}" varStatus="loop">
+						<span> <span style="color: #999;">${loop.index + 1}위</span>
+							<strong>${r.nickname}</strong> <span style="color: #888;">(${r.tradeCount}건)</span>
+						</span>
+						<c:if test="${not loop.last}">
+							<span style="color: #ddd;">|</span>
+						</c:if>
+					</c:forEach>
+				</c:otherwise>
+			</c:choose>
+		</div>
+	</div>
+
 	<div class="app-container">
 
 
 
-		<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-			<h2 class="section-title" style="border-bottom:none; margin:0;">최근 등록 상품</h2>
-			<a href="${ctx}/productList" style="font-size:14px; color:#666;">전체보기 &gt;</a>
+		<div
+			style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+			<h2 class="section-title" style="border-bottom: none; margin: 0;">최근
+				등록 상품</h2>
+			<a href="${ctx}/productList" style="font-size: 14px; color: #666;">전체보기
+				&gt;</a>
 		</div>
 
 		<c:if test="${empty productList}">
@@ -74,6 +117,19 @@
 				</c:forEach>
 			</div>
 		</c:if>
+
+
+		<div
+			style="display: flex; justify-content: space-between; align-items: center; margin: 40px 0 20px;">
+			<h2 class="section-title" style="border-bottom: none; margin: 0;">게시판</h2>
+			<a href="${ctx}/boardList" style="font-size: 14px; color: #666;">전체보기
+				&gt;</a>
+		</div>
+
+		<a href="${ctx}/boardList" class="btn">게시글 보기</a> <a
+			href="${ctx}/boardList/addForm" class="btn btn-primary">게시글 쓰기</a>
+	</div>
+	</div>
 
 	</div>
 

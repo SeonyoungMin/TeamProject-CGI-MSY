@@ -43,7 +43,7 @@
 						</div>
 					</a>
 					<form action="${ctx}/favorite/remove" method="post" style="margin-top:10px;">
-						<input type="hidden" name="boardNo" value="${p.productNo}">
+						<input type="hidden" name="productNo" value="${p.productNo}">
 						<button type="submit" class="btn btn-danger btn-block"
 							onclick="return confirm('찜 목록에서 삭제하시겠습니까?')">찜 취소</button>
 					</form>

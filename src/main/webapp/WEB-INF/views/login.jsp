@@ -10,30 +10,37 @@
 </head>
 <body>
 
-<%@ include file="/WEB-INF/views/header.jsp"%>
+	<%@ include file="/WEB-INF/views/header.jsp"%>
 
-<div class="app-container" style="max-width:480px;">
+	<div class="app-container" style="max-width: 480px;">
 
-	<h2 class="section-title">로그인</h2>
+		<h2 class="section-title">로그인</h2>
 
-	<form class="card" action="${ctx}/login" method="post">
-		<input type="hidden" name="redirect" value="${redirect}">
+		<form class="card" action="${ctx}/login" method="post">
+			<input type="hidden" name="redirect" value="${redirect}"> <label
+				class="form-label">아이디</label> <input type="text" class="form-input"
+				name="userId" required> <label class="form-label">비밀번호</label>
+			<input type="password" class="form-input" name="userPw" required>
 
-		<label class="form-label">아이디</label>
-		<input type="text" class="form-input" name="userId" required>
+			<button type="submit" class="btn btn-primary btn-block">로그인</button>
 
-		<label class="form-label">비밀번호</label>
-		<input type="password" class="form-input" name="userPw" required>
+			<div style="margin-top: 15px; text-align: center; font-size: 13px;">
+				계정이 없으신가요? <a href="${ctx}/signup" style="font-weight: bold;">회원가입</a>
+			</div>
+		</form>
 
-		<button type="submit" class="btn btn-primary btn-block">로그인</button>
+	</div>
 
-		<div style="margin-top:15px; text-align:center; font-size:13px;">
-			계정이 없으신가요? <a href="${ctx}/signup" style="font-weight:bold;">회원가입</a>
-		</div>
-	</form>
+	<%@ include file="/WEB-INF/views/footer.jsp"%>
 
-</div>
 
-<%@ include file="/WEB-INF/views/footer.jsp"%>
+	<script>
+		
+		const urlParams = new URLSearchParams(window.location.search);
+
+		if (urlParams.has('error')) {
+			alert("아이디 또는 비밀번호가 일치하지 않습니다.");
+		}
+	</script>
 </body>
 </html>

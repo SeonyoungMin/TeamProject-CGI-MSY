@@ -1,4 +1,5 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+	pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="jakarta.tags.core"%>
 <c:set var="ctx" value="${pageContext.request.contextPath}" />
 
@@ -7,7 +8,10 @@
 
 <style>
 /* ===== 공통 ===== */
-* { box-sizing: border-box; }
+* {
+	box-sizing: border-box;
+}
+
 body {
 	margin: 0;
 	font-family: 'Malgun Gothic', sans-serif;
@@ -15,7 +19,10 @@ body {
 	color: #222;
 }
 
-a { text-decoration: none; color: inherit; }
+a {
+	text-decoration: none;
+	color: inherit;
+}
 
 /* 가운데 정렬 컨테이너 */
 .app-container {
@@ -43,12 +50,9 @@ a { text-decoration: none; color: inherit; }
 }
 
 /* input */
-.form-input,
-input[type="text"].form-input,
-input[type="password"].form-input,
-input[type="number"].form-input,
-select.form-input,
-textarea.form-input {
+.form-input, input[type="text"].form-input, input[type="password"].form-input,
+	input[type="number"].form-input, select.form-input, textarea.form-input
+	{
 	width: 100%;
 	padding: 10px 12px;
 	border: 1px solid #ddd;
@@ -58,7 +62,10 @@ textarea.form-input {
 	margin-bottom: 12px;
 }
 
-textarea.form-input { min-height: 120px; resize: vertical; }
+textarea.form-input {
+	min-height: 120px;
+	resize: vertical;
+}
 
 label.form-label {
 	display: block;
@@ -80,14 +87,20 @@ label.form-label {
 	cursor: pointer;
 	text-align: center;
 }
-.btn:hover { background: #f5f5f5; }
+
+.btn:hover {
+	background: #f5f5f5;
+}
 
 .btn-primary {
 	background: #121212;
 	border-color: #121212;
 	color: #fff;
 }
-.btn-primary:hover { background: #000; }
+
+.btn-primary:hover {
+	background: #000;
+}
 
 .btn-line {
 	background: #fff;
@@ -100,9 +113,14 @@ label.form-label {
 	border-color: #e74c3c;
 	color: #e74c3c;
 }
-.btn-danger:hover { background: #fdecea; }
 
-.btn-block { width: 100%; }
+.btn-danger:hover {
+	background: #fdecea;
+}
+
+.btn-block {
+	width: 100%;
+}
 
 /* ===== Header ===== */
 .top-bar {
@@ -114,7 +132,11 @@ label.form-label {
 	background: #f9f9f9;
 	border-bottom: 1px solid #eee;
 }
-.top-bar a { color: #888; margin-right: 15px; }
+
+.top-bar a {
+	color: #888;
+	margin-right: 15px;
+}
 
 .main-header {
 	display: flex;
@@ -132,7 +154,12 @@ label.form-label {
 	flex: 1;
 }
 
-.search-container { flex: 2; display: flex; justify-content: center; }
+.search-container {
+	flex: 2;
+	display: flex;
+	justify-content: center;
+}
+
 .search-bar {
 	width: 80%;
 	padding: 10px 16px;
@@ -147,19 +174,29 @@ label.form-label {
 	display: flex;
 	align-items: center;
 	justify-content: flex-end;
-	gap: 16px;
+	gap: 12px;
+	white-space: nowrap;
 }
 
-.nav-link { font-size: 14px; color: #333; }
-.nav-link:hover { text-decoration: underline; }
-.admin-link { color: #e74c3c; font-weight: bold; }
+.nav-link {
+	font-size: 14px;
+	color: #333;
+}
+
+.nav-link:hover {
+	text-decoration: underline;
+}
+
+.admin-link {
+	color: #e74c3c;
+	font-weight: bold;
+}
 </style>
 
 <header>
 	<div class="top-bar">
 		<div>
-			<a href="${ctx}/home">홈</a>
-			<a href="${ctx}/productList">상품 목록</a>
+			<a href="${ctx}/home">홈</a> <a href="${ctx}/productList">상품 목록</a>
 		</div>
 		<div>TEAM 404</div>
 	</div>
@@ -167,8 +204,10 @@ label.form-label {
 	<div class="main-header">
 		<a href="${ctx}/home" class="logo">team404</a>
 
-		<form class="search-container" action="${ctx}/product/search" method="get">
-			<input type="text" name="keyword" class="search-bar" placeholder="상품명 검색" value="${keyword}">
+		<form class="search-container" action="${ctx}/product/search"
+			method="get">
+			<input type="text" name="keyword" class="search-bar"
+				placeholder="상품명 검색" value="${keyword}">
 		</form>
 
 		<div class="header-right">
@@ -178,14 +217,21 @@ label.form-label {
 			</c:if>
 
 			<c:if test="${not empty sessionScope.loginUser}">
-				<a href="${ctx}/favorite" class="nav-link">찜 목록</a>
+				<span
+					style="font-size: 14px; font-weight: bold; margin-right: 10px;">
+					${sessionScope.loginUser.userNickName}님 </span>
+
+				<a href="${ctx}/favorite" class="nav-link">찜목록</a>
 				<a href="${ctx}/mypage" class="nav-link">마이페이지</a>
+
 				<c:if test="${sessionScope.loginUser.userRole == 'ROLE_ADMIN'}">
 					<a href="${ctx}/users/search/allUsers" class="nav-link admin-link">계정관리</a>
 				</c:if>
-				<span style="font-size:14px;"><b>${sessionScope.loginUser.userNickName}</b>님</span>
-				<a href="${ctx}/logout" class="btn">로그아웃</a>
-				<a href="${ctx}/product/new" class="btn btn-primary">글쓰기</a>
+
+				<form action="${ctx}/logout" method="post"
+					style="display: inline; margin: 0;">
+					<button type="submit" class="btn">로그아웃</button>
+				</form>
 			</c:if>
 		</div>
 	</div>

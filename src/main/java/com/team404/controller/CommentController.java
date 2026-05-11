@@ -31,16 +31,15 @@ public class CommentController {
 		return commentService.getComments(boardNo);
 	}
 
-	// AJAX: 댓글 등록
+	// 댓글 등록 (일반 폼 submit)
 	@PostMapping("/comment/add")
-	@ResponseBody
 	public String add(@RequestParam("boardNo") int boardNo,
 			@RequestParam("content") String content,
 			HttpSession session) {
 
 		User loginUser = (User) session.getAttribute("loginUser");
 		if (loginUser == null) {
-			return "login";
+			return "redirect:/login";
 		}
 
 		Comment c = new Comment();
@@ -48,7 +47,7 @@ public class CommentController {
 		c.setContent(content);
 		c.setAuthorNo(loginUser.getUserNo());
 		commentService.addComment(c);
-		return "ok";
+		return "redirect:/product/" + boardNo;
 	}
 
 	// 댓글 수정 폼 — 작성자 본인만 진입 가능
@@ -86,7 +85,7 @@ public class CommentController {
 		return "redirect:/product/" + boardNo;
 	}
 
-	// 댓글 삭제 처리
+	// 댓글 삭제 처리 — 본인 또는 관리자
 	@PostMapping("/comment/{commentNo}/delete")
 	public String delete(@PathVariable("commentNo") int commentNo,
 			@RequestParam("boardNo") int boardNo,
@@ -97,7 +96,9 @@ public class CommentController {
 			return "redirect:/login";
 		}
 		Comment comment = commentService.getComment(commentNo);
-		if (comment.getAuthorNo() != loginUser.getUserNo()) {
+		boolean isAuthor = comment.getAuthorNo() == loginUser.getUserNo();
+		boolean isAdmin = "ROLE_ADMIN".equals(loginUser.getUserRole());
+		if (!isAuthor && !isAdmin) {
 			return "redirect:/product/" + boardNo;
 		}
 		commentService.deleteComment(commentNo);

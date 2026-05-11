@@ -1,17 +1,12 @@
 package com.team404.domain;
 
-import java.sql.Timestamp;
-
-import com.fasterxml.jackson.annotation.JsonFormat;
-
 public class Comment {
 
 	private int commentNo;
 	private String content;
 	private int boardNo;
 	private int authorNo;
-	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
-	private Timestamp createdTime;
+	private String createdTime;
 
 	private String nickname;
 
@@ -47,11 +42,11 @@ public class Comment {
 		this.authorNo = authorNo;
 	}
 
-	public Timestamp getCreatedTime() {
+	public String getCreatedTime() {
 		return createdTime;
 	}
 
-	public void setCreatedTime(Timestamp createdTime) {
+	public void setCreatedTime(String createdTime) {
 		this.createdTime = createdTime;
 	}
 

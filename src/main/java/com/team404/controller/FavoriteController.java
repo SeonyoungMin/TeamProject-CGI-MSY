@@ -53,30 +53,30 @@ public class FavoriteController {
 	// AJAX: 찜 버튼 누르면 — 이미 찜이면 삭제, 아니면 추가
 	@PostMapping("/favorite/toggle")
 	@ResponseBody
-	public String toggleFavorite(@RequestParam("boardNo") int boardNo, HttpSession session) {
+	public String toggleFavorite(@RequestParam("productNo") int productNo, HttpSession session) {
 		User loginUser = (User) session.getAttribute("loginUser");
 		if (loginUser == null) {
 			return "login";
 		}
 
 		int userNo = loginUser.getUserNo();
-		if (favoriteService.exists(userNo, boardNo)) {
-			favoriteService.delete(userNo, boardNo);
+		if (favoriteService.exists(userNo, productNo)) {
+			favoriteService.delete(userNo, productNo);
 			return "removed";
 		} else {
-			favoriteService.insertFavorite(userNo, boardNo);
+			favoriteService.insertFavorite(userNo, productNo);
 			return "added";
 		}
 	}
 
 	// 찜 목록 페이지에서 찜 취소 버튼 누르면 단순 삭제 후 다시 찜 목록으로
 	@PostMapping("/favorite/remove")
-	public String remove(@RequestParam("boardNo") int boardNo, HttpSession session) {
+	public String remove(@RequestParam("productNo") int productNo, HttpSession session) {
 		User loginUser = (User) session.getAttribute("loginUser");
 		if (loginUser == null) {
 			return "redirect:/login";
 		}
-		favoriteService.delete(loginUser.getUserNo(), boardNo);
+		favoriteService.delete(loginUser.getUserNo(), productNo);
 		return "redirect:/favorite";
 	}
 }
