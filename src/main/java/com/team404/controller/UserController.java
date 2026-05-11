@@ -18,10 +18,12 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.team404.domain.ProductListDto;
+import com.team404.domain.ReviewDto;
 import com.team404.domain.SearchDTO;
 import com.team404.domain.User;
 import com.team404.exception.NoUserFoundException;
 import com.team404.service.ProductService;
+import com.team404.service.ReviewService;
 import com.team404.service.UserService;
 
 import jakarta.servlet.http.HttpSession;
@@ -36,11 +38,14 @@ public class UserController {
 	UserService userService;
 	@Autowired
 	private ProductService productService;
+	@Autowired
+	private ReviewService reviewService;
+
 
 	// 관리자 외 접근 차단 헬퍼 — null/일반회원 모두 /home 으로 보냄
 	private boolean isAdmin(HttpSession session) {
 		User loginUser = (User) session.getAttribute("loginUser");
-		return loginUser != null && ROLE_ADMIN.equals(loginUser.getUserRole()); 
+		return loginUser != null && ROLE_ADMIN.equals(loginUser.getUserRole());
 	}
 
 	// 기존 /users/search 진입은 분리된 신규 엔드포인트로 보냄
@@ -209,6 +214,13 @@ public class UserController {
 		if (loginUser == null) {
 			return "redirect:/login";
 		}
+		
+		int loginMemberNo = 30001; 
+		
+	    // 후기 목록 추가
+	    List<ReviewDto> reviewList = reviewService.findReviewsByUser(loginMemberNo);
+	    model.addAttribute("reviewList", reviewList);
+	
 
 		return "myPage";
 	}

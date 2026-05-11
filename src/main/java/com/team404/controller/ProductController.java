@@ -20,8 +20,10 @@ import org.springframework.web.multipart.MultipartFile;
 import com.team404.domain.Product;
 import com.team404.domain.ProductDetailDto;
 import com.team404.domain.ProductListDto;
+import com.team404.domain.ReviewDto;
 import com.team404.domain.User;
 import com.team404.service.ProductService;
+import com.team404.service.ReviewService;
 
 import jakarta.servlet.http.HttpSession;
 
@@ -30,6 +32,9 @@ public class ProductController {
 
 	@Autowired
 	private ProductService productService;
+	
+	@Autowired
+	private ReviewService reviewService;
 
 	// 세션에서 로그인 사용자 꺼내기 — null 이면 비로그인
 	private User getLoginUser(HttpSession session) {
@@ -89,6 +94,11 @@ public class ProductController {
 	public String getProduct(@PathVariable("productNo") int productNo, Model model) {
 		ProductDetailDto listByProductNo = productService.findProductDetail(productNo);
 		model.addAttribute("listByProductNo", listByProductNo);
+		
+		//후기 추가
+		ReviewDto review = reviewService.findReviewByProduct(productNo);
+		model.addAttribute("review",review);
+		
 		return "productDetail";
 	}
 
