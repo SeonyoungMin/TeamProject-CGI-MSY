@@ -10,7 +10,6 @@ import com.team404.domain.Product;
 import com.team404.domain.ProductDetailDto;
 import com.team404.domain.ProductListDto;
 
-// insertImage(), findImagesByProduct() 제거 → ImageRepository 가 단일 책임
 @Repository
 public class ProductRepositoryImpl implements ProductRepository {
 
@@ -70,7 +69,26 @@ public class ProductRepositoryImpl implements ProductRepository {
 		return template.query(SQL, new ProductListRowMapper(), category);
 	}
 
-	// 내 판매목록 조회
+	// 내 판매목록 조회 (페이징)
+	@Override
+	public List<ProductListDto> findBySeller(int sellerNo, int startNum, int limit) {
+		String SQL = "select p.product_no, p.name, p.category, p.price, p.trade_status, p.created_time, "
+				+ "p.seller_no, u.nickname as seller_nickname, i.file_name as img_name, i.file_path as img_path "
+				+ "from product p "
+				+ "left join users u on u.user_no = p.seller_no "
+				+ "left join image i on i.entity_type = 'product' and i.entity_id = p.product_no and i.is_thumbnail = 1 "
+				+ "where p.seller_no=? order by p.created_time desc limit ?, ?";
+		return template.query(SQL, new ProductListRowMapper(), sellerNo, startNum, limit);
+	}
+
+	// 내 판매목록 카운트
+	@Override
+	public int countBySeller(int sellerNo) {
+		String SQL = "select count(*) from product where seller_no = ?";
+		return template.queryForObject(SQL, Integer.class, sellerNo);
+	}
+
+	// 내 판매목록 조회 (전체)
 	public List<ProductListDto> findBySeller(int sellerNo) {
 		String SQL = "select p.product_no, p.name, p.category, p.price, p.trade_status, p.created_time, "
 				+ "p.seller_no, u.nickname as seller_nickname, i.file_name as img_name, i.file_path as img_path "

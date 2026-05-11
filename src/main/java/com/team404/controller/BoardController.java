@@ -16,8 +16,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import com.team404.domain.Board;
 import com.team404.domain.BoardDetailDto;
 import com.team404.domain.BoardListDto;
+import com.team404.domain.Comment;
 import com.team404.domain.User;
 import com.team404.service.BoardService;
+import com.team404.service.CommentService;
 
 import jakarta.servlet.http.HttpSession;
 
@@ -26,6 +28,9 @@ public class BoardController {
 
 	@Autowired
 	private BoardService boardService;
+
+	@Autowired
+	private CommentService commentService;
 
 	// 문의글 전체 목록 (페이징)
 	@GetMapping("/boardList")
@@ -49,8 +54,10 @@ public class BoardController {
 	public String getBoard(@PathVariable("boardNo") int boardNo, Model model, HttpSession session) {
 		BoardDetailDto dto = boardService.findBoardDetail(boardNo);
 		User loginUser = (User) session.getAttribute("loginUser");
+		List<Comment> comments = commentService.getComments(boardNo);
 		model.addAttribute("board", dto);
 		model.addAttribute("loginUser", loginUser);
+		model.addAttribute("comments", comments);
 		return "boardDetail";
 	}
 

@@ -12,8 +12,6 @@ import com.team404.domain.ProductDetailDto;
 import com.team404.domain.ProductListDto;
 import com.team404.repository.ProductRepository;
 
-// ProductService는 더 이상 이미지 처리(File/transferTo/UUID/ProductImage 생성/insertImage)를 알지 않음
-//->모든 이미지 처리는 ImageService 로 위임
 @Service
 public class ProductServiceImpl implements ProductService {
 
@@ -62,25 +60,29 @@ public class ProductServiceImpl implements ProductService {
 		return productRepository.findByCategory(category);
 	}
 
-	// 내 판매 목록
+	// 내 판매 목록 (전체)
 	@Override
 	public List<ProductListDto> findBySeller(int sellerNo) {
 		return productRepository.findBySeller(sellerNo);
+	}
+
+	// 내 판매 목록 (페이징)
+	@Override
+	public List<ProductListDto> findBySeller(int sellerNo, int startNum, int limit) {
+		return productRepository.findBySeller(sellerNo, startNum, limit);
+	}
+
+	@Override
+	public int countBySeller(int sellerNo) {
+		return productRepository.countBySeller(sellerNo);
 	}
 
 	// 상품 등록
 	@Override
 	public void registerProduct(Product product, List<MultipartFile> imgFiles, int loginMemberNo) {
 
-		// 상품 저장 (LAST_INSERT_ID 로 상품번호 받음)
 		int productNo = productRepository.insertProduct(product);
 
-		// orders 테이블에 (상품번호, 판매자번호, 구매자번호) 저장
-		int sellerNo = product.getSellerNo();
-		int buyerNo = loginMemberNo;
-		productRepository.insertOrder(productNo, sellerNo, buyerNo);
-
-		// 이미지 업로드
 		if (imgFiles != null && !imgFiles.isEmpty()) {
 			imageService.upload(imgFiles, "product", productNo);
 		}

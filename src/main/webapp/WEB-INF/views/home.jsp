@@ -116,18 +116,34 @@
 					</a>
 				</c:forEach>
 			</div>
+
+			<!-- 페이징 -->
+			<c:if test="${totalPages > 1}">
+				<div style="display:flex; justify-content:center; gap:8px; margin-top:25px;">
+					<c:forEach var="i" begin="1" end="${totalPages}">
+						<c:choose>
+							<c:when test="${i == currentPage}">
+								<span class="btn btn-primary" style="padding:6px 12px; font-size:13px;">${i}</span>
+							</c:when>
+							<c:otherwise>
+								<a href="${ctx}/home?pageNum=${i}" class="btn" style="padding:6px 12px; font-size:13px;">${i}</a>
+							</c:otherwise>
+						</c:choose>
+					</c:forEach>
+				</div>
+			</c:if>
 		</c:if>
 
 
 		<div
 			style="display: flex; justify-content: space-between; align-items: center; margin: 40px 0 20px;">
-			<h2 class="section-title" style="border-bottom: none; margin: 0;">게시판</h2>
+			<h2 class="section-title" style="border-bottom: none; margin: 0;">나문희게시판</h2>
 			<a href="${ctx}/boardList" style="font-size: 14px; color: #666;">전체보기
 				&gt;</a>
 		</div>
-
-		<a href="${ctx}/boardList" class="btn">게시글 보기</a> <a
-			href="${ctx}/boardList/addForm" class="btn btn-primary">게시글 쓰기</a>
+ 
+		<a href="${ctx}/boardList" class="btn">문의 게시글 보기</a> <a href="${ctx}/boardList/addForm" class="btn btn-primary">문의
+			게시글 쓰기</a>
 	</div>
 	</div>
 

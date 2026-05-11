@@ -14,12 +14,14 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import com.team404.domain.Account;
 import com.team404.domain.Image;
 import com.team404.domain.ProductListDto;
 import com.team404.domain.Rangking;
 import com.team404.domain.SearchDTO;
 import com.team404.domain.User;
 import com.team404.exception.NoUserFoundException;
+import com.team404.service.AccountService;
 import com.team404.service.ImageService;
 import com.team404.service.ProductService;
 import com.team404.service.RankingService;
@@ -44,6 +46,9 @@ public class UserController {
 	@Autowired
 	private RankingService rankingService;
 
+	@Autowired
+	private AccountService accountService;
+
 	// 로그인한 사용자가 관리자인지 검사
 	private boolean isAdmin(HttpSession session) {
 		User loginUser = (User) session.getAttribute("loginUser");
@@ -55,13 +60,22 @@ public class UserController {
 		return "redirect:/home";
 	}
 
-	// 홈
+	// 홈 
 	@GetMapping("/home")
-	public String home(Model model) {
-		List<ProductListDto> productList = productService.findAll(0, 6);
+	public String home(@RequestParam(value = "pageNum", defaultValue = "1") int pageNum, Model model) {
+		int limit = 9;
+		int startNum = limit * (pageNum - 1);
+
+		List<ProductListDto> productList = productService.findAll(startNum, limit);
+		int totalNum = productService.countAll();
+		int totalPages = (totalNum % limit) == 0 ? totalNum / limit : (totalNum / limit) + 1;
+
 		List<Rangking> topSellers = rankingService.findTopSellers(3);
 		List<Rangking> topBuyers = rankingService.findTopBuyers(3);
+
 		model.addAttribute("productList", productList);
+		model.addAttribute("totalPages", totalPages);
+		model.addAttribute("currentPage", pageNum);
 		model.addAttribute("topSellers", topSellers);
 		model.addAttribute("topBuyers", topBuyers);
 		return "home";
@@ -88,39 +102,25 @@ public class UserController {
 		return "login";
 	}
 
-	/*
-	 * // 로그인 처리 — 아이디/비밀번호 일치하면 세션에 저장
-	 * 
-	 * @PostMapping("/login") public String login(@RequestParam("userId") String
-	 * userId, @RequestParam("userPw") String userPw,
-	 * 
-	 * @RequestParam(value = "redirect", required = false) String redirect,
-	 * HttpSession session) {
-	 * 
-	 * User user = userService.getUserById(userId);
-	 * 
-	 * if (user != null && user.getUserPw().equals(userPw)) {
-	 * session.setAttribute("loginUser", user); // redirect 파라미터가 있으면 그쪽으로, 없으면 홈으로
-	 * if (redirect != null && !redirect.isEmpty()) { return "redirect:" + redirect;
-	 * } return "redirect:/home"; } return "redirect:/login"; }
-	 */
-
-	// 마이페이지 — 내 정보 + 내가 등록한 상품 보여줌
+	// 마이페이지 — 내 정보 + 최근 상품/가계부 미리보기
 	@GetMapping("/mypage")
 	public String myPage(HttpSession session, Model model) {
 		User loginUser = (User) session.getAttribute("loginUser");
 		if (loginUser == null) {
 			return "redirect:/login";
 		}
-		List<ProductListDto> myProducts = productService.findBySeller(loginUser.getUserNo());
 
-		// 프로필 사진 — 있으면 첫 번째, 없으면 null
+		List<ProductListDto> myProducts = productService.findBySeller(loginUser.getUserNo(), 0, 5);
+
 		List<Image> profileImages = imageService.getImages("user", loginUser.getUserNo());
 		Image profileImage = profileImages.isEmpty() ? null : profileImages.get(0);
+
+		List<Account> accountList = accountService.findAllByBuyer(loginUser.getUserNo(), 0, 6);
 
 		model.addAttribute("user", loginUser);
 		model.addAttribute("myProducts", myProducts);
 		model.addAttribute("profileImage", profileImage);
+		model.addAttribute("accountList", accountList);
 		return "myPage";
 	}
 

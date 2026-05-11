@@ -4,6 +4,6 @@ public interface OrderRepository {
 
 	public void updateProductStatus(int productNo, String status);
 
-	void insertOrder(int productNo, int sellerNo, int buyerNo);
+	void insertOrder(int productNo, int sellerNo, int buyerNo, long price);
 
 }

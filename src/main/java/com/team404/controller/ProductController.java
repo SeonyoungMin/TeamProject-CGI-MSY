@@ -62,14 +62,22 @@ public class ProductController {
 		return "productList";
 	}
 
-	// 내가 등록한 상품 (로그인 필요)
+	// 내가 등록한 상품 (로그인 필요, 페이징)
 	@GetMapping("/product/mylist")
-	public String myList(Model model, HttpSession session) {
+	public String myList(@RequestParam(value = "pageNum", defaultValue = "1") int pageNum,
+			Model model, HttpSession session) {
 		User loginUser = (User) session.getAttribute("loginUser");
 		if (loginUser == null) {
 			return "redirect:/login";
 		}
-		model.addAttribute("list", productService.findBySeller(loginUser.getUserNo()));
+		int limit = 10;
+		int startNum = limit * (pageNum - 1);
+		model.addAttribute("list",
+				productService.findBySeller(loginUser.getUserNo(), startNum, limit));
+		int total = productService.countBySeller(loginUser.getUserNo());
+		int totalPages = (total % limit) == 0 ? total / limit : (total / limit) + 1;
+		model.addAttribute("totalPages", totalPages);
+		model.addAttribute("currentPage", pageNum);
 		return "productList";
 	}
 

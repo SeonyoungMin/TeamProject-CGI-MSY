@@ -26,8 +26,13 @@ public interface ProductService {
 		//카테고리별 조회
 		public List<ProductListDto> findByCategory(String category);
 		
-		//내 판매 목록 조회
+		//내 판매 목록 조회 (전체)
 		public List<ProductListDto> findBySeller(int sellerNo);
+
+		//내 판매 목록 조회 (페이징)
+		public List<ProductListDto> findBySeller(int sellerNo, int startNum, int limit);
+
+		public int countBySeller(int sellerNo);
 		
 		//상품 등록
 		public void registerProduct(Product product, List<MultipartFile> imgFiles, int loginMemberNo);
