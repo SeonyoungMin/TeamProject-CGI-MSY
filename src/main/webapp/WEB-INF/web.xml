@@ -9,12 +9,16 @@
 	<!-- ===== Root Context ===== -->
 	<context-param>
 		<param-name>contextConfigLocation</param-name>
-		<param-value>/WEB-INF/spring/root-context.xml</param-value>
+		<param-value>
+        /WEB-INF/spring/root-context.xml
+        /WEB-INF/spring/security-context.xml
+    </param-value>
 	</context-param>
 
 	<listener>
 		<listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
 	</listener>
+
 
 	<!-- ===== UTF-8 Encoding ===== -->
 	<filter>
@@ -32,6 +36,16 @@
 
 	<filter-mapping>
 		<filter-name>encodingFilter</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping>
+
+
+	<filter>
+		<filter-name>springSecurityFilterChain</filter-name>
+		<filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
+	</filter>
+	<filter-mapping>
+		<filter-name>springSecurityFilterChain</filter-name>
 		<url-pattern>/*</url-pattern>
 	</filter-mapping>
 
@@ -57,12 +71,13 @@
 
 		<init-param>
 			<param-name>contextConfigLocation</param-name>
-			<param-value>/WEB-INF/spring/appServlet/servlet-context.xml</param-value>
+			<param-value>/WEB-INF/spring/appServlet/servlet-context.xml
+			</param-value>
 		</init-param>
 
 		<load-on-startup>1</load-on-startup>
 
-		<!--  Multipart 설정 (핵심) -->
+		<!-- Multipart 설정 (핵심) -->
 		<multipart-config>
 			<location>C:/team404_upload/temp</location>
 			<max-file-size>5000000</max-file-size>
@@ -78,16 +93,15 @@
 	
 
 
+
+
 	<!-- ===== Session ===== -->
-	<!-- <session-config>
-		<session-timeout>30</session-timeout>
-		<cookie-config>
-			<http-only>true</http-only>
-		</cookie-config>
-		<tracking-mode>COOKIE</tracking-mode>
-	</session-config> -->
+	<!-- <session-config> <session-timeout>30</session-timeout> <cookie-config> 
+		<http-only>true</http-only> </cookie-config> <tracking-mode>COOKIE</tracking-mode> 
+		</session-config> -->
 
 	<!-- ===== Error Page ===== -->
+
 	<!-- <error-page>
 		<error-code>404</error-code>
 		<location>/WEB-INF/views/error/404.jsp</location>
@@ -101,5 +115,10 @@
 	
 =======
  -->
+
+
+	<!-- <error-page> <error-code>404</error-code> <location>/WEB-INF/views/error/404.jsp</location> 
+		</error-page> <error-page> <error-code>500</error-code> <location>/WEB-INF/views/error/500.jsp</location> 
+		</error-page> -->
 
 </web-app>
