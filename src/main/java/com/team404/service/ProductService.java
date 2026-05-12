@@ -41,5 +41,11 @@ public interface ProductService {
 		//거래 상태 변경 (본인 확인 필요)
 		public void updateTradeStatus(int productNo, String tradeStatus, int loginMemberNo);
 		
+		//상품 조회수
+		public void increaseViewCount(int productNo);
+		
+		//인기 상품 배너
+		public List<ProductListDto> findTopByViewCount(int limit, String category);
+	 	
 	}
 

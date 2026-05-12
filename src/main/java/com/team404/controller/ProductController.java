@@ -113,6 +113,10 @@ public class ProductController {
 		}
 
 		User loginUser = (User) session.getAttribute("loginUser");
+		
+		if(loginUser == null || loginUser.getUserNo() != product.getSellerNo()) {
+			productService.increaseViewCount(productNo);
+		}
 
 		boolean favorite = false;
 		if (loginUser != null) {

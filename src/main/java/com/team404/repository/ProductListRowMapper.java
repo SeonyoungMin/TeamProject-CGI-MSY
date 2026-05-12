@@ -21,6 +21,7 @@ public class ProductListRowMapper implements RowMapper<ProductListDto> {
 		productListDto.setSellerNickname(rs.getString("seller_nickname"));
 		productListDto.setImgName(rs.getString("img_name"));
 		productListDto.setImgPath(rs.getString("img_path"));
+		productListDto.setViewCount(rs.getInt("view_count"));
 		
 		return productListDto;
 	}

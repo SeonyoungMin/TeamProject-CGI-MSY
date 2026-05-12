@@ -135,4 +135,13 @@ public class ProductServiceImpl implements ProductService {
 		productRepository.updateTradeStatus(productNo, tradeStatus);
 	}
 
+	// 상품 조회수
+	public void increaseViewCount(int productNo) {
+		productRepository.increaseViewCount(productNo);
+	}
+
+	// 인기 상품 배너
+	public List<ProductListDto> findTopByViewCount(int limit, String category) {
+		return productRepository.findTopByViewCount(limit, category);
+	}
 }

@@ -159,7 +159,12 @@
 				</div>
 
 				<div class="detail-info">
-					<div class="product-status">${product.tradeStatus == '판매중' ? '판매중' : product.tradeStatus == '예약중' ? '예약중' : '판매완료'}
+					<div
+						style="display: flex; justify-content: space-between; align-items: center;">
+						<div class="product-status">${product.tradeStatus == '판매중' ? '판매중' : product.tradeStatus == '예약중' ? '예약중' : '판매완료'}
+						</div>
+						<span style="font-size: 12px; color: #888;">👁
+							${product.viewCount}</span>
 					</div>
 					<div class="product-title">${product.productName}</div>
 					<div class="product-price">
@@ -175,7 +180,8 @@
 					<div class="desc-box">${product.description}</div>
 
 					<!-- 구매 / 찜하기 -->
-					<div style="margin-top: 20px; display: flex; gap: 10px;">
+					<div
+						style="margin-top: 20px; display: flex; gap: 10px;">
 						<a
 							href="${pageContext.request.contextPath}/order/select?productNo=${product.productNo}"
 							class="btn-order">구매하기</a>
@@ -190,16 +196,19 @@
 					<!-- 수정 / 삭제 — 본인 또는 관리자 -->
 					<c:if
 						test="${not empty loginUser && (loginUser.userNo == product.sellerNo || loginUser.userRole == 'ROLE_ADMIN')}">
-						<div style="margin-top: 10px; display: flex; gap: 10px;">
-							<a class="btn btn-line"
-								href="${ctx}/product/${product.productNo}/edit">수정</a>
-							<form action="${ctx}/product/${product.productNo}/delete"
-								method="post" style="margin: 0;">
-								<button type="submit" class="btn btn-danger"
-									onclick="return confirm('삭제하시겠습니까?')">삭제</button>
-							</form>
+							<div style="margin-top: 10px; display: flex; gap: 10px;">
+								<a class="btn btn-line"
+									href="${ctx}/product/${product.productNo}/edit">수정</a>
+								<form action="${ctx}/product/${product.productNo}/delete"
+									method="post" style="margin: 0;">
+									<button type="submit" class="btn btn-danger"
+										onclick="return confirm('삭제하시겠습니까?')">삭제</button>
+								</form>
+				
 						</div>
+
 					</c:if>
+
 				</div>
 
 			</div>
@@ -216,41 +225,43 @@
 					</div>
 				</c:when>
 				<c:otherwise>
-					<form action="${ctx}/comment/add" method="post" style="margin-bottom: 20px;">
+					<form action="${ctx}/comment/add" method="post"
+						style="margin-bottom: 20px;">
 						<input type="hidden" name="boardNo" value="${product.productNo}">
-						<textarea class="form-input" name="content" placeholder="댓글을 입력하세요"
-							required></textarea>
+						<textarea class="form-input" name="content"
+							placeholder="댓글을 입력하세요" required></textarea>
 						<button type="submit" class="btn btn-primary">댓글 등록</button>
 					</form>
 
 					<div id="commentList">
 						<c:choose>
 							<c:when test="${empty comments}">
-								<div style="color:#999; padding:10px 0;">아직 댓글이 없습니다.</div>
+								<div style="color: #999; padding: 10px 0;">아직 댓글이 없습니다.</div>
 							</c:when>
 							<c:otherwise>
 								<c:forEach var="c" items="${comments}">
 									<div class="comment-item">
-										<span class="comment-author">
-											<c:choose>
+										<span class="comment-author"> <c:choose>
 												<c:when test="${empty c.nickname}">익명</c:when>
 												<c:otherwise>${c.nickname}</c:otherwise>
 											</c:choose>
-										</span>
-										<span class="comment-date">${c.createdTime}</span>
+										</span> <span class="comment-date">${c.createdTime}</span>
 										<div class="comment-content">${c.content}</div>
 
 										<!-- 본인: 수정 + 삭제 / 관리자(타인 댓글): 삭제만 -->
-										<c:if test="${c.authorNo == loginUser.userNo || loginUser.userRole == 'ROLE_ADMIN'}">
-											<div style="display:flex; gap:5px; margin-top:6px;">
+										<c:if
+											test="${c.authorNo == loginUser.userNo || loginUser.userRole == 'ROLE_ADMIN'}">
+											<div style="display: flex; gap: 5px; margin-top: 6px;">
 												<c:if test="${c.authorNo == loginUser.userNo}">
-													<a href="${ctx}/comment/${c.commentNo}/edit"
-														class="btn" style="padding:3px 10px; font-size:12px;">수정</a>
+													<a href="${ctx}/comment/${c.commentNo}/edit" class="btn"
+														style="padding: 3px 10px; font-size: 12px;">수정</a>
 												</c:if>
-												<form action="${ctx}/comment/${c.commentNo}/delete" method="post" style="margin:0;">
-													<input type="hidden" name="boardNo" value="${product.productNo}">
+												<form action="${ctx}/comment/${c.commentNo}/delete"
+													method="post" style="margin: 0;">
+													<input type="hidden" name="boardNo"
+														value="${product.productNo}">
 													<button type="submit" class="btn btn-danger"
-														style="padding:3px 10px; font-size:12px;"
+														style="padding: 3px 10px; font-size: 12px;"
 														onclick="return confirm('삭제하시겠습니까?')">삭제</button>
 												</form>
 											</div>

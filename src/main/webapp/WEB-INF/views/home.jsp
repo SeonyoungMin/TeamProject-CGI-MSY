@@ -16,9 +16,8 @@
 	<!-- 배너 -->
 
 	<div class="card" style="text-align: center;">
-		<a href="${ctx}/home">전체</a> <a
-			href="${ctx}/home?category=의류">의류</a> | <a
-			href="${ctx}/home?category=잡화">잡화</a> | <a
+		<a href="${ctx}/home">전체</a> <a href="${ctx}/home?category=의류">의류</a>
+		| <a href="${ctx}/home?category=잡화">잡화</a> | <a
 			href="${ctx}/home?category=가구">가구</a> | <a
 			href="${ctx}/home?category=전자기기">전자기기</a> | <a
 			href="${ctx}/home?category=도서">도서</a> | <a
@@ -74,7 +73,49 @@
 
 	<div class="app-container">
 
+		<div class="app-container" style="margin-top: 20px;">
+			<div
+				style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+				<h2 class="section-title" style="border-bottom: none; margin: 0;">🔥
+					인기상품</h2>
+			</div>
 
+			<c:if test="${empty popularList}">
+				<div class="card" style="text-align: center; color: #888;">인기상품이
+					없습니다.</div>
+			</c:if>
+
+			<c:if test="${not empty popularList}">
+				<div
+					style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px;">
+					<c:forEach var="p" items="${popularList}">
+						<a href="${ctx}/product/${p.productNo}" class="card"
+							style="display: block;">
+							<div
+								style="height: 180px; background: #f0f0f0; margin-bottom: 10px;">
+								<c:if test="${not empty p.imgPath}">
+									<img src="${ctx}${p.imgPath}"
+										style="width: 100%; height: 100%; object-fit: cover;">
+								</c:if>
+								<c:if test="${empty p.imgPath}">
+									<div
+										style="height: 100%; display: flex; align-items: center; justify-content: center; color: #aaa;">이미지
+										없음</div>
+								</c:if>
+							</div>
+							<div style="font-size: 15px; font-weight: 600;">${p.productName}</div>
+							<div style="font-size: 12px; color: #888; margin-top: 4px;">${p.sellerNickname}</div>
+							<div
+								style="display: flex; justify-content: space-between; margin-top: 6px;">
+								<span style="font-weight: bold;"><fmt:formatNumber
+										value="${p.price}" />원</span> <span
+									style="font-size: 12px; color: #888;">👁 ${p.viewCount}</span>
+							</div>
+						</a>
+					</c:forEach>
+				</div>
+			</c:if>
+		</div>
 
 		<div
 			style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
@@ -113,6 +154,9 @@
 							<fmt:formatNumber value="${p.price}" />
 							원
 						</div>
+						<div
+							style="font-size: 12px; color: #888; margin-top: 4px; text-align: right;">
+							👁 ${p.viewCount}</div>
 					</a>
 				</c:forEach>
 			</div>

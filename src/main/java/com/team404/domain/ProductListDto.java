@@ -15,6 +15,7 @@ public class ProductListDto {
 	private String tradeStatus;
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     private Timestamp createdTime;
+	private int viewCount;
 	
 	//orders 테이블 데이터 (orders.product_no = product.product_no)
 	private int sellerNo;
@@ -76,6 +77,15 @@ public class ProductListDto {
 
 	public void setCreatedTime(Timestamp createdTime) {
 		this.createdTime = createdTime;
+	}
+
+
+	public int getViewCount() {
+		return viewCount;
+	}
+
+	public void setViewCount(int viewCount) {
+		this.viewCount = viewCount;
 	}
 
 	public int getSellerNo() {
