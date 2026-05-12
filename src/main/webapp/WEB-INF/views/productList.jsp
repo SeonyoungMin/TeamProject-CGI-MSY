@@ -1,7 +1,7 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8"
-	pageEncoding="UTF-8"%>
-
+<%@ page contentType="text/html; charset=UTF-8" language="java"%>
 <%@ taglib prefix="c" uri="jakarta.tags.core"%>
+<%@ taglib prefix="fmt" uri="jakarta.tags.fmt"%>
+<c:set var="ctx" value="${pageContext.request.contextPath}" />
 <!DOCTYPE html>
 <html>
 <head>
@@ -9,7 +9,7 @@
 <title>상품 목록</title>
 </head>
 <body>
-	<a href="<c:url value='/welcome'/>">메인</a>
+	<a href="${ctx}/home">홈</a>
 	<h1>상품 목록</h1>
 	<hr>
 
@@ -39,14 +39,17 @@
 	</c:if>
 
 	<c:forEach var="p" items="${list}">
-		<div>
+		<div style="position: relative; padding-bottom: 20px;">
 			<c:if test="${not empty p.imgPath}">
-				<img src="<c:url value='${p.imgPath}'/>" width="50" height="50" alt="${p.imgName}">
+				<img src="<c:url value='${p.imgPath}'/>" width="50" height="50"
+					alt="${p.imgName}">
 			</c:if>
 			<a href="<c:url value='/product/${p.productNo}'/>">${p.productName}</a>
-			| ${p.category} | ${p.price}원 |
-			${p.tradeStatus == 'SALE' ? '판매중' : p.tradeStatus == 'RESERVED' ? '예약중' : '판매완료'}
-			| ${p.sellerNickname}
+			| ${p.category} | ${p.price}원 | ${p.tradeStatus == '완료' ? '판매완료' : p.tradeStatus}
+			| ${p.sellerNickname} <span
+				style="position: absolute; bottom: 0; right: 0; font-size: 12px; color: #888;">
+				👁 ${p.viewCount} </span>
+
 		</div>
 		<hr>
 	</c:forEach>

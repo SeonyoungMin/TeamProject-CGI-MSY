@@ -74,6 +74,9 @@ public class UserController {
 		
 		List<Rangking> topSellers = rankingService.findTopSellers(3);
 		List<Rangking> topBuyers = rankingService.findTopBuyers(3);
+		List<ProductListDto> popularList = productService.findTopByViewCount(3, category);
+		
+		model.addAttribute("popularList", popularList);
 		model.addAttribute("productList", productList);
 		model.addAttribute("topSellers", topSellers);
 		model.addAttribute("topBuyers", topBuyers);
