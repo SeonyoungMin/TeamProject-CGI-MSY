@@ -8,15 +8,48 @@
 <head>
 <meta charset="UTF-8">
 <title>홈</title>
+<style>
+.product-grid {
+	display: grid;
+	grid-template-columns: repeat(3, 1fr);
+	gap: 15px;
+}
+
+.card {
+	display: block;
+	text-decoration: none;
+	color: inherit;
+	border: 1px solid #eee;
+	padding: 10px;
+	border-radius: 8px;
+}
+
+.info-row {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin-top: 8px;
+	font-size: 13px;
+}
+
+.heart-box {
+	color: #ff4d4d;
+	font-weight: bold;
+}
+
+.date-box {
+	color: #999;
+	font-size: 11px;
+}
+</style>
 </head>
 <body>
 
 	<%@ include file="/WEB-INF/views/header.jsp"%>
 
-	<!-- 배너 -->
-
-	<div class="card" style="text-align: center;">
-		<a href="${ctx}/productList">전체</a> <a
+	<div class="card"
+		style="text-align: center; border: none; border-bottom: 1px solid #eee; border-radius: 0;">
+		<a href="${ctx}/productList">전체</a> | <a
 			href="${ctx}/product/category?category=의류">의류</a> | <a
 			href="${ctx}/product/category?category=잡화">잡화</a> | <a
 			href="${ctx}/product/category?category=가구">가구</a> | <a
@@ -32,54 +65,10 @@
 			href="${ctx}/product/new" class="btn">글쓰기</a>
 	</div>
 
-	<!-- 이달의 판매왕 / 소비왕 -->
-	<div class="app-container" style="margin-top: 20px; margin-bottom: 0;">
-		<div
-			style="background: #fff; border: 1px solid #eee; border-radius: 6px; padding: 10px 16px; font-size: 13px; display: flex; align-items: center; gap: 14px; margin-bottom: 8px;">
-			<strong style="color: #121212;">이달의 판매왕</strong>
-			<c:choose>
-				<c:when test="${empty topSellers}">
-					<span style="color: #888;">아직 기록이 없습니다.</span>
-				</c:when>
-				<c:otherwise>
-					<c:forEach var="r" items="${topSellers}" varStatus="loop">
-						<span> <span style="color: #999;">${loop.index + 1}위</span>
-							<strong>${r.nickname}</strong> <span style="color: #888;">(${r.tradeCount}건)</span>
-						</span>
-						<c:if test="${not loop.last}">
-							<span style="color: #ddd;">|</span>
-						</c:if>
-					</c:forEach>
-				</c:otherwise>
-			</c:choose>
-			<hr>
-			<strong style="color: #121212;">이달의 소비왕</strong>
-			<c:choose>
-				<c:when test="${empty topBuyers}">
-					<span style="color: #888;">아직 기록이 없습니다.</span>
-				</c:when>
-				<c:otherwise>
-					<c:forEach var="r" items="${topBuyers}" varStatus="loop">
-						<span> <span style="color: #999;">${loop.index + 1}위</span>
-							<strong>${r.nickname}</strong> <span style="color: #888;">(${r.tradeCount}건)</span>
-						</span>
-						<c:if test="${not loop.last}">
-							<span style="color: #ddd;">|</span>
-						</c:if>
-					</c:forEach>
-				</c:otherwise>
-			</c:choose>
-		</div>
-	</div>
-
 	<div class="app-container">
-
-
-
 		<div
-			style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-			<h2 class="section-title" style="border-bottom: none; margin: 0;">최근
-				등록 상품</h2>
+			style="display: flex; justify-content: space-between; align-items: center; margin: 30px 0 20px;">
+			<h2 style="font-size: 20px; margin: 0;">최근 등록 상품</h2>
 			<a href="${ctx}/productList" style="font-size: 14px; color: #666;">전체보기
 				&gt;</a>
 		</div>
@@ -90,24 +79,36 @@
 		</c:if>
 
 		<c:if test="${not empty productList}">
-			<div
-				style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px;">
+			<div class="product-grid">
 				<c:forEach var="p" items="${productList}">
 					<a href="${ctx}/product/${p.productNo}" class="card"
-						style="display: block;">
+						style="display: block; position: relative;">
 						<div
-							style="height: 180px; background: #f0f0f0; margin-bottom: 10px;">
+							style="height: 180px; background: #f0f0f0; border-radius: 4px; overflow: hidden; position: relative;">
 							<c:if test="${not empty p.imgPath}">
 								<img src="${ctx}${p.imgPath}"
 									style="width: 100%; height: 100%; object-fit: cover;">
 							</c:if>
-							<c:if test="${empty p.imgPath}">
-								<div
-									style="height: 100%; display: flex; align-items: center; justify-content: center; color: #aaa;">이미지
-									없음</div>
-							</c:if>
+
+							<div
+								style="position: absolute; bottom: 10px; right: 10px; display: flex; align-items: center; gap: 4px;">
+								<span style="color: #ff4d4d; font-size: 16px;"> <c:choose>
+										<c:when test="${p.favoriteCount > 0}">♥</c:when>
+										<c:otherwise>♡</c:otherwise>
+									</c:choose>
+								</span> <span style="color: #111; font-size: 13px; font-weight: bold;">${p.favoriteCount}</span>
+							</div>
 						</div>
-						<div style="font-size: 15px; font-weight: 600;">${p.productName}</div>
+						<div
+							style="font-size: 15px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+							${p.productName}</div>
+
+						<div class="info-row">
+							<span class="date-box"> <fmt:formatDate
+									value="${p.createdTime}" pattern="MM.dd" />
+							</span>
+						</div>
+
 						<div style="font-size: 12px; color: #888; margin-top: 4px;">${p.sellerNickname}</div>
 						<div style="font-weight: bold; margin-top: 6px;">
 							<fmt:formatNumber value="${p.price}" />
@@ -116,37 +117,20 @@
 					</a>
 				</c:forEach>
 			</div>
-
-			<!-- 페이징 -->
-			<c:if test="${totalPages > 1}">
-				<div style="display:flex; justify-content:center; gap:8px; margin-top:25px;">
-					<c:forEach var="i" begin="1" end="${totalPages}">
-						<c:choose>
-							<c:when test="${i == currentPage}">
-								<span class="btn btn-primary" style="padding:6px 12px; font-size:13px;">${i}</span>
-							</c:when>
-							<c:otherwise>
-								<a href="${ctx}/home?pageNum=${i}" class="btn" style="padding:6px 12px; font-size:13px;">${i}</a>
-							</c:otherwise>
-						</c:choose>
-					</c:forEach>
-				</div>
-			</c:if>
 		</c:if>
 
-
 		<div
-			style="display: flex; justify-content: space-between; align-items: center; margin: 40px 0 20px;">
-			<h2 class="section-title" style="border-bottom: none; margin: 0;">나문희게시판</h2>
+			style="display: flex; justify-content: space-between; align-items: center; margin: 50px 0 20px;">
+			<h2 style="font-size: 20px; margin: 0;">나문희게시판</h2>
 			<a href="${ctx}/boardList" style="font-size: 14px; color: #666;">전체보기
 				&gt;</a>
 		</div>
- 
-		<a href="${ctx}/boardList" class="btn">문의 게시글 보기</a> <a href="${ctx}/boardList/addForm" class="btn btn-primary">문의
-			게시글 쓰기</a>
-	</div>
-	</div>
 
+		<div style="margin-bottom: 40px;">
+			<a href="${ctx}/boardList" class="btn">문의 게시글 보기</a> <a
+				href="${ctx}/boardList/addForm" class="btn btn-primary">문의 게시글
+				쓰기</a>
+		</div>
 	</div>
 
 	<%@ include file="/WEB-INF/views/footer.jsp"%>

@@ -18,6 +18,7 @@ import com.team404.domain.Account;
 import com.team404.domain.Image;
 import com.team404.domain.ProductListDto;
 import com.team404.domain.Rangking;
+import com.team404.domain.ReviewDto;
 import com.team404.domain.SearchDTO;
 import com.team404.domain.User;
 import com.team404.exception.NoUserFoundException;
@@ -25,6 +26,7 @@ import com.team404.service.AccountService;
 import com.team404.service.ImageService;
 import com.team404.service.ProductService;
 import com.team404.service.RankingService;
+import com.team404.service.ReviewService;
 import com.team404.service.UserService;
 
 import jakarta.servlet.http.HttpSession;
@@ -49,6 +51,9 @@ public class UserController {
 	@Autowired
 	private AccountService accountService;
 
+	@Autowired
+	private ReviewService reviewService;
+
 	// 로그인한 사용자가 관리자인지 검사
 	private boolean isAdmin(HttpSession session) {
 		User loginUser = (User) session.getAttribute("loginUser");
@@ -60,7 +65,7 @@ public class UserController {
 		return "redirect:/home";
 	}
 
-	// 홈 
+	// 홈
 	@GetMapping("/home")
 	public String home(@RequestParam(value = "pageNum", defaultValue = "1") int pageNum, Model model) {
 		int limit = 9;
@@ -124,6 +129,34 @@ public class UserController {
 		return "myPage";
 	}
 
+	// 유저 페이지
+	@GetMapping("/users/search/{userNo}")
+	public String userPage(@PathVariable("userNo") int userNo,
+			@RequestParam(value = "page", defaultValue = "1") int page, Model model) {
+		User user = userService.getUserByNo(userNo);
+		List<ProductListDto> myProducts = productService.findBySeller(userNo);
+
+		List<ReviewDto> allReviews = reviewService.findReviewsByUser(userNo);
+
+		// 페이징
+		int pageSize = 5;
+		int totalReviews = allReviews.size();
+		int totalPages = (int) Math.ceil((double) totalReviews / pageSize);
+		int start = (page - 1) * pageSize;
+		int end = Math.min(start + pageSize, totalReviews);
+
+		List<ReviewDto> pagedReviews = (start < totalReviews) ? allReviews.subList(start, end)
+				: new java.util.ArrayList<>();
+
+		model.addAttribute("user", user);
+		model.addAttribute("myProducts", myProducts);
+		model.addAttribute("reviews", pagedReviews); // 잘린 리스트
+		model.addAttribute("currentPage", page); // 현재 페이지 번호
+		model.addAttribute("totalPages", totalPages); // 전체 페이지 수
+
+		return "userPage";
+	}
+
 	// 관리자 검색 진입점 — 전체 회원 목록으로 보냄
 	@GetMapping("/users/search")
 	public String redirectLegacySearch(HttpSession session) {
@@ -172,16 +205,6 @@ public class UserController {
 		model.addAttribute("currentPage", pageNumber);
 		model.addAttribute("limit", limit);
 		return "usersBySearch";
-	}
-
-	@GetMapping("/users/search/{userNo}")
-	public String getUserByNo(@PathVariable("userNo") int userNo, Model model, HttpSession session) {
-		if (!isAdmin(session)) {
-			return "redirect:/home";
-		}
-		User userByNo = userService.getUserByNo(userNo);
-		model.addAttribute("user", userByNo);
-		return "user";
 	}
 
 	// 회원 정보 수정 폼 — 본인 또는 관리자만 진입

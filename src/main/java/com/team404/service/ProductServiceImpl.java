@@ -22,10 +22,19 @@ public class ProductServiceImpl implements ProductService {
 	@Autowired
 	private ImageService imageService;
 
-	// 상품 목록 조회 (+페이징)
+	@Autowired
+	private FavoriteService favoriteService;
+
+	// 상품 목록 조회 (+페이징), 찜갯수 카운트
 	@Override
-	public List<ProductListDto> findAll(int startNum, int limit) {
-		return productRepository.findAll(startNum, limit);
+	public List<ProductListDto> findAll(int offset, int limit) {
+		List<ProductListDto> list = productRepository.findAll(offset, limit);
+
+		for (ProductListDto dto : list) {
+			int count = favoriteService.countByBoard(dto.getProductNo());
+			dto.setFavoriteCount(count);
+		}
+		return list;
 	}
 
 	// 전체 데이터 개수 반환

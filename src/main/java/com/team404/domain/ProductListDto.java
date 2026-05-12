@@ -14,18 +14,20 @@ public class ProductListDto {
 	private long price;
 	private String tradeStatus;
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
-    private Timestamp createdTime;
-	
-	//orders 테이블 데이터 (orders.product_no = product.product_no)
+	private Timestamp createdTime;
+
+	private int favoriteCount;
+
+	// orders 테이블 데이터 (orders.product_no = product.product_no)
 	private int sellerNo;
-	
+
 	// users.nickname
-	private String sellerNickname;  
-	
-	//image 테이블 데이터 (entity_type='product', is_thumbnail=1)
+	private String sellerNickname;
+
+	// image 테이블 데이터 (entity_type='product', is_thumbnail=1)
 	private String imgName;
 	private String imgPath;
-	
+
 	public ProductListDto() {
 		super();
 	}
@@ -109,5 +111,13 @@ public class ProductListDto {
 	public void setImgPath(String imgPath) {
 		this.imgPath = imgPath;
 	}
-	
- }
+
+	public int getFavoriteCount() {
+		return favoriteCount;
+	}
+
+	public void setFavoriteCount(int favoriteCount) {
+		this.favoriteCount = favoriteCount;
+	}
+
+}
