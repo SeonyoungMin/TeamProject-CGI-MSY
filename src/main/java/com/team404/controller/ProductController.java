@@ -245,6 +245,9 @@ public class ProductController {
 			return "redirect:/login";
 		}
 		ProductDetailDto origin = productService.findProductDetail(productNo);
+		
+		System.out.println("loginUser.getUserNo(): " + loginUser.getUserNo());
+		System.out.println("origin.getSellerNo(): " + origin.getSellerNo());
 		if (!canManage(loginUser, origin.getSellerNo())) {
 			return "redirect:/product/" + productNo;
 		}

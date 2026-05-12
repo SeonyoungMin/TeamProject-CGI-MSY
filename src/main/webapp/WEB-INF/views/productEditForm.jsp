@@ -22,7 +22,7 @@
 			<label class="form-label">상품명</label> <input type="text"
 				class="form-input" name="productName" value="${product.productName}"
 				required> <label class="form-label">판매자 번호</label> <input
-				type="text" class="form-input" name="sellerNo"
+				type="text" class="form-input" name="sellerNo"ㄴ
 				value="${product.sellerNo}" required> <label
 				class="form-label">카테고리</label> <select class="form-input"
 				name="category">
@@ -50,7 +50,8 @@
 
 
 			<label class="form-label">이미지 추가</label> <input type="file"
-				class="form-input" name="imgFiles" multiple onchange="previewImages(this)">
+				class="form-input" name="imgFiles" multiple
+				onchange="previewImages(this)">
 			<div id="preview-container"
 				style="display: flex; gap: 10px; flex-wrap: wrap; margin-top: 10px;"></div>
 
@@ -87,47 +88,47 @@
 				<a href="${ctx}/product/${product.productNo}" class="btn btn-block">취소</a>
 			</div>
 
+		</form>
 
+		<!-- 등록된 이미지 목록 + 대표 지정 (수정 폼 밖에 두는 게 안전 — 별도 form) -->
+		<c:if test="${not empty product.images}">
+			<h3 class="section-title">등록된 이미지</h3>
+			<div class="card" style="display: flex; gap: 15px; flex-wrap: wrap;">
+				<c:forEach var="img" items="${product.images}">
+					<div style="text-align: center;">
+						<img src="${ctx}${img.filePath}"
+							style="width: 120px; height: 120px; object-fit: cover; border: 1px solid #ddd; border-radius: 4px;">
+						<div style="margin-top: 6px;">
+							<c:if test="${img.thumbnail}">
+								<span
+									style="font-size: 12px; color: #121212; font-weight: bold;">★
+									대표 이미지</span>
+								<button type="button" onclick="alert('대표 이미지는 삭제할 수 없습니다.')">
+									삭제</button>
+							</c:if>
+							<c:if test="${not img.thumbnail}">
+								<form action="${ctx}/product/${product.productNo}/thumbnail"
+									method="post" style="margin: 0;">
+									<input type="hidden" name="imageNo" value="${img.imageNo}">
+									<button type="submit" class="btn"
+										style="font-size: 12px; padding: 4px 10px;">대표로 지정</button>
+								</form>
+								<form action="${ctx}/images/delete" method="post"
+									style="margin: 0;">
+									<input type="hidden" name="imageNo" value="${img.imageNo}">
+									<input type="hidden" name="entityType" value="product">
+									<input type="hidden" name="entityId"
+										value="${product.productNo}">
+									<button type="submit"
+										onclick="return confirm('이미지를 삭제하시겠습니까?')">삭제</button>
+								</form>
+							</c:if>
 
-			<!-- 등록된 이미지 목록 + 대표 지정 (수정 폼 밖에 두는 게 안전 — 별도 form) -->
-			<c:if test="${not empty product.images}">
-				<h3 class="section-title">등록된 이미지</h3>
-				<div class="card" style="display: flex; gap: 15px; flex-wrap: wrap;">
-					<c:forEach var="img" items="${product.images}">
-						<div style="text-align: center;">
-							<img src="${ctx}${img.filePath}"
-								style="width: 120px; height: 120px; object-fit: cover; border: 1px solid #ddd; border-radius: 4px;">
-							<div style="margin-top: 6px;">
-								<c:if test="${img.thumbnail}">
-									<span
-										style="font-size: 12px; color: #121212; font-weight: bold;">★
-										대표 이미지</span>
-									<button type="button" onclick="alert('대표 이미지는 삭제할 수 없습니다.')">
-										삭제</button>
-								</c:if>
-								<c:if test="${not img.thumbnail}">
-									<form action="${ctx}/product/${product.productNo}/thumbnail"
-										method="post" style="margin: 0;">
-										<input type="hidden" name="imageNo" value="${img.imageNo}">
-										<button type="submit" class="btn"
-											style="font-size: 12px; padding: 4px 10px;">대표로 지정</button>
-									</form>
-									<form action="${ctx}/images/delete" method="post"
-										style="margin: 0;">
-										<input type="hidden" name="imageNo" value="${img.imageNo}">
-										<input type="hidden" name="entityType" value="product">
-										<input type="hidden" name="entityId"
-											value="${product.productNo}">
-										<button type="submit"
-											onclick="return confirm('이미지를 삭제하시겠습니까?')">삭제</button>
-									</form>
-								</c:if>
-
-							</div>
 						</div>
-					</c:forEach>
-				</div>
-			</c:if>
+					</div>
+				</c:forEach>
+			</div>
+		</c:if>
 	</div>
 
 	<%@ include file="/WEB-INF/views/footer.jsp"%>
