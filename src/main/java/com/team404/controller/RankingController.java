@@ -23,12 +23,5 @@ public class RankingController {
 		return "ranking";
 	}
 
-	
-//	 테스트용 
-	@GetMapping(value = "/test", produces = "text/plain; charset=UTF-8")
-	@ResponseBody
-	public String insertTestData() {
-		rankingService.insertTestData();
-		return "테스트 데이터 삽입 완료 /ranking 에서 확인";
-	}
+
 }

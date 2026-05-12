@@ -72,14 +72,15 @@ public class ProductServiceImpl implements ProductService {
 	@Override
 	public void registerProduct(Product product, List<MultipartFile> imgFiles, int loginMemberNo) {
 
-		// 1. 상품 저장
+		// 상품 저장 (LAST_INSERT_ID 로 상품번호 받음)
 		int productNo = productRepository.insertProduct(product);
 
-		// 2. 판매자 정보 저장
-		productRepository.insertOrder(productNo, loginMemberNo);
+		// orders 테이블에 (상품번호, 판매자번호, 구매자번호) 저장
+		int sellerNo = product.getSellerNo();
+		int buyerNo = loginMemberNo;
+		productRepository.insertOrder(productNo, sellerNo, buyerNo);
 
-		// 3. File/transferTo/파일명 생성/ProductImage 생성/insertImage 전부 제거
-		// 공통 ImageService 로 일괄 위임
+		// 이미지 업로드
 		if (imgFiles != null && !imgFiles.isEmpty()) {
 			imageService.upload(imgFiles, "product", productNo);
 		}
@@ -134,4 +135,13 @@ public class ProductServiceImpl implements ProductService {
 		productRepository.updateTradeStatus(productNo, tradeStatus);
 	}
 
+	// 상품 조회수
+	public void increaseViewCount(int productNo) {
+		productRepository.increaseViewCount(productNo);
+	}
+
+	// 인기 상품 배너
+	public List<ProductListDto> findTopByViewCount(int limit, String category) {
+		return productRepository.findTopByViewCount(limit, category);
+	}
 }

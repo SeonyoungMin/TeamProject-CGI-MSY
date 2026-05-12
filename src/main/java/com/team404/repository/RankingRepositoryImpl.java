@@ -14,67 +14,84 @@ public class RankingRepositoryImpl implements RankingRepository {
 	@Autowired
 	private JdbcTemplate template;
 
+	// 판매 기록 가져 오기 (판매자 기준)
 	@Override
-	public Rangking getTopSeller() {
-		String SQL = "SELECT o.seller_no AS memberNo, u.nickname AS nickname, "
-				+ "SUM(p.price) AS totalAmount "
-				+ "FROM orders o "
-				+ "JOIN product p ON p.product_no = o.product_no "
-				+ "JOIN users u ON u.user_no = o.seller_no "
-				+ "WHERE p.trade_status = '완료' "
-				+ "AND DATE_FORMAT(o.created_time, '%Y-%m') = DATE_FORMAT(NOW(), '%Y-%m') "
-				+ "GROUP BY o.seller_no, u.nickname "
-				+ "ORDER BY totalAmount DESC LIMIT 1";
+	public List<Rangking> getAllMonthlySales() {
+		String SQL = "SELECT o.seller_no AS memberNo, u.nickname AS nickname " // 닉네임과 판매자번호를
+				+ "FROM orders o " // 오더테이블에서
+				+ "JOIN product p ON p.product_no = o.product_no " // 상품 테이블과 합치고
+				+ "JOIN users u ON u.user_no = o.seller_no " // 유저 테이블과 합쳐서
+				+ "WHERE p.trade_status = '완료' " // 상품이 거래완료 상태이고
+				+ "AND DATE_FORMAT(o.created_time, '%Y-%m') = DATE_FORMAT(NOW(), '%Y-%m')"; // 이번 달 데이터만 가져오기
 
-		List<Rangking> list = template.query(SQL, (rs, rowNum) -> {
+		return template.query(SQL, (rs, rowNum) -> {
+			Rangking r = new Rangking(); // 랭킹 객체 만들고
+			r.setMemberNo(rs.getInt("memberNo")); // 멤버번호 넣고
+			r.setNickname(rs.getString("nickname")); // 닉네임 넣고
+			r.settradeCount(1L); // 거래건수 한건으로 설정해서
+			return r; // 리스트에 담기
+		});
+	}
+
+	// 이달의 판매왕 상위 N명 (판매완료된 상품 기준)
+	@Override
+	public List<Rangking> getTopSellers(int limit) {
+		String SQL = "SELECT p.seller_no AS memberNo, u.nickname AS nickname, COUNT(*) AS cnt "
+				+ "FROM product p "
+				+ "JOIN users u ON u.user_no = p.seller_no "
+				+ "WHERE p.trade_status = '완료' "
+				+ "  AND DATE_FORMAT(p.created_time, '%Y-%m') = DATE_FORMAT(NOW(), '%Y-%m') "
+				+ "GROUP BY p.seller_no, u.nickname "
+				+ "ORDER BY cnt DESC "
+				+ "LIMIT ?";
+		return template.query(SQL, (rs, rowNum) -> {
 			Rangking r = new Rangking();
 			r.setMemberNo(rs.getInt("memberNo"));
 			r.setNickname(rs.getString("nickname"));
-			r.setTotalAmount(rs.getLong("totalAmount"));
+			r.settradeCount(rs.getLong("cnt"));
 			return r;
-		});
-
-		return list.isEmpty() ? null : list.get(0);
+		}, limit);
 	}
 
+	// 이달의 소비왕 상위 N명 (판매완료된 상품의 구매자 기준)
 	@Override
-	public Rangking getTopSpender() {
+	public List<Rangking> getTopBuyers(int limit) {
 		String SQL = "SELECT o.buyer_no AS memberNo, u.nickname AS nickname, "
-				+ "SUM(p.price) AS totalAmount "
+				+ "COUNT(DISTINCT o.product_no) AS cnt "
 				+ "FROM orders o "
 				+ "JOIN product p ON p.product_no = o.product_no "
 				+ "JOIN users u ON u.user_no = o.buyer_no "
 				+ "WHERE p.trade_status = '완료' "
-				+ "AND DATE_FORMAT(o.created_time, '%Y-%m') = DATE_FORMAT(NOW(), '%Y-%m') "
+				+ "  AND DATE_FORMAT(o.created_time, '%Y-%m') = DATE_FORMAT(NOW(), '%Y-%m') "
 				+ "GROUP BY o.buyer_no, u.nickname "
-				+ "ORDER BY totalAmount DESC LIMIT 1";
-
-		List<Rangking> list = template.query(SQL, (rs, rowNum) -> {
+				+ "ORDER BY cnt DESC "
+				+ "LIMIT ?";
+		return template.query(SQL, (rs, rowNum) -> {
 			Rangking r = new Rangking();
 			r.setMemberNo(rs.getInt("memberNo"));
 			r.setNickname(rs.getString("nickname"));
-			r.setTotalAmount(rs.getLong("totalAmount"));
+			r.settradeCount(rs.getLong("cnt"));
 			return r;
+		}, limit);
+	}
+
+	// 판매 기록 가져 오기 (구매자 기준)
+	@Override
+	public List<Rangking> getAllMonthlySpendings() {
+		String SQL = "SELECT o.buyer_no AS memberNo, u.nickname AS nickname " // 닉네임과 구매자번호를
+				+ "FROM orders o " // 오더테이블에서
+				+ "JOIN product p ON p.product_no = o.product_no " // 상품 테이블과 합치고
+				+ "JOIN users u ON u.user_no = o.buyer_no " // 유저 테이블과 합쳐서
+				+ "WHERE p.trade_status = '완료' " // 상품이 거래완료 상태이고
+				+ "AND DATE_FORMAT(o.created_time, '%Y-%m') = DATE_FORMAT(NOW(), '%Y-%m')"; // 이번 달 데이터만 가져오기
+
+		return template.query(SQL, (rs, rowNum) -> {
+			Rangking r = new Rangking(); // 랭킹 객체 만들고
+			r.setMemberNo(rs.getInt("memberNo")); // 멤버번호 넣고
+			r.setNickname(rs.getString("nickname")); // 닉네임 넣고
+			r.settradeCount(1L); // 거래건수 한건으로 설정해서
+			return r; // 리스트에 담기
 		});
 
-		return list.isEmpty() ? null : list.get(0);
-	}
-	
-	// 테스트용
-
-	@Override
-	public void insertTestData() {
-		template.update("INSERT INTO product(name, category, price, description, trade_status, created_time) "
-				+ "VALUES('테스트상품A', '전자기기', 500000, '판매왕 테스트용', '완료', NOW())");
-		int productNoA = template.queryForObject("SELECT LAST_INSERT_ID()", Integer.class);
-
-		template.update("INSERT INTO product(name, category, price, description, trade_status, created_time) "
-				+ "VALUES('테스트상품B', '의류', 300000, '소비왕 테스트용', '완료', NOW())");
-		int productNoB = template.queryForObject("SELECT LAST_INSERT_ID()", Integer.class);
-
-		template.update("INSERT INTO orders(product_no, seller_no, buyer_no, created_time) "
-				+ "VALUES(?, 1200990, 3, NOW())", productNoA);
-		template.update("INSERT INTO orders(product_no, seller_no, buyer_no, created_time) "
-				+ "VALUES(?, 1200990, 3, NOW())", productNoB);
 	}
 }

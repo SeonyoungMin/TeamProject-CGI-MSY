@@ -2,7 +2,6 @@ package com.team404.repository;
 
 import java.util.List;
 
-import com.team404.domain.Image;
 import com.team404.domain.Product;
 import com.team404.domain.ProductDetailDto;
 import com.team404.domain.ProductListDto;
@@ -18,7 +17,7 @@ public interface ProductRepository {
 	// 전체 데이터 개수 반환
 
 	// 상품 상세 조회 (productNo 기준)
-	public ProductDetailDto findProductDetail(int productNo);
+	public ProductDetailDto findProductDetail(int productNo); 
 
 	// 상품 조건 조회(키워드 검색)
 	public List<ProductListDto> findByKeyword(String keyword);
@@ -45,5 +44,11 @@ public interface ProductRepository {
 	public int findSellerNo(int productNo);
 
 	// 상품 등록 orders 추가
-	public void insertOrder(int productNo, int sellerNo);
+	public void insertOrder(int productNo, int sellerNo, int buyerNo);
+	
+	// 상품 조회수
+	public void increaseViewCount(int productNo);
+	
+	// 인기 상품 배너
+	public List<ProductListDto> findTopByViewCount(int limit, String category);
 }
