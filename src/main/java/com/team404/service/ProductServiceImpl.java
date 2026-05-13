@@ -12,8 +12,6 @@ import com.team404.domain.ProductDetailDto;
 import com.team404.domain.ProductListDto;
 import com.team404.repository.ProductRepository;
 
-// ProductService는 더 이상 이미지 처리(File/transferTo/UUID/ProductImage 생성/insertImage)를 알지 않음
-//->모든 이미지 처리는 ImageService 로 위임
 @Service
 public class ProductServiceImpl implements ProductService {
 
@@ -24,10 +22,19 @@ public class ProductServiceImpl implements ProductService {
 	@Autowired
 	private ImageService imageService;
 
-	// 상품 목록 조회 (+페이징)
+	@Autowired
+	private FavoriteService favoriteService;
+
+	// 상품 목록 조회 (+페이징), 찜갯수 카운트
 	@Override
-	public List<ProductListDto> findAll(int startNum, int limit) {
-		return productRepository.findAll(startNum, limit);
+	public List<ProductListDto> findAll(int offset, int limit) {
+		List<ProductListDto> list = productRepository.findAll(offset, limit);
+
+		for (ProductListDto dto : list) {
+			int count = favoriteService.countByBoard(dto.getProductNo());
+			dto.setFavoriteCount(count);
+		}
+		return list;
 	}
 
 	// 전체 데이터 개수 반환
@@ -62,25 +69,29 @@ public class ProductServiceImpl implements ProductService {
 		return productRepository.findByCategory(category);
 	}
 
-	// 내 판매 목록
+	// 내 판매 목록 (전체)
 	@Override
 	public List<ProductListDto> findBySeller(int sellerNo) {
 		return productRepository.findBySeller(sellerNo);
+	}
+
+	// 내 판매 목록 (페이징)
+	@Override
+	public List<ProductListDto> findBySeller(int sellerNo, int startNum, int limit) {
+		return productRepository.findBySeller(sellerNo, startNum, limit);
+	}
+
+	@Override
+	public int countBySeller(int sellerNo) {
+		return productRepository.countBySeller(sellerNo);
 	}
 
 	// 상품 등록
 	@Override
 	public void registerProduct(Product product, List<MultipartFile> imgFiles, int loginMemberNo) {
 
-		// 상품 저장 (LAST_INSERT_ID 로 상품번호 받음)
 		int productNo = productRepository.insertProduct(product);
 
-		// orders 테이블에 (상품번호, 판매자번호, 구매자번호) 저장
-		int sellerNo = product.getSellerNo();
-		int buyerNo = loginMemberNo;
-		productRepository.insertOrder(productNo, sellerNo, buyerNo);
-
-		// 이미지 업로드
 		if (imgFiles != null && !imgFiles.isEmpty()) {
 			imageService.upload(imgFiles, "product", productNo);
 		}
@@ -135,12 +146,15 @@ public class ProductServiceImpl implements ProductService {
 		productRepository.updateTradeStatus(productNo, tradeStatus);
 	}
 
-	// 상품 조회수
+	// 상품 조회수 +1
+	@Override
 	public void increaseViewCount(int productNo) {
 		productRepository.increaseViewCount(productNo);
 	}
 
-	// 인기 상품 배너
+
+	// 인기 상품 (조회수 desc, 거래완료 제외)
+	@Override
 	public List<ProductListDto> findTopByViewCount(int limit, String category) {
 		return productRepository.findTopByViewCount(limit, category);
 	}

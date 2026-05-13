@@ -10,10 +10,13 @@
 </head>
 <body>
 	<a href="${ctx}/home">홈</a>
+
+	<%@ include file="/WEB-INF/views/header.jsp"%>
+
 	<h1>상품 목록</h1>
 	<hr>
 
-	<a href="<c:url value='/product/new'/>">상품 등록</a>
+	<a href="<c:url value='/product/new'/>">상품 등록></a>
 	<br>
 	<br>
 
@@ -41,7 +44,7 @@
 	<c:forEach var="p" items="${list}">
 		<div style="position: relative; padding-bottom: 20px;">
 			<c:if test="${not empty p.imgPath}">
-				<img src="<c:url value='${p.imgPath}'/>" width="50" height="50"
+				<img src="${ctx}${p.imgPath}" width="50" height="50"
 					alt="${p.imgName}">
 			</c:if>
 			<a href="<c:url value='/product/${p.productNo}'/>">${p.productName}</a>
@@ -49,7 +52,6 @@
 			| ${p.sellerNickname} <span
 				style="position: absolute; bottom: 0; right: 0; font-size: 12px; color: #888;">
 				👁 ${p.viewCount} </span>
-
 		</div>
 		<hr>
 	</c:forEach>
@@ -60,6 +62,6 @@
 				style="${i == currentPage ? 'font-weight:bold' : ''}">${i}</a>
 		</c:forEach>
 	</c:if>
-
+	<%@ include file="/WEB-INF/views/footer.jsp"%>
 </body>
 </html>

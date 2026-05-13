@@ -25,7 +25,7 @@
 			<div style="margin-bottom: 20px;">
 				<c:choose>
 					<c:when test="${not empty profileImage}">
-						<img src="${ctx}${profileImage.filePath}"
+						<img src="${profileImage.filePath}"
 							style="max-width: 200px; border: 1px solid #ddd;">
 					</c:when>
 					<c:otherwise>
@@ -63,7 +63,12 @@
 		</div>
 
 
-		<h3 class="section-title">내가 등록한 상품</h3>
+		<div
+			style="display: flex; justify-content: space-between; align-items: center; margin-top: 40px; border-bottom: 2px solid #121212; padding-bottom: 10px; margin-bottom: 20px;">
+			<h3 class="section-title" style="margin: 0; border-bottom: none;">내가 등록한 상품</h3>
+			<a href="${ctx}/product/mylist" style="font-size: 14px; color: #666;">전체보기
+				&gt;</a>
+		</div>
 
 		<c:if test="${empty myProducts}">
 			<div class="card" style="text-align: center; color: #888;">등록한
@@ -99,6 +104,48 @@
 
 		</c:forEach>
 
+
+		<!-- 가계부 (최근 5건) -->
+		<div
+			style="display: flex; justify-content: space-between; align-items: center; margin-top: 40px;">
+			<h3 class="section-title" style="margin: 0; border-bottom: none;">가계부</h3>
+			<a href="${ctx}/accountList" style="font-size: 14px; color: #666;">전체보기
+				&gt;</a>
+		</div>
+		<c:choose>
+			<c:when test="${empty accountList}">
+				<div class="card" style="text-align: center; color: #888;">구매
+					완료된 내역이 없습니다.</div>
+			</c:when>
+			<c:otherwise>
+				<div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px;">
+					<c:forEach var="a" items="${accountList}">
+						<div class="card">
+							<div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
+								<div>
+									<div style="font-weight: 600;">${a.productName}</div>
+									<div style="font-size: 12px; color: #888; margin-top: 4px;">
+										<fmt:formatDate value="${a.createdTime}" pattern="yyyy.MM.dd" />
+									</div>
+								</div>
+								<div style="font-weight: bold;">
+									<fmt:formatNumber value="${a.price}" />원
+								</div>
+							</div>
+							<form action="${ctx}/account/${a.orderNo}" method="post"
+								style="display: flex; gap: 5px; margin: 0;">
+								<input type="text" name="memo" value="${a.memo}"
+									class="form-input" placeholder="메모를 입력하세요"
+									style="flex: 1; margin: 0; font-size: 13px;">
+								<button type="submit" class="btn" style="padding: 5px 14px; font-size: 13px;">저장</button>
+							</form>
+						</div>
+					</c:forEach>
+				</div>
+
+			</c:otherwise>
+		</c:choose>
+
 	</div>
 	<script>
 		function deleteProduct(productNo) {
@@ -108,7 +155,6 @@
 					type : 'POST',
 					success : function(result) {
 						alert('삭제되었습니다.');
-						// 삭제 완료 후 '홈'이 아닌 '상품 목록' 페이지로 강제 이동
 						location.href = '${ctx}/mypage';
 					},
 					error : function() {

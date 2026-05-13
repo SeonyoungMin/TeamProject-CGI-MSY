@@ -14,11 +14,8 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
-/**
- * 로그인 성공 시 — 세션에 "loginUser"(User 객체)를 넣어준다.
- * 컨트롤러들이 session.getAttribute("loginUser") 로 사용자 꺼내쓰는 기존 코드와
- * Spring Security 인증을 연결하는 다리 역할.
- */
+
+//로그인 성공 후 처리
 @Component("loginSuccessHandler")
 public class LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
 

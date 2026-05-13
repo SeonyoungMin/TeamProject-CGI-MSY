@@ -14,6 +14,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import com.team404.domain.Account;
+import com.team404.domain.BoardListDto;
 import com.team404.domain.Image;
 import com.team404.domain.ProductListDto;
 import com.team404.domain.Rangking;
@@ -21,6 +23,8 @@ import com.team404.domain.ReviewDto;
 import com.team404.domain.SearchDTO;
 import com.team404.domain.User;
 import com.team404.exception.NoUserFoundException;
+import com.team404.service.AccountService;
+import com.team404.service.BoardService;
 import com.team404.service.ImageService;
 import com.team404.service.ProductService;
 import com.team404.service.RankingService;
@@ -49,6 +53,12 @@ public class UserController {
 	@Autowired
 	private RankingService rankingService;
 
+	@Autowired
+	private AccountService accountService;
+
+	@Autowired
+	private BoardService boardService;
+
 	// 로그인한 사용자가 관리자인지 검사
 	private boolean isAdmin(HttpSession session) {
 		User loginUser = (User) session.getAttribute("loginUser");
@@ -62,25 +72,40 @@ public class UserController {
 
 	// 홈
 	@GetMapping("/home")
-	public String home(@RequestParam(value = "category", required = false) String category, Model model) {
+	public String home(@RequestParam(value = "category", required = false) String category, @RequestParam(value = "pageNum", defaultValue = "1") int pageNum, Model model) {
 		
-		List<ProductListDto> productList;
 		
-		if (category != null && !category.isEmpty()) {
-			productList = productService.findByCategory(category);
-		} else {
-			productList = productService.findAll(0, 6);
-		}
+		int limit = 9;
+		int startNum = limit * (pageNum - 1);
+
+	    // 카테고리 있으면 필터링, 없으면 전체 조회
+	    List<ProductListDto> productList;
+	    if (category != null && !category.isEmpty()) {
+	        productList = productService.findByCategory(category);
+	    } else {
+	        productList = productService.findAll(startNum, limit);
+	    }
+		int totalNum = productService.countAll();
+		int totalPages = (totalNum % limit) == 0 ? totalNum / limit : (totalNum / limit) + 1;
+
+		
 		
 		List<Rangking> topSellers = rankingService.findTopSellers(3);
 		List<Rangking> topBuyers = rankingService.findTopBuyers(3);
+
 		List<ProductListDto> popularList = productService.findTopByViewCount(3, category);
-		
-		model.addAttribute("popularList", popularList);
+
+		List<BoardListDto> recentBoards = boardService.findRecentAll(0, 8);
+
 		model.addAttribute("productList", productList);
+		model.addAttribute("totalPages", totalPages);
+		model.addAttribute("currentPage", pageNum);
 		model.addAttribute("topSellers", topSellers);
 		model.addAttribute("topBuyers", topBuyers);
 		model.addAttribute("selectedCategory", category);
+		model.addAttribute("popularList", popularList);
+		model.addAttribute("recentBoards", recentBoards);
+
 		return "home";
 	}
 
@@ -105,45 +130,59 @@ public class UserController {
 		return "login";
 	}
 
-	/*
-	 * // 로그인 처리 — 아이디/비밀번호 일치하면 세션에 저장
-	 * 
-	 * @PostMapping("/login") public String login(@RequestParam("userId") String
-	 * userId, @RequestParam("userPw") String userPw,
-	 * 
-	 * @RequestParam(value = "redirect", required = false) String redirect,
-	 * HttpSession session) {
-	 * 
-	 * User user = userService.getUserById(userId);
-	 * 
-	 * if (user != null && user.getUserPw().equals(userPw)) {
-	 * session.setAttribute("loginUser", user); // redirect 파라미터가 있으면 그쪽으로, 없으면 홈으로
-	 * if (redirect != null && !redirect.isEmpty()) { return "redirect:" + redirect;
-	 * } return "redirect:/home"; } return "redirect:/login"; }
-	 */
-
-	// 마이페이지 — 내 정보 + 내가 등록한 상품 보여줌
+	// 마이페이지 — 내 정보 + 최근 상품/가계부 미리보기
 	@GetMapping("/mypage")
 	public String myPage(HttpSession session, Model model) {
 		User loginUser = (User) session.getAttribute("loginUser");
 		if (loginUser == null) {
 			return "redirect:/login";
 		}
-		List<ProductListDto> myProducts = productService.findBySeller(loginUser.getUserNo());
 
-		// 프로필 사진 — 있으면 첫 번째, 없으면 null
+		List<ProductListDto> myProducts = productService.findBySeller(loginUser.getUserNo(), 0, 5);
+
 		List<Image> profileImages = imageService.getImages("user", loginUser.getUserNo());
 		Image profileImage = profileImages.isEmpty() ? null : profileImages.get(0);
+
+		List<Account> accountList = accountService.findAllByBuyer(loginUser.getUserNo(), 0, 6);
 
 		model.addAttribute("user", loginUser);
 		model.addAttribute("myProducts", myProducts);
 		model.addAttribute("profileImage", profileImage);
-		
-		int loginMemberNo = 30001;
-		List<ReviewDto> reviewList = reviewService.findReviewsByUser(loginMemberNo);
-	    model.addAttribute("reviewList", reviewList);
-	    
+		model.addAttribute("accountList", accountList);
 		return "myPage";
+	}
+
+	// 유저 페이지
+	@GetMapping("/users/search/{userNo}")
+	public String userPage(@PathVariable("userNo") int userNo,
+			@RequestParam(value = "page", defaultValue = "1") int page, Model model) {
+		User user = userService.getUserByNo(userNo);
+		List<ProductListDto> myProducts = productService.findBySeller(userNo);
+
+		// 프로필 이미지
+		List<Image> profileImages = imageService.getImages("user", userNo);
+		Image profileImage = profileImages.isEmpty() ? null : profileImages.get(0);
+
+		List<ReviewDto> allReviews = reviewService.findReviewsByUser(userNo);
+
+		// 후기 페이징
+		int pageSize = 5;
+		int totalReviews = allReviews.size();
+		int totalPages = (totalReviews + pageSize - 1) / pageSize;
+		int start = (page - 1) * pageSize;
+		int end = Math.min(start + pageSize, totalReviews);
+
+		List<ReviewDto> pagedReviews = (start < totalReviews) ? allReviews.subList(start, end)
+				: new java.util.ArrayList<>();
+
+		model.addAttribute("user", user);
+		model.addAttribute("myProducts", myProducts);
+		model.addAttribute("profileImage", profileImage);
+		model.addAttribute("reviews", pagedReviews);
+		model.addAttribute("currentPage", page);
+		model.addAttribute("totalPages", totalPages);
+
+		return "userPage";
 	}
 
 	// 관리자 검색 진입점 — 전체 회원 목록으로 보냄
@@ -194,16 +233,6 @@ public class UserController {
 		model.addAttribute("currentPage", pageNumber);
 		model.addAttribute("limit", limit);
 		return "usersBySearch";
-	}
-
-	@GetMapping("/users/search/{userNo}")
-	public String getUserByNo(@PathVariable("userNo") int userNo, Model model, HttpSession session) {
-		if (!isAdmin(session)) {
-			return "redirect:/home";
-		}
-		User userByNo = userService.getUserByNo(userNo);
-		model.addAttribute("user", userByNo);
-		return "user";
 	}
 
 	// 회원 정보 수정 폼 — 본인 또는 관리자만 진입

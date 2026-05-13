@@ -32,15 +32,14 @@ public class ReviewRepositoryImpl implements ReviewRepository {
 
 	// 마이페이지 후기 조회
 	public List<ReviewDto> findReviewsByUser(int userNo) {
-		String SQL = "select b.board_no, b.content, b.product_no, b.created_time, "
-				+ "u.nickname as sellerNickname, p.name as productName "
-			+ "from board b "
-				+ "join users u on u.user_no = b.author_no "
-			+ "join product p on p.product_no = b.product_no "
-				+ "where b.author_no = ? and b.board_type = 'review' "
-			+"order by b.created_time desc";
+		String SQL = "SELECT b.board_no, b.content, b.product_no, b.created_time, "
+				+ "u.nickname as sellerNickname, p.name as productName " + "FROM board b "
+				+ "JOIN product p ON p.product_no = b.product_no " + "JOIN users u ON u.user_no = b.author_no "
+				+ "WHERE p.seller_no = ? AND b.board_type = 'review' " + "ORDER BY b.created_time DESC";
+
 		return template.query(SQL, new ReviewRowMapper(), userNo);
-				
+
+
 	}
 
 	public void updateReview(int boardNo, String content) {
@@ -50,10 +49,11 @@ public class ReviewRepositoryImpl implements ReviewRepository {
 
 	public void deleteReview(int boardNo) {
 		String SQL = "delete from board where board_no = ?";
+
 		template.update(SQL, boardNo); 
 	}
 
-	//수정, 삭제 본인 확인용
+	// 수정, 삭제 본인 확인용
 	public int findAuthorNo(int boardNo) {
 		String SQL = "select author_no from board where board_no = ?";
 		List<Integer> result = template.query(SQL, (rs, rowNum) -> rs.getInt("author_no"), boardNo);

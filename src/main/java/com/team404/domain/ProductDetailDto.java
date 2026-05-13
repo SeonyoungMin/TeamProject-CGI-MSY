@@ -20,6 +20,7 @@ public class ProductDetailDto {
 	private Timestamp createdTime;
 	private int viewCount;
 
+
 	// orders 테이블 데이터 (orders.product_no = product.product_no)
 	private int sellerNo;
 	private int buyerNo;

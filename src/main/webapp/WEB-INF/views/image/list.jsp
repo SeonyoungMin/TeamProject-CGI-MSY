@@ -21,17 +21,16 @@
 		<div
 			style="margin-bottom: 20px; border-bottom: 1px solid #eee; padding-bottom: 10px;">
 
-			<img src="${pageContext.request.contextPath}${img.filePath}"
-				width="200" />
+			<img src="${img.filePath}" width="200" />
 
 			<p>파일명: ${img.fileName}</p>
 
 
-			<p>썸네일 여부: ${img.Thumbnail() ? '대표 이미지' : '일반'}</p>
+			<p>썸네일 여부: ${img.thumbnail ? '대표 이미지' : '일반'}</p>
 
 			<c:choose>
 
-				<c:when test="${img.Thumbnail()}">
+				<c:when test="${img.thumbnail}">
 					<a
 						href="${pageContext.request.contextPath}/images/thumbnail/cancel?entityType=${entityType}&entityId=${entityId}">
 						대표 해제 </a>

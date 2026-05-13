@@ -13,6 +13,8 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.team404.domain.ReviewDto;
+import com.team404.domain.User;
+
 import com.team404.service.ReviewService;
 
 import jakarta.servlet.http.HttpSession;
@@ -52,6 +54,25 @@ public class ReviewController {
  
 		reviewService.registerReview(productNo, loginMemberNo, content);
 		return "redirect:/reviewTest";
+	}
+
+	// 후기 등록 처리
+	@PostMapping("/review/add")
+	public String registerReview(@RequestParam("productNo") int productNo, @RequestParam("content") String content,
+			@RequestParam("sellerNo") int sellerNo, HttpSession session) {
+
+		User loginUser = (User) session.getAttribute("loginUser");
+
+		if (loginUser == null) {
+			return "redirect:/login";
+		}
+
+		// 작성자는 로그인한 유저, 타겟은 sellerNo를 가진 판매자
+		reviewService.registerReview(productNo, loginUser.getUserNo(), content);
+
+		// 등록 후 다시 보던 판매자의 유저페이지로 이동
+		return "redirect:/users/search/" + sellerNo;
+
 	}
 
 	@PutMapping("/review/{boardNo}")

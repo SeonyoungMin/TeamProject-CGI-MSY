@@ -11,6 +11,8 @@ public class BoardListDto {
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
 	private Timestamp createdTime;
 	private String authorNickname;
+	private String boardType;
+	private boolean pinned;
 	
 	public int getBoardNo() {
 		return boardNo;
@@ -37,5 +39,16 @@ public class BoardListDto {
 	public void setAuthorNickname(String authorNickname) {
 		this.authorNickname = authorNickname;
 	}
-	
+	public String getBoardType() {
+		return boardType;
+	}
+	public void setBoardType(String boardType) {
+		this.boardType = boardType;
+	}
+	public boolean isPinned() {
+		return pinned;
+	}
+	public void setPinned(boolean pinned) {
+		this.pinned = pinned;
+	}
 }
