@@ -91,14 +91,22 @@ public class ProductController {
 		return "productList";
 	}
 
-	// 내가 등록한 상품 (로그인 필요)
+	// 내가 등록한 상품 (로그인 필요, 페이징)
 	@GetMapping("/product/mylist")
-	public String myList(Model model, HttpSession session) {
+	public String myList(@RequestParam(value = "pageNum", defaultValue = "1") int pageNum,
+			Model model, HttpSession session) {
 		User loginUser = (User) session.getAttribute("loginUser");
 		if (loginUser == null) {
 			return "redirect:/login";
 		}
-		model.addAttribute("list", productService.findBySeller(loginUser.getUserNo()));
+		int limit = 10;
+		int startNum = limit * (pageNum - 1);
+		model.addAttribute("list",
+				productService.findBySeller(loginUser.getUserNo(), startNum, limit));
+		int total = productService.countBySeller(loginUser.getUserNo());
+		int totalPages = (total % limit) == 0 ? total / limit : (total / limit) + 1;
+		model.addAttribute("totalPages", totalPages);
+		model.addAttribute("currentPage", pageNum);
 		return "productList";
 	}
 
@@ -113,8 +121,9 @@ public class ProductController {
 		}
 
 		User loginUser = (User) session.getAttribute("loginUser");
-		
-		if(loginUser == null || loginUser.getUserNo() != product.getSellerNo()) {
+
+		// 본인 상품이 아니면 조회수 +1
+		if (product != null && (loginUser == null || loginUser.getUserNo() != product.getSellerNo())) {
 			productService.increaseViewCount(productNo);
 		}
 
@@ -256,6 +265,15 @@ public class ProductController {
 			return "redirect:/product/" + productNo;
 		}
 		imageService.setThumbnail(imageNo, "product", productNo);
+		return "redirect:/product/" + productNo + "/edit";
+	}
+	
+	//이미지 추가 후 redirect
+	@PostMapping("/product/{productNo}/addImage")
+	public String addImage(@PathVariable("productNo") int productNo, @RequestParam(value = "imgFiles", required = false) List<MultipartFile> imgFiles) {
+		if (imgFiles != null && !imgFiles.isEmpty()) {
+			imageService.upload(imgFiles, "product", productNo);
+		}
 		return "redirect:/product/" + productNo + "/edit";
 	}
 }

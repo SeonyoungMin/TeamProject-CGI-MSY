@@ -34,16 +34,35 @@ public class AccountRepositoryImpl implements AccountRepository {
 		return template.query(SQL, new AccountRowMapper(), userNo, userNo, startNum, limit);
 	}
 
-	// 목록조회 페이징용
-	public int countAllByBuyer(int userNo) {
-		String SQL = "select count(*) from orders where (buyer_no = ? or seller_no = ?) and order_status = 'DONE'";
-		return template.queryForObject(SQL, Integer.class, userNo, userNo);
+
+	// 거래 완료된 내 구매 내역 목록 (페이징)
+	@Override
+	public List<Account> findAllByBuyer(int buyerNo, int startNum, int limit) {
+		String SQL = "select o.order_no, o.price, o.created_time, o.memo, "
+				+ "p.name as product_name "
+				+ "from orders o "
+				+ "join product p on p.product_no = o.product_no "
+				+ "where o.buyer_no = ? and p.trade_status = 'DONE' "
+				+ "order by o.created_time desc limit ?, ?";
+		return template.query(SQL, new AccountRowMapper(), buyerNo, startNum, limit);
 	}
 
+	// 페이징용 총 건수
+	@Override
+	public int countAllByBuyer(int buyerNo) {
+		String SQL = "select count(*) from orders o "
+				+ "join product p on p.product_no = o.product_no "
+				+ "where o.buyer_no = ? and p.trade_status = '완료'";
+		return template.queryForObject(SQL, Integer.class, buyerNo);
+	}
+
+	// 메모 수정
+	@Override
 	public void updateMemo(int orderNo, String memo) {
 		String SQL = "update orders set memo = ? where order_no = ?";
 		template.update(SQL, memo, orderNo);
 	}
+
 
 	public long getTotalBuy(int userNo) {
 		String SQL = "select coalesce(sum(price), 0) from orders where buyer_no = ? and order_status = 'DONE'";

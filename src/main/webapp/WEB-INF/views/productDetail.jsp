@@ -85,6 +85,42 @@
 	margin-bottom: 20px;
 }
 
+/* 판매자 섹션 스타일 추가 */
+.seller-profile-box {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: 15px 0;
+	border-top: 1px solid #eee;
+	border-bottom: 1px solid #eee;
+	margin: 20px 0;
+}
+
+.seller-info-left {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+}
+
+.seller-img {
+	width: 45px;
+	height: 45px;
+	border-radius: 50%;
+	background: #f0f0f0;
+	overflow: hidden;
+}
+
+.seller-name-link {
+	text-decoration: none;
+	color: #121212;
+	font-weight: bold;
+	font-size: 16px;
+}
+
+.seller-name-link:hover {
+	text-decoration: underline;
+}
+
 .desc-box {
 	background: #f7f7f7;
 	border-radius: 6px;
@@ -136,7 +172,6 @@
 
 	<div class="app-container">
 
-		<!-- 상품 영역 -->
 		<div class="card">
 			<div class="detail-top">
 
@@ -159,43 +194,46 @@
 				</div>
 
 				<div class="detail-info">
-					<div
-						style="display: flex; justify-content: space-between; align-items: center;">
-						<div class="product-status">${product.tradeStatus == '판매중' ? '판매중' : product.tradeStatus == '예약중' ? '예약중' : '판매완료'}
-						</div>
-						<span style="font-size: 12px; color: #888;">👁
-							${product.viewCount}</span>
+					<div class="product-status">${product.tradeStatus == '판매중' ? '판매중' : product.tradeStatus == '예약중' ? '예약중' : '판매완료'}
 					</div>
 					<div class="product-title">${product.productName}</div>
 					<div class="product-price">
 						<fmt:formatNumber value="${product.price}" />
 						원
 					</div>
+
+					<div class="seller-profile-box">
+						<div class="seller-info-left">
+							<div style="display: flex; flex-direction: column;">
+								<a href="${ctx}/users/search/${product.sellerNo}"
+									class="seller-name-link"> ${product.sellerNickname} </a> <span
+									style="font-size: 12px; color: #888;">판매자 프로필 보기</span>
+							</div>
+						</div>
+					</div>
+
 					<div class="product-meta">
-						판매자 : ${product.sellerNickname}<br> 카테고리 :
-						${product.category}<br> 등록일 :
+						카테고리 : ${product.category}<br> 등록일 :
 						<fmt:formatDate value="${product.createdTime}"
 							pattern="yyyy.MM.dd" />
-					</div>
-					<div class="desc-box">${product.description}</div>
+						<br>
+						<div class="product-meta">상품번호 : ${product.productNo}</div>
 
-					<!-- 구매 / 찜하기 -->
-					<div
-						style="margin-top: 20px; display: flex; gap: 10px;">
-						<a
-							href="${pageContext.request.contextPath}/order/select?productNo=${product.productNo}"
-							class="btn-order">구매하기</a>
 
-						<c:if test="${not empty loginUser}">
-							<button id="favBtn" type="button" class="btn btn-line"
-								onclick="toggleFavorite()">${favorite ? '♥ 찜 취소' : '♡ 찜하기'}
-							</button>
-						</c:if>
-					</div>
+						<div style="margin-top: 20px; display: flex; gap: 10px;">
+							<a
+								href="${pageContext.request.contextPath}/order/select?productNo=${product.productNo}"
+								class="btn-order">구매하기</a>
 
-					<!-- 수정 / 삭제 — 본인 또는 관리자 -->
-					<c:if
-						test="${not empty loginUser && (loginUser.userNo == product.sellerNo || loginUser.userRole == 'ROLE_ADMIN')}">
+							<c:if test="${not empty loginUser}">
+								<button id="favBtn" type="button" class="btn btn-line"
+									onclick="toggleFavorite()">${favorite ? '♥ 찜 취소' : '♡ 찜하기'}
+								</button>
+							</c:if>
+						</div>
+
+						<c:if
+							test="${not empty loginUser && (loginUser.userNo == product.sellerNo || loginUser.userRole == 'ROLE_ADMIN')}">
 							<div style="margin-top: 10px; display: flex; gap: 10px;">
 								<a class="btn btn-line"
 									href="${ctx}/product/${product.productNo}/edit">수정</a>
@@ -204,82 +242,77 @@
 									<button type="submit" class="btn btn-danger"
 										onclick="return confirm('삭제하시겠습니까?')">삭제</button>
 								</form>
-				
-						</div>
-
-					</c:if>
+							</div>
+						</c:if>
+					</div>
 
 				</div>
-
 			</div>
+
+			<div class="card">
+				<h3 class="section-title">댓글</h3>
+
+				<c:choose>
+					<c:when test="${empty loginUser}">
+						<div style="color: #888;">
+							<a href="${ctx}/login">댓글을 작성하려면 로그인이 필요합니다.</a>
+						</div>
+					</c:when>
+					<c:otherwise>
+						<form action="${ctx}/comment/add" method="post"
+							style="margin-bottom: 20px;">
+							<input type="hidden" name="boardNo" value="${product.productNo}">
+							<textarea class="form-input" name="content"
+								placeholder="댓글을 입력하세요" required></textarea>
+							<button type="submit" class="btn btn-primary">댓글 등록</button>
+						</form>
+
+						<div id="commentList">
+							<c:choose>
+								<c:when test="${empty comments}">
+									<div style="color: #999; padding: 10px 0;">아직 댓글이 없습니다.</div>
+								</c:when>
+								<c:otherwise>
+									<c:forEach var="c" items="${comments}">
+										<div class="comment-item">
+											<span class="comment-author"> <c:choose>
+													<c:when test="${empty c.nickname}">익명</c:when>
+													<c:otherwise>${c.nickname}</c:otherwise>
+												</c:choose>
+											</span> <span class="comment-date">${c.createdTime}</span>
+											<div class="comment-content">${c.content}</div>
+
+											<c:if
+												test="${c.authorNo == loginUser.userNo || loginUser.userRole == 'ROLE_ADMIN'}">
+												<div style="display: flex; gap: 5px; margin-top: 6px;">
+													<c:if test="${c.authorNo == loginUser.userNo}">
+														<a href="${ctx}/comment/${c.commentNo}/edit" class="btn"
+															style="padding: 3px 10px; font-size: 12px;">수정</a>
+													</c:if>
+													<form action="${ctx}/comment/${c.commentNo}/delete"
+														method="post" style="margin: 0;">
+														<input type="hidden" name="boardNo"
+															value="${product.productNo}">
+														<button type="submit" class="btn btn-danger"
+															style="padding: 3px 10px; font-size: 12px;"
+															onclick="return confirm('삭제하시겠습니까?')">삭제</button>
+													</form>
+												</div>
+											</c:if>
+										</div>
+									</c:forEach>
+								</c:otherwise>
+							</c:choose>
+						</div>
+					</c:otherwise>
+				</c:choose>
+			</div>
+
 		</div>
 
-		<!-- 댓글 영역 -->
-		<div class="card">
-			<h3 class="section-title">댓글</h3>
+		<%@ include file="/WEB-INF/views/footer.jsp"%>
 
-			<c:choose>
-				<c:when test="${empty loginUser}">
-					<div style="color: #888;">
-						<a href="${ctx}/login">댓글을 작성하려면 로그인이 필요합니다.</a>
-					</div>
-				</c:when>
-				<c:otherwise>
-					<form action="${ctx}/comment/add" method="post"
-						style="margin-bottom: 20px;">
-						<input type="hidden" name="boardNo" value="${product.productNo}">
-						<textarea class="form-input" name="content"
-							placeholder="댓글을 입력하세요" required></textarea>
-						<button type="submit" class="btn btn-primary">댓글 등록</button>
-					</form>
-
-					<div id="commentList">
-						<c:choose>
-							<c:when test="${empty comments}">
-								<div style="color: #999; padding: 10px 0;">아직 댓글이 없습니다.</div>
-							</c:when>
-							<c:otherwise>
-								<c:forEach var="c" items="${comments}">
-									<div class="comment-item">
-										<span class="comment-author"> <c:choose>
-												<c:when test="${empty c.nickname}">익명</c:when>
-												<c:otherwise>${c.nickname}</c:otherwise>
-											</c:choose>
-										</span> <span class="comment-date">${c.createdTime}</span>
-										<div class="comment-content">${c.content}</div>
-
-										<!-- 본인: 수정 + 삭제 / 관리자(타인 댓글): 삭제만 -->
-										<c:if
-											test="${c.authorNo == loginUser.userNo || loginUser.userRole == 'ROLE_ADMIN'}">
-											<div style="display: flex; gap: 5px; margin-top: 6px;">
-												<c:if test="${c.authorNo == loginUser.userNo}">
-													<a href="${ctx}/comment/${c.commentNo}/edit" class="btn"
-														style="padding: 3px 10px; font-size: 12px;">수정</a>
-												</c:if>
-												<form action="${ctx}/comment/${c.commentNo}/delete"
-													method="post" style="margin: 0;">
-													<input type="hidden" name="boardNo"
-														value="${product.productNo}">
-													<button type="submit" class="btn btn-danger"
-														style="padding: 3px 10px; font-size: 12px;"
-														onclick="return confirm('삭제하시겠습니까?')">삭제</button>
-												</form>
-											</div>
-										</c:if>
-									</div>
-								</c:forEach>
-							</c:otherwise>
-						</c:choose>
-					</div>
-				</c:otherwise>
-			</c:choose>
-		</div>
-
-	</div>
-
-	<%@ include file="/WEB-INF/views/footer.jsp"%>
-
-	<script>
+		<script>
 	var ctx = "${ctx}";
 	var productNo = ${product.productNo};
 	var loginUserNo = ${empty loginUser ? 0 : loginUser.userNo};
@@ -300,8 +333,6 @@
 			}
 		});
 	}
-
 </script>
-
 </body>
 </html>

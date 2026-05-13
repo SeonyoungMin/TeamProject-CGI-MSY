@@ -1,5 +1,5 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-<%@ taglib prefix="c" uri="jakarta.tags.core"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
 <!DOCTYPE html>
 <html>
@@ -14,7 +14,7 @@
 	<!-- 후기 등록 폼 -->
 	<h4>후기 등록</h4>
 	<form action="/minimarket/review" method="post">
-		<input type="hidden" name="productNo" value="30001">
+		<input type="hidden" name="productNo" value="90031">
 		<div>
 			<textarea name="content" rows="5" cols="40" placeholder="후기를 입력하세요" required></textarea>
 		</div>

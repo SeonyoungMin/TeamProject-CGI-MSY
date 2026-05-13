@@ -8,12 +8,12 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 //orders 테이블 + product 테이블 JOIN
 public class Account {
 
-	// orders
 	private int orderNo;
 	private long price;
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
 	private Timestamp createdTime;
 	private String memo;
+
 
 	// product
 	private String productName;
@@ -66,6 +66,7 @@ public class Account {
 	public void setProductName(String productName) {
 		this.productName = productName;
 	}
+
 
 	public String getPartnerNickname() {
 		return partnerNickname;

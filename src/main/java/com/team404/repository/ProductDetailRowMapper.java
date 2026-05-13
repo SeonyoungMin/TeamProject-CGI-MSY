@@ -17,6 +17,7 @@ public class ProductDetailRowMapper implements RowMapper<ProductDetailDto> {
 		productDetailDto.setPrice(rs.getLong("price"));
 		productDetailDto.setDescription(rs.getString("description"));
 		productDetailDto.setTradeStatus(rs.getString("trade_status"));
+		productDetailDto.setViewCount(rs.getInt("view_count"));
 		productDetailDto.setCreatedTime(rs.getTimestamp("created_time"));
 		productDetailDto.setSellerNo(rs.getInt("seller_no"));
 		productDetailDto.setSellerNickname(rs.getString("seller_nickname"));

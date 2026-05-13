@@ -26,8 +26,13 @@ public interface ProductService {
 		//카테고리별 조회
 		public List<ProductListDto> findByCategory(String category);
 		
-		//내 판매 목록 조회
+		//내 판매 목록 조회 (전체)
 		public List<ProductListDto> findBySeller(int sellerNo);
+
+		//내 판매 목록 조회 (페이징)
+		public List<ProductListDto> findBySeller(int sellerNo, int startNum, int limit);
+
+		public int countBySeller(int sellerNo);
 		
 		//상품 등록
 		public void registerProduct(Product product, List<MultipartFile> imgFiles, int loginMemberNo);
@@ -40,12 +45,11 @@ public interface ProductService {
 		 
 		//거래 상태 변경 (본인 확인 필요)
 		public void updateTradeStatus(int productNo, String tradeStatus, int loginMemberNo);
-		
-		//상품 조회수
+
+		//상품 조회수 +1
 		public void increaseViewCount(int productNo);
-		
-		//인기 상품 배너
+
+		//인기 상품 (조회수 desc, 거래완료 제외, 카테고리 옵션)
 		public List<ProductListDto> findTopByViewCount(int limit, String category);
-	 	
 	}
 
