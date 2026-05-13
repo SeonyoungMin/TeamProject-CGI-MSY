@@ -367,7 +367,7 @@
 						<a href="${ctx}/product/${p.productNo}" class="card">
 							<div class="thumb">
 								<c:if test="${not empty p.imgPath}">
-									<img src="${ctx}${p.imgPath}">
+									<img src="${p.imgPath}">
 								</c:if>
 								<span class="view-badge"><i class="fa-solid fa-eye"></i> ${p.viewCount}</span>
 								<span class="fav-btn" data-product-no="${p.productNo}"
@@ -404,7 +404,7 @@
 						<a href="${ctx}/product/${p.productNo}" class="card">
 							<div class="thumb">
 								<c:if test="${not empty p.imgPath}">
-									<img src="${ctx}${p.imgPath}">
+									<img src="${p.imgPath}">
 								</c:if>
 								<span class="view-badge"><i class="fa-solid fa-eye"></i> ${p.viewCount}</span>
 								<span class="fav-btn" data-product-no="${p.productNo}"

@@ -1,8 +1,6 @@
 package com.team404.service;
 
-import java.io.File;
 import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -16,141 +14,82 @@ public class ImageServiceImpl implements ImageService {
 	@Autowired
 	private ImageRepository imageRepository;
 
-	private static final String ROOT = "C:/team404_upload/";
-	private static final String URL_PREFIX = "/team404_upload/";
+	@Autowired
+	private ImgBBService imgBBService; // ImgBB 연동 서비스 주입
 
-	// 경로 생성 규칙 메서드
-	private String subDir(String entityType) {
-		return entityType + "Img";
-	}
-
-	private String diskFolder(String entityType) {
-		return ROOT + subDir(entityType) + "/";
-	}
-
-	private String urlPath(String entityType, String saveName) {
-		return URL_PREFIX + subDir(entityType) + "/" + saveName;
-	}
-
-	// =========================
-	// 1. 이미지 업로드
-	// =========================
+	// 이미지 업로드 (ImgBB 클라우드 전송)
 	@Override
 	public void upload(List<MultipartFile> files, String entityType, int entityId) {
-		String folderPath = diskFolder(entityType);
 
-		File dir = new File(folderPath);
-		if (!dir.exists()) {
-			dir.mkdirs();
-		}
-
-		//첫 번째 이미지 자동 썸네일 지정용 — 해당 엔티티에 이미 이미지가 있으면 false
+		// 해당 엔티티에 이미 이미지가 있는지 확인 (첫 이미지 자동 썸네일 지정용)
 		boolean hasExisting = !imageRepository.findByEntity(entityType, entityId).isEmpty();
 		boolean isFirstUpload = !hasExisting;
 
+		System.out.println("[ImageService] upload 호출 - files 개수: " + (files == null ? "null" : files.size())
+				+ " / entity: " + entityType + "/" + entityId);
+
 		for (MultipartFile file : files) {
-			if (file == null || file.isEmpty())
+			if (file == null || file.isEmpty()) {
+				System.out.println("[ImageService] 빈 파일 건너뜀");
 				continue;
-
-			String originName = file.getOriginalFilename();
-
-			//파일명 생성 방식 entityType + entityId + timestamp로 변경
-			String saveName = entityType + "_" + entityId + "_" + System.currentTimeMillis() + "_" + originName;
-
-			File saveFile = new File(folderPath + saveName);
+			}
 
 			try {
-				file.transferTo(saveFile);
+				String cloudUrl = imgBBService.upload(file);
 
 				Image img = new Image();
-				img.setFileName(originName);
-				img.setFilePath(urlPath(entityType, saveName));
+				img.setFileName(file.getOriginalFilename());
+				img.setFilePath(cloudUrl);
 				img.setEntityType(entityType);
 				img.setEntityId(entityId);
-
-				//첫 이미지만 thumbnail = true, 나머지는 false
 				img.setThumbnail(isFirstUpload);
-				isFirstUpload = false;
+				if (isFirstUpload) {
+					isFirstUpload = false;
+				}
 
 				imageRepository.insert(img);
+				System.out.println("[ImageService] DB 저장 완료: " + cloudUrl);
+
 			} catch (Exception e) {
+				System.err.println("[ImageService] ImgBB 업로드 실패 - " + e.getClass().getSimpleName()
+						+ ": " + e.getMessage());
 				e.printStackTrace();
 			}
 		}
 	}
 
-	// =========================
-	// 2. 이미지 목록 조회
-	// =========================
+	// 이미지 목록 조회
 	@Override
 	public List<Image> getImages(String entityType, int entityId) {
 		return imageRepository.findByEntity(entityType, entityId);
 	}
 
-	// =========================
-	// 3. 이미지 단건 삭제
-	// =========================
+	// 이미지 단건 삭제
 	@Override
 	public void delete(int imageNo) {
-		try {
-			// DB에서 이미지 정보를 먼저 조회하여 경로(filePath)를 확보
-			Image img = imageRepository.findByImageNo(imageNo);
-
-			if (img != null) {
-				// DB 저장 경로에서 URL 접두어를 지워 실제 디스크 경로
-				String relativePath = img.getFilePath().replace(URL_PREFIX, "");
-				File file = new File(ROOT + relativePath);
-
-				if (file.exists()) {
-					file.delete(); // 실제 파일 삭제
-				}
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-
-		// DB 데이터 삭제
+		// ImgBB 무료 API는 API를 통한 삭제를 지원하지 않거나 별도의 Delete Key가 필요합니다.
+		// 따라서 여기서는 DB 데이터만 삭제하도록 처리합니다.
 		imageRepository.delete(imageNo);
 	}
 
-	// =========================
-	// 4. [NEW] 엔티티 단위 일괄 삭제 — 상품/유저/게시글 삭제 시 호출
-	// =========================
+	// 엔티티 단위 일괄 삭제
 	@Override
 	public void deleteByEntity(String entityType, int entityId) {
 		List<Image> images = imageRepository.findByEntity(entityType, entityId);
 
-		// 1) 디스크의 실제 파일 삭제
-		for (Image img : images) {
-			try {
-				String relativePath = img.getFilePath().replace(URL_PREFIX, "");
-				File file = new File(ROOT + relativePath);
-				if (file.exists()) {
-					file.delete();
-				}
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		}
-
-		// 2) DB 레코드 일괄 삭제 (단건 delete 재사용 — 트랜잭션 처리는 호출측에서)
 		for (Image img : images) {
 			imageRepository.delete(img.getImageNo());
 		}
 	}
 
-	// =========================
-	// 5. 대표 이미지(썸네일) 설정
-	// =========================
+	// 대표 이미지(썸네일) 설정
 	@Override
 	public void setThumbnail(int imageNo, String entityType, int entityId) {
 		imageRepository.resetThumbnail(entityType, entityId);
 		imageRepository.setThumbnail(imageNo);
 	}
 
-	// =========================
-	// 6. 대표 이미지 해제
-	// =========================
+	// 대표 이미지 해제
 	@Override
 	public void cancelThumbnail(String entityType, int entityId) {
 		imageRepository.resetThumbnail(entityType, entityId);

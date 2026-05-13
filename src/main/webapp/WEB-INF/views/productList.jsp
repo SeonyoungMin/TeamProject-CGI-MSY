@@ -41,7 +41,7 @@
 	<c:forEach var="p" items="${list}">
 		<div style="position: relative; padding-bottom: 20px;">
 			<c:if test="${not empty p.imgPath}">
-				<img src="<c:url value='${p.imgPath}'/>" width="50" height="50"
+				<img src="${p.imgPath}" width="50" height="50"
 					alt="${p.imgName}">
 			</c:if>
 			<a href="<c:url value='/product/${p.productNo}'/>">${p.productName}</a>

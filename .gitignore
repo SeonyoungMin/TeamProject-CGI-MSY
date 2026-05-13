@@ -42,3 +42,4 @@ upload/
 ##################################
 **/db.properties
 **/db.properties.example
+**/application.properties

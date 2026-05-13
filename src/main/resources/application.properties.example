@@ -1,0 +1,4 @@
+# ImgBB 이미지 호스팅 API 키
+# https://api.imgbb.com/ 에서 계정 만들고 API 키 발급 받아 입력
+# 또는 팀원에게 공유받은 키 사용
+imgbb.api.key=YOUR_IMGBB_API_KEY_HERE

@@ -162,7 +162,7 @@
 			<div style="margin-bottom: 20px;">
 				<c:choose>
 					<c:when test="${not empty profileImage}">
-						<img src="${ctx}${profileImage.filePath}"
+						<img src="${profileImage.filePath}"
 							style="max-width: 200px; border: 1px solid #ddd;">
 					</c:when>
 					<c:otherwise>
@@ -205,7 +205,7 @@
 						<a href="${ctx}/product/${p.productNo}" class="product-card">
 							<c:choose>
 								<c:when test="${not empty p.imgPath}">
-									<img src="${ctx}${p.imgPath}">
+									<img src="${p.imgPath}">
 								</c:when>
 								<c:otherwise>
 									<div
