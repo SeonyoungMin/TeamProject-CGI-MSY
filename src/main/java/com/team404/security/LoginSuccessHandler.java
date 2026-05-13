@@ -14,6 +14,8 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
+
+//로그인 성공 후 처리
 @Component("loginSuccessHandler")
 public class LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
 

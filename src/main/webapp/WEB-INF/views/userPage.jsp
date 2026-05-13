@@ -174,6 +174,18 @@
 				<h2 style="margin: 0; font-size: 22px; color: #121212;">${user.userNickName}</h2>
 				<div style="margin-top: 5px; color: #666; font-size: 14px;">등급:
 					${user.userRole}</div>
+
+				<c:if test="${sessionScope.loginUser.userRole == 'ROLE_ADMIN'}">
+					<div style="margin-top: 12px; display: flex; gap: 8px;">
+						<a href="${ctx}/users/edit/${user.userNo}" class="btn">회원 정보 수정</a>
+						<form action="${ctx}/users/delete/${user.userNo}" method="post"
+							style="display: inline; margin: 0;"
+							onsubmit="return confirm('정말 이 회원을 삭제하시겠습니까?');">
+							<input type="hidden" name="_method" value="DELETE">
+							<button type="submit" class="btn btn-danger">회원 삭제</button>
+						</form>
+					</div>
+				</c:if>
 			</div>
 		</div>
 
