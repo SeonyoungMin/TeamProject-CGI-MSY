@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.team404.domain.Account;
+import com.team404.domain.User;
 import com.team404.service.AccountService;
 
 import jakarta.servlet.http.HttpSession;
@@ -32,7 +33,7 @@ public class AccountController {
 			
 	int startNum = limit * (pageNum - 1);
 	
-	List<Account> list = accountService.findAllByUser(loginMemberNo, startNum, limit);
+	List<Account> list = accountService.findAllByBuyer(loginMemberNo, startNum, limit);
 	
 	int totalNum = accountService.countAllByBuyer(loginMemberNo);
 	
@@ -55,11 +56,16 @@ public class AccountController {
 	return "accountList";
 	}
 	
+	// 메모 수정
 	@PostMapping("/account/{orderNo}")
-	public String updateMemo(@PathVariable("orderNo") int orderNo, @RequestParam("memo") String memo) {
+	public String updateMemo(@PathVariable("orderNo") int orderNo, @RequestParam("memo") String memo,
+			HttpSession session) {
+
+		User loginUser = (User) session.getAttribute("loginUser");
+		if (loginUser == null) {
+			return "redirect:/login";
+		}
 		accountService.updateMemo(orderNo, memo);
 		return "redirect:/accountList";
-		
 	}
-	
 }

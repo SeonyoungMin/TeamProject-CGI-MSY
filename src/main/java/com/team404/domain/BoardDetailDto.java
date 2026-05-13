@@ -11,6 +11,8 @@ public class BoardDetailDto {
 	private int productNo;
 	private Timestamp createdTime;
 	private String authorNickname;
+	private String boardType;
+	private boolean pinned;
 	
 	public int getBoardNo() {
 		return boardNo;
@@ -55,6 +57,16 @@ public class BoardDetailDto {
 	public void setAuthorNickname(String authorNickname) {
 		this.authorNickname = authorNickname;
 	}
-	
-	
+	public String getBoardType() {
+		return boardType;
+	}
+	public void setBoardType(String boardType) {
+		this.boardType = boardType;
+	}
+	public boolean isPinned() {
+		return pinned;
+	}
+	public void setPinned(boolean pinned) {
+		this.pinned = pinned;
+	}
 }

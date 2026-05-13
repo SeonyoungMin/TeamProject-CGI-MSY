@@ -3,31 +3,49 @@
 
 <%@ taglib prefix="c" uri="jakarta.tags.core"%>
 
+<%@ taglib prefix="fmt" uri="jakarta.tags.fmt"%>
+<c:set var="ctx" value="${pageContext.request.contextPath}" />
+<c:set var="title" value="${empty boardTitle ? '문의 게시판' : boardTitle}" />
+<c:set var="type" value="${empty boardType ? 'inquiry' : boardType}" />
+<c:set var="listUrl" value="${empty listUrl ? '/boardList' : listUrl}" />
+<c:set var="writeUrl"
+	value="${type == 'notice' ? '/notice/addForm' : (type == 'free' ? '/freeBoard/addForm' : '/boardList/addForm')}" />
+
 <!DOCTYPE html>
 <html>
 <head>
 <meta charset="UTF-8">
-<title>문의 게시판</title>
+<title>${title}</title>
 </head>
 <body>
-	<h3>문의 게시판</h3>
+	<h3>${title}</h3>
+	<hr>
 
 	<c:choose>
 		<c:when test="${empty list}">
-			<p>등록된 문의글이 없습니다.</p>
+			<p>등록된 글이 없습니다.</p>
 		</c:when>
 		<c:otherwise>
 			<c:forEach var="b" items="${list}">
 				<div>
-					${b.boardNo} |<a href="<c:url value='/boardList/${b.boardNo}'/>" />${b.title}</a>
-					|${b.authorNickname} |${b.createdTime}
+					${b.boardNo} | <a
+						href="<c:url value='/boardList/${b.boardNo}'/>">${b.title}</a>
+					| ${b.authorNickname} |
+					<fmt:formatDate value="${b.createdTime}" pattern="yyyy-MM-dd HH:mm" />
 				</div>
 				<hr>
 			</c:forEach>
 		</c:otherwise>
 	</c:choose>
 
-	<a href="<c:url value='/boardList/addForm'/>">문의글 등록</a>
+	<c:choose>
+		<c:when test="${type == 'inquiry'}">
+			<a href="<c:url value='${writeUrl}'/>">문의글 등록</a>
+		</c:when>
+		<c:when test="${canWrite}">
+			<a href="<c:url value='${writeUrl}'/>">글쓰기</a>
+		</c:when>
+	</c:choose>
 
 	<hr>
 	<c:if test="${not empty list}">
@@ -37,7 +55,7 @@
 					<strong>${i}</strong>
 				</c:when>
 				<c:otherwise>
-					<a href="<c:url value='/boardList?pageNum=${i}'/>">${i}</a>
+					<a href="<c:url value='${listUrl}?pageNum=${i}'/>">${i}</a>
 				</c:otherwise>
 			</c:choose>
 		</c:forEach>

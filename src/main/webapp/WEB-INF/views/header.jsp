@@ -6,13 +6,17 @@
 <!-- jQuery (찜/댓글 AJAX용) -->
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 
+<!-- Font Awesome 6 (아이콘) -->
+<link rel="stylesheet"
+	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
 <style>
 /* ===== 공통 ===== */
 * {
 	box-sizing: border-box;
 }
 
-body {
+header {
 	margin: 0;
 	font-family: 'Malgun Gothic', sans-serif;
 	background: #fafafa;
@@ -167,6 +171,21 @@ label.form-label {
 	border-radius: 4px;
 	background: #f5f5f5;
 	outline: none;
+	font-size: 14px;
+	white-space: nowrap;
+}
+
+.search-btn {
+	padding: 10px 16px;
+	background: #121212;
+	color: #fff;
+	border: 1px solid #121212;
+	border-radius: 0 4px 4px 0;
+	cursor: pointer;
+	font-size: 14px;
+	cursor: pointer;
+	font-size: 14px;
+	white-space: nowrap;
 }
 
 .header-right {
@@ -204,11 +223,13 @@ label.form-label {
 	<div class="main-header">
 		<a href="${ctx}/home" class="logo">team404</a>
 
-		<form class="search-container" action="${ctx}/product/search"
-			method="get">
-			<input type="text" name="keyword" class="search-bar"
+		<form class="search-container" id="searchForm" action="${ctx}/product/search"
+			method="get" onsubmit="return validateSearch()">
+			<input type="text" name="keyword" id="searchInput" class="search-bar"
 				placeholder="상품명 검색" value="${keyword}">
+			<button type="submit" class="search-btn">검색</button>
 		</form>
+		
 
 		<div class="header-right">
 			<c:if test="${empty sessionScope.loginUser}">
@@ -236,3 +257,15 @@ label.form-label {
 		</div>
 	</div>
 </header>
+		<!-- 검색창에 검색어 없을 때 경고창 뜨게 함  -->
+		<script>
+			function validateSearch() {
+				var keyword = document.getElementById('searchInput').value
+						.trim();
+				if (keyword === '') {
+					alert('검색어를 입력하세요.');
+					return false; // ← form 제출 막기
+				}
+				return true; // ← 검색어 있으면 제출
+			}
+		</script>

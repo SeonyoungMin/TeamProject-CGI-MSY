@@ -12,11 +12,6 @@ import org.springframework.stereotype.Service;
 
 import com.team404.service.UserService;
 
-/**
- * Spring Security 가 로그인 시 호출하는 사용자 조회 서비스.
- * 기존 UserService 를 그대로 활용해서 DB 의 회원으로 인증되도록 한다.
- * 비밀번호는 평문 그대로 비교 ({noop} 접두사 = 인코더 없음).
- */
 @Service("userDetailsService")
 public class SimpleUserDetailsService implements UserDetailsService {
 

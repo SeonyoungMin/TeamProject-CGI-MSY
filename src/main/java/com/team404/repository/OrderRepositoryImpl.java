@@ -10,18 +10,16 @@ public class OrderRepositoryImpl implements OrderRepository {
 	@Autowired
 	private JdbcTemplate template;
 
-	// 상품의 거래 상태를 변경하기
 	@Override
 	public void updateProductStatus(int productNo, String status) {
-		String SQL = "UPDATE product SET trade_status = ? WHERE product_no = ?"; // 상태 수정 쿼리
-		template.update(SQL, status, productNo); // DB에 반영
+		String SQL = "UPDATE product SET trade_status = ? WHERE product_no = ?";
+		template.update(SQL, status, productNo);
 	}
 
-	// 새로운 주문 내역 저장하기
 	@Override
-	public void insertOrder(int productNo, int sellerNo, int buyerNo) {
-		String SQL = "INSERT INTO orders (product_no, seller_no, buyer_no, created_time) " // 주문 추가 쿼리
-				+ "VALUES (?, ?, ?, NOW())"; // 현재 시간으로 저장
-		template.update(SQL, productNo, sellerNo, buyerNo); // DB에 반영
+	public void insertOrder(int productNo, int sellerNo, int buyerNo, long price) {
+		String SQL = "INSERT INTO orders (product_no, seller_no, buyer_no, price, order_status, created_time) "
+				+ "VALUES (?, ?, ?, ?, '완료', NOW())";
+		template.update(SQL, productNo, sellerNo, buyerNo, price);
 	}
 }

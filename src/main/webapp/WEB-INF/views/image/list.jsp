@@ -27,11 +27,11 @@
 			<p>파일명: ${img.fileName}</p>
 
 
-			<p>썸네일 여부: ${img.Thumbnail() ? '대표 이미지' : '일반'}</p>
+			<p>썸네일 여부: ${img.thumbnail ? '대표 이미지' : '일반'}</p>
 
 			<c:choose>
 
-				<c:when test="${img.Thumbnail()}">
+				<c:when test="${img.thumbnail}">
 					<a
 						href="${pageContext.request.contextPath}/images/thumbnail/cancel?entityType=${entityType}&entityId=${entityId}">
 						대표 해제 </a>

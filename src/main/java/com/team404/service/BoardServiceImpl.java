@@ -11,48 +11,59 @@ import com.team404.domain.BoardListDto;
 import com.team404.repository.BoardRepository;
 
 @Service
-public class BoardServiceImpl implements BoardService{
+public class BoardServiceImpl implements BoardService {
 
 	@Autowired
 	private BoardRepository boardRepository;
-	
-	// 문의글 등록
+
+	// 등록
 	public void registerBoard(Board board, int loginMemberNo) {
 		board.setAuthorNo(loginMemberNo);
 		boardRepository.insertBoard(board);
 	}
- 
-	// 문의글 전체목록 조회
+
+	// 문의글 목록 / 개수
 	public List<BoardListDto> findAllInquiry(int startNum, int limit) {
 		return boardRepository.findAllBoard(startNum, limit);
 	}
-	
-	// 전체 조회 페이징
+
 	public int countAllInquiry() {
 		return boardRepository.countAllBoard();
 	}
- 
-	//  문의글 상세 조회
+
+	// 타입별 목록 / 개수
+	public List<BoardListDto> findAllByType(String boardType, int startNum, int limit) {
+		return boardRepository.findByType(boardType, startNum, limit);
+	}
+
+	public int countAllByType(String boardType) {
+		return boardRepository.countByType(boardType);
+	}
+
+	// 전체 통합 조회 (홈 사이드바용)
+	public List<BoardListDto> findRecentAll(int startNum, int limit) {
+		return boardRepository.findRecentAll(startNum, limit);
+	}
+
+	// 상세
 	public BoardDetailDto findBoardDetail(int boardNo) {
 		return boardRepository.findBoardDetail(boardNo);
 	}
- 
-	// 문의글 수정 (본인 확인)
+
+	// 수정 (본인 확인)
 	public void updateBoard(Board board, int loginMemberNo) {
 		int authorNo = boardRepository.findAuthorNo(board.getBoardNo());
-		 
 		if (authorNo != loginMemberNo) {
-			throw new RuntimeException("본인의 문의글만 수정할 수 있습니다.");
+			throw new RuntimeException("본인의 글만 수정할 수 있습니다.");
 		}
 		boardRepository.updateBoard(board);
 	}
- 
-	// 문의글 삭제 (본인 확인)
+
+	// 삭제 (본인 확인)
 	public void deleteBoard(int boardNo, int loginMemberNo) {
 		int authorNo = boardRepository.findAuthorNo(boardNo);
-		 
 		if (authorNo != loginMemberNo) {
-			throw new RuntimeException("본인의 문의글만 삭제할 수 있습니다.");
+			throw new RuntimeException("본인의 글만 삭제할 수 있습니다.");
 		}
 		boardRepository.deleteBoard(boardNo);
 	}

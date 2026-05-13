@@ -14,6 +14,7 @@ public class AccountServiceImpl implements AccountService{
 	@Autowired
 	private AccountRepository accountRepository;
 	
+
 	public List<Account> findAllByUser(int userNo, int startNum, int limit) {
 		return accountRepository.findAllByUser(userNo, startNum, limit);
 	}
@@ -21,10 +22,16 @@ public class AccountServiceImpl implements AccountService{
 	public int countAllByBuyer(int userNo) {
 		return accountRepository.countAllByBuyer(userNo);
 	}
+
+	public List<Account> findAllByBuyer(int buyerNo, int startNum, int limit) {
+		return accountRepository.findAllByBuyer(buyerNo, startNum, limit);
+	}
+
 	
 	public void updateMemo(int orderNo, String memo) {
 		accountRepository.updateMemo(orderNo, memo);
 	}
+
 	
 	public long getTotalBuy(int userNo) {
 		return accountRepository.getTotalBuy(userNo);

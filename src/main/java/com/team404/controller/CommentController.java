@@ -31,10 +31,11 @@ public class CommentController {
 		return commentService.getComments(boardNo);
 	}
 
-	// 댓글 등록 (일반 폼 submit)
+	// 댓글 등록 (일반 폼 submit). returnTo=board 이면 게시판으로 돌아감
 	@PostMapping("/comment/add")
 	public String add(@RequestParam("boardNo") int boardNo,
 			@RequestParam("content") String content,
+			@RequestParam(value = "returnTo", required = false) String returnTo,
 			HttpSession session) {
 
 		User loginUser = (User) session.getAttribute("loginUser");
@@ -47,7 +48,9 @@ public class CommentController {
 		c.setContent(content);
 		c.setAuthorNo(loginUser.getUserNo());
 		commentService.addComment(c);
-		return "redirect:/product/" + boardNo;
+		return "board".equals(returnTo)
+				? "redirect:/boardList/" + boardNo
+				: "redirect:/product/" + boardNo;
 	}
 
 	// 댓글 수정 폼 — 작성자 본인만 진입 가능
@@ -85,23 +88,27 @@ public class CommentController {
 		return "redirect:/product/" + boardNo;
 	}
 
-	// 댓글 삭제 처리 — 본인 또는 관리자
+	// 댓글 삭제 처리 — 본인 또는 관리자. returnTo=board 이면 게시판으로 돌아감
 	@PostMapping("/comment/{commentNo}/delete")
 	public String delete(@PathVariable("commentNo") int commentNo,
 			@RequestParam("boardNo") int boardNo,
+			@RequestParam(value = "returnTo", required = false) String returnTo,
 			HttpSession session) {
 
 		User loginUser = (User) session.getAttribute("loginUser");
 		if (loginUser == null) {
 			return "redirect:/login";
 		}
+		String back = "board".equals(returnTo)
+				? "redirect:/boardList/" + boardNo
+				: "redirect:/product/" + boardNo;
 		Comment comment = commentService.getComment(commentNo);
 		boolean isAuthor = comment.getAuthorNo() == loginUser.getUserNo();
 		boolean isAdmin = "ROLE_ADMIN".equals(loginUser.getUserRole());
 		if (!isAuthor && !isAdmin) {
-			return "redirect:/product/" + boardNo;
+			return back;
 		}
 		commentService.deleteComment(commentNo);
-		return "redirect:/product/" + boardNo;
+		return back;
 	}
 }

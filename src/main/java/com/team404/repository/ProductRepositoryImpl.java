@@ -10,7 +10,6 @@ import com.team404.domain.Product;
 import com.team404.domain.ProductDetailDto;
 import com.team404.domain.ProductListDto;
 
-// insertImage(), findImagesByProduct() 제거 → ImageRepository 가 단일 책임
 @Repository
 public class ProductRepositoryImpl implements ProductRepository {
 
@@ -20,23 +19,26 @@ public class ProductRepositoryImpl implements ProductRepository {
 	// 상품 목록 조회
 	public List<ProductListDto> findAll(int startNum, int limit) {
 		String SQL = "select p.product_no, p.name, p.category, p.price, p.trade_status, p.view_count, p.created_time, "
-				+ "p.seller_no, u.nickname as seller_nickname, " + "i.file_name as img_name, i.file_path as img_path "
+				+ "p.seller_no, u.nickname as seller_nickname, " + "i.file_name as img_name, i.file_path as img_path, "
+				+ "(select count(*) from favorite f where f.product_no = p.product_no) as favorite_count "
 				+ "from product p " + "left join users u on u.user_no = p.seller_no "
 				+ "left join image i on i.entity_type = 'product' and i.entity_id = p.product_no and i.is_thumbnail=1 "
-				+ "order by p.created_time desc limit ?, ?";
+				+ "where p.trade_status != '완료' " 
+				+ "order by p.created_time desc limit ?, ? ";
 		return template.query(SQL, new ProductListRowMapper(), startNum, limit);
 	}
 
 	// 전체 데이터 개수 반환
 	public int countAll() {
-		String SQL = "select count(*) from product";
+		String SQL = "select count(*) from product p where p.trade_status != '완료'";
 		return template.queryForObject(SQL, Integer.class);
 	}
 
 	// 상품 상세 조회
 	public ProductDetailDto findProductDetail(int productNo) {
 		String SQL = "select p.product_no, p.name, p.category, p.price, p.description, p.trade_status, p.view_count, p.created_time, "
-				+ "p.seller_no, u.nickname as seller_nickname, " + "i.file_name as img_name, i.file_path as img_path "
+
+				+ "p.seller_no, u.nickname as seller_nickname, i.file_name as img_name, i.file_path as img_path "
 				+ "from product p " + "left join users u on u.user_no = p.seller_no "
 				+ "left join image i on i.entity_type='product' and i.entity_id=p.product_no and i.is_thumbnail=1 "
 				+ "where p.product_no=?";
@@ -46,28 +48,53 @@ public class ProductRepositoryImpl implements ProductRepository {
 
 	// 상품 조건 조회 (키워드)
 	public List<ProductListDto> findByKeyword(String keyword) {
-		String SQL = "select p.product_no, p.name, p.category, p.price, p.trade_status, p.view_count, p.created_time, "
-				+ "p.seller_no, u.nickname as seller_nickname, i.file_name as img_name, i.file_path as img_path "
-				+ "from product p " + "left join users u on u.user_no = p.seller_no "
-				+ "left join image i on i.entity_type = 'product' and i.entity_id = p.product_no and i.is_thumbnail = 1 "
-				+ "where p.name like ?";
-		return template.query(SQL, new ProductListRowMapper(), "%" + keyword + "%");
+		String SQL ="select p.product_no, p.name, p.category, p.price, p.trade_status, p.view_count, p.created_time, "
+	            + "p.seller_no, u.nickname as seller_nickname, i.file_name as img_name, i.file_path as img_path, "
+	            + "(select count(*) from favorite f where f.product_no = p.product_no) as favorite_count "  // ← 추가
+	            + "from product p "
+	            + "left join users u on u.user_no = p.seller_no "
+	            + "left join image i on i.entity_type = 'product' and i.entity_id = p.product_no and i.is_thumbnail = 1 "
+	            + "where p.name like ? and p.trade_status != '완료'";
+	    return template.query(SQL, new ProductListRowMapper(), "%" + keyword + "%");
 	}
 
 	// 카테고리 조회
 	public List<ProductListDto> findByCategory(String category) {
-		String SQL = "select p.product_no, p.name, p.category, p.price, p.trade_status,  p.view_count, p.created_time, "
-				+ "p.seller_no, u.nickname as seller_nickname, i.file_name as img_name, i.file_path as img_path "
+
+		String SQL = "select p.product_no, p.name, p.category, p.price, p.trade_status, p.view_count, p.created_time, "
+				+ "p.seller_no, u.nickname as seller_nickname, i.file_name as img_name, i.file_path as img_path, "
+				+ "(select count(*) from favorite f where f.product_no = p.product_no) as favorite_count "
 				+ "from product p " + "left join users u on u.user_no = p.seller_no "
+
 				+ "left join image i on i.entity_type = 'product' and i.entity_id = p.product_no and i.is_thumbnail = 1 "
-				+ "where p.category=?";
+				+ "where p.category=? and p.trade_status != '완료'";
 		return template.query(SQL, new ProductListRowMapper(), category);
 	}
 
-	// 내 판매목록 조회
+	// 내 판매목록 조회 (페이징)
+	@Override
+	public List<ProductListDto> findBySeller(int sellerNo, int startNum, int limit) {
+		String SQL = "select p.product_no, p.name, p.category, p.price, p.trade_status, p.view_count, p.created_time, "
+				+ "p.seller_no, u.nickname as seller_nickname, i.file_name as img_name, i.file_path as img_path, "
+				+ "(select count(*) from favorite f where f.product_no = p.product_no) as favorite_count "
+				+ "from product p " + "left join users u on u.user_no = p.seller_no "
+				+ "left join image i on i.entity_type = 'product' and i.entity_id = p.product_no and i.is_thumbnail = 1 "
+				+ "where p.seller_no=? order by p.created_time desc limit ?, ?";
+		return template.query(SQL, new ProductListRowMapper(), sellerNo, startNum, limit);
+	}
+
+	// 내 판매목록 카운트
+	@Override
+	public int countBySeller(int sellerNo) {
+		String SQL = "select count(*) from product where seller_no = ?";
+		return template.queryForObject(SQL, Integer.class, sellerNo);
+	}
+
+	// 내 판매목록 조회 (전체)
 	public List<ProductListDto> findBySeller(int sellerNo) {
 		String SQL = "select p.product_no, p.name, p.category, p.price, p.trade_status, p.view_count, p.created_time, "
-				+ "p.seller_no, u.nickname as seller_nickname, i.file_name as img_name, i.file_path as img_path "
+				+ "p.seller_no, u.nickname as seller_nickname, i.file_name as img_name, i.file_path as img_path, "
+				+ "(select count(*) from favorite f where f.product_no = p.product_no) as favorite_count "
 				+ "from product p " + "left join users u on u.user_no = p.seller_no "
 				+ "left join image i on i.entity_type = 'product' and i.entity_id = p.product_no and i.is_thumbnail = 1 "
 				+ "where p.seller_no=?";
@@ -119,30 +146,28 @@ public class ProductRepositoryImpl implements ProductRepository {
 		template.update(SQL, productNo, sellerNo, buyerNo);
 	}
 
-	// 상품 조회수
+	// 상품 조회수 +1
+	@Override
 	public void increaseViewCount(int productNo) {
 		String SQL = "update product set view_count = view_count + 1 where product_no = ?";
 		template.update(SQL, productNo);
 	}
 
-	// 인기 상품 배너
+	// 인기 상품 (조회수 desc, 거래완료 제외, 카테고리 옵션)
+	@Override
 	public List<ProductListDto> findTopByViewCount(int limit, String category) {
-		// 카테고리 있으면 조건 추가
-		if (category != null && !category.isEmpty()) {
-			String SQL = "select p.product_no, p.name, p.category, p.price, p.trade_status, p.view_count, p.created_time, "
-					+ "p.seller_no, u.nickname as seller_nickname, "
-					+ "i.file_name as img_name, i.file_path as img_path " + "from product p "
-					+ "left join users u on u.user_no = p.seller_no "
-					+ "left join image i on i.entity_type = 'product' and i.entity_id = p.product_no and i.is_thumbnail = 1 "
-					+ "where p.trade_status != '완료' and p.category = ? " + "order by p.view_count desc limit ?";
-			return template.query(SQL, new ProductListRowMapper(), category, limit);
-		}
-		// 카테고리 없으면 전체
-		String SQL = "select p.product_no, p.name, p.category, p.price, p.trade_status, p.view_count, p.created_time, "
-				+ "p.seller_no, u.nickname as seller_nickname, " + "i.file_name as img_name, i.file_path as img_path "
+		String base = "select p.product_no, p.name, p.category, p.price, p.trade_status, p.view_count, p.created_time, "
+				+ "p.seller_no, u.nickname as seller_nickname, " + "i.file_name as img_name, i.file_path as img_path, "
+				+ "(select count(*) from favorite f where f.product_no = p.product_no) as favorite_count "
 				+ "from product p " + "left join users u on u.user_no = p.seller_no "
 				+ "left join image i on i.entity_type = 'product' and i.entity_id = p.product_no and i.is_thumbnail = 1 "
-				+ "where p.trade_status != '완료' " + "order by p.view_count desc limit ?";
+				+ "where p.trade_status <> '완료' ";
+
+		if (category != null && !category.isEmpty()) {
+			String SQL = base + "and p.category = ? order by p.view_count desc limit ?";
+			return template.query(SQL, new ProductListRowMapper(), category, limit);
+		}
+		String SQL = base + "order by p.view_count desc limit ?";
 		return template.query(SQL, new ProductListRowMapper(), limit);
 	}
 }
