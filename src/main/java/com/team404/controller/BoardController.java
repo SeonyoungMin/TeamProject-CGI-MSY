@@ -37,6 +37,25 @@ public class BoardController {
 	@Autowired
 	private CommentService commentService;
 
+	// 전체 게시글 목록 (공지/문의/자유)
+	@GetMapping("/board/all")
+	public String getAllBoardList(@RequestParam(value = "pageNum", defaultValue = "1") int pageNum,
+			@RequestParam(value = "limit", defaultValue = "10") int limit, HttpSession session, Model model) {
+		int startNum = limit * (pageNum - 1);
+		List<BoardListDto> list = boardService.findRecentAll(startNum, limit);
+		int totalNum = boardService.countRecentAll();
+		int totalPages = (totalNum + limit - 1) / limit;
+
+		model.addAttribute("list", list);
+		model.addAttribute("totalPages", totalPages);
+		model.addAttribute("currentPage", pageNum);
+		model.addAttribute("boardType", "all");
+		model.addAttribute("boardTitle", "전체 게시글");
+		model.addAttribute("listUrl", "/board/all");
+		model.addAttribute("canWrite", session.getAttribute("loginUser") != null);
+		return "boardList";
+	}
+
 	// 문의 게시판 목록
 	@GetMapping("/boardList")
 	public String getBoardList(@RequestParam(value = "pageNum", defaultValue = "1") int pageNum,
@@ -156,8 +175,10 @@ public class BoardController {
 
 	// 타입별 목록 URL
 	private String listUrlByType(String type) {
-		if ("notice".equals(type)) return "/notice";
-		if ("free".equals(type)) return "/freeBoard";
+		if ("notice".equals(type))
+			return "/notice";
+		if ("free".equals(type))
+			return "/freeBoard";
 		return "/boardList";
 	}
 
@@ -222,16 +243,19 @@ public class BoardController {
 
 	// 수정 처리
 	@PutMapping("/boardList/{boardNo}")
-	public String updateBoard(@PathVariable("boardNo") int boardNo, @ModelAttribute Board board, HttpSession session) {
+	public String updateBoard(@PathVariable("boardNo") int boardNo, @ModelAttribute Board board,
+			@RequestParam(value = "boardType", required = false) String boardType, HttpSession session) {
 
 		User loginUser = (User) session.getAttribute("loginUser");
 		if (loginUser == null) {
 			return "redirect:/login";
 		}
-		// 관리자가 아니면 기존 핀 값 유지
+		BoardDetailDto existing = boardService.findBoardDetail(boardNo);
 		if (!"ROLE_ADMIN".equals(loginUser.getUserRole())) {
-			BoardDetailDto existing = boardService.findBoardDetail(boardNo);
 			board.setPinned(existing.isPinned());
+		}
+		if (boardType != null) {
+			board.setBoardType(boardType);
 		}
 		board.setBoardNo(boardNo);
 		boardService.updateBoard(board, loginUser.getUserNo());

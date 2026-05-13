@@ -25,7 +25,7 @@
 			<div style="margin-bottom: 20px;">
 				<c:choose>
 					<c:when test="${not empty profileImage}">
-						<img src="${ctx}${profileImage.filePath}"
+						<img src="${profileImage.filePath}"
 							style="max-width: 200px; border: 1px solid #ddd;">
 					</c:when>
 					<c:otherwise>

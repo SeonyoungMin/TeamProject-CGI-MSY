@@ -10,7 +10,7 @@
 
 	<p>${imgPath}</p>
 
-	<img src="${pageContext.request.contextPath}${imgPath}" width="300" />
+	<img src="${imgPath}" width="300" />
 
 	<br>
 	<br>

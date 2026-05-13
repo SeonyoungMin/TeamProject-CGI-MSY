@@ -31,7 +31,7 @@
 					<a href="${ctx}/product/${p.productNo}">
 						<div style="height:180px; background:#f0f0f0; margin-bottom:10px;">
 							<c:if test="${not empty p.imgPath}">
-								<img src="${ctx}${p.imgPath}" style="width:100%; height:100%; object-fit:cover;">
+								<img src="${p.imgPath}" style="width:100%; height:100%; object-fit:cover;">
 							</c:if>
 							<c:if test="${empty p.imgPath}">
 								<div style="height:100%; display:flex; align-items:center; justify-content:center; color:#aaa;">이미지 없음</div>

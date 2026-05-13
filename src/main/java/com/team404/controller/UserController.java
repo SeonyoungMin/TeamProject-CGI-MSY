@@ -159,12 +159,16 @@ public class UserController {
 		User user = userService.getUserByNo(userNo);
 		List<ProductListDto> myProducts = productService.findBySeller(userNo);
 
+		// 프로필 이미지
+		List<Image> profileImages = imageService.getImages("user", userNo);
+		Image profileImage = profileImages.isEmpty() ? null : profileImages.get(0);
+
 		List<ReviewDto> allReviews = reviewService.findReviewsByUser(userNo);
 
-		// 페이징
+		// 후기 페이징
 		int pageSize = 5;
 		int totalReviews = allReviews.size();
-		int totalPages = (int) Math.ceil((double) totalReviews / pageSize);
+		int totalPages = (totalReviews + pageSize - 1) / pageSize;
 		int start = (page - 1) * pageSize;
 		int end = Math.min(start + pageSize, totalReviews);
 
@@ -173,9 +177,10 @@ public class UserController {
 
 		model.addAttribute("user", user);
 		model.addAttribute("myProducts", myProducts);
-		model.addAttribute("reviews", pagedReviews); // 잘린 리스트
-		model.addAttribute("currentPage", page); // 현재 페이지 번호
-		model.addAttribute("totalPages", totalPages); // 전체 페이지 수
+		model.addAttribute("profileImage", profileImage);
+		model.addAttribute("reviews", pagedReviews);
+		model.addAttribute("currentPage", page);
+		model.addAttribute("totalPages", totalPages);
 
 		return "userPage";
 	}
