@@ -19,8 +19,9 @@ public interface BoardService {
 	List<BoardListDto> findAllByType(String boardType, int startNum, int limit);
 	int countAllByType(String boardType);
 
-	// 전체 통합 조회 (홈 사이드바용)
+	// 전체 통합 조회 (공지/문의/자유)
 	List<BoardListDto> findRecentAll(int startNum, int limit);
+	int countRecentAll();
 
 	// 상세 / 수정 / 삭제
 	BoardDetailDto findBoardDetail(int boardNo);

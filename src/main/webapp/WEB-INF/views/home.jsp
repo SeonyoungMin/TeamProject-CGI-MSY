@@ -432,7 +432,7 @@
 		<aside class="board-side">
 			<div class="board-side-header">
 				<h3>게시글</h3>
-				<a href="${ctx}/boardList" class="board-side-more">더보기 &gt;</a>
+				<a href="${ctx}/board/all" class="board-side-more">더보기 &gt;</a>
 			</div>
 
 			<a href="${ctx}/board/write" class="board-side-write">게시글 쓰기</a>

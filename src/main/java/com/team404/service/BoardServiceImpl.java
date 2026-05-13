@@ -40,9 +40,13 @@ public class BoardServiceImpl implements BoardService {
 		return boardRepository.countByType(boardType);
 	}
 
-	// 전체 통합 조회 (홈 사이드바용)
+	// 전체 통합 조회 (공지/문의/자유)
 	public List<BoardListDto> findRecentAll(int startNum, int limit) {
 		return boardRepository.findRecentAll(startNum, limit);
+	}
+
+	public int countRecentAll() {
+		return boardRepository.countRecentAll();
 	}
 
 	// 상세
