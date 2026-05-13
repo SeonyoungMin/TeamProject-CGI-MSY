@@ -17,6 +17,8 @@ public class BoardDetailRowMapper implements RowMapper<BoardDetailDto> {
 		dto.setAuthorNo(rs.getInt("author_no"));
 		dto.setCreatedTime(rs.getTimestamp("created_time"));
 		dto.setAuthorNickname(rs.getString("author_nickname"));
+		dto.setBoardType(rs.getString("board_type"));
+		dto.setPinned(rs.getBoolean("pinned"));
 		return dto;
 	}
 }

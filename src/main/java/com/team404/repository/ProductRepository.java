@@ -50,4 +50,10 @@ public interface ProductRepository {
 
 	// 상품 등록 orders 추가
 	public void insertOrder(int productNo, int sellerNo, int buyerNo);
+
+	// 상품 조회수 +1
+	public void increaseViewCount(int productNo);
+
+	// 인기 상품 (조회수 desc, 거래완료 제외, 카테고리 옵션)
+	public List<ProductListDto> findTopByViewCount(int limit, String category);
 }

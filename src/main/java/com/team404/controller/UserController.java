@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.team404.domain.Account;
+import com.team404.domain.BoardListDto;
 import com.team404.domain.Image;
 import com.team404.domain.ProductListDto;
 import com.team404.domain.Rangking;
@@ -23,6 +24,7 @@ import com.team404.domain.SearchDTO;
 import com.team404.domain.User;
 import com.team404.exception.NoUserFoundException;
 import com.team404.service.AccountService;
+import com.team404.service.BoardService;
 import com.team404.service.ImageService;
 import com.team404.service.ProductService;
 import com.team404.service.RankingService;
@@ -54,6 +56,9 @@ public class UserController {
 	@Autowired
 	private ReviewService reviewService;
 
+	@Autowired
+	private BoardService boardService;
+
 	// 로그인한 사용자가 관리자인지 검사
 	private boolean isAdmin(HttpSession session) {
 		User loginUser = (User) session.getAttribute("loginUser");
@@ -78,11 +83,17 @@ public class UserController {
 		List<Rangking> topSellers = rankingService.findTopSellers(3);
 		List<Rangking> topBuyers = rankingService.findTopBuyers(3);
 
+		List<ProductListDto> popularList = productService.findTopByViewCount(3, null);
+
+		List<BoardListDto> recentBoards = boardService.findRecentAll(0, 8);
+
 		model.addAttribute("productList", productList);
 		model.addAttribute("totalPages", totalPages);
 		model.addAttribute("currentPage", pageNum);
 		model.addAttribute("topSellers", topSellers);
 		model.addAttribute("topBuyers", topBuyers);
+		model.addAttribute("popularList", popularList);
+		model.addAttribute("recentBoards", recentBoards);
 		return "home";
 	}
 

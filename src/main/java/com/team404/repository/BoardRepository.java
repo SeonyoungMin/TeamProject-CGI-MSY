@@ -6,24 +6,29 @@ import com.team404.domain.Board;
 import com.team404.domain.BoardDetailDto;
 import com.team404.domain.BoardListDto;
 
-
 public interface BoardRepository {
 
-	//문의글 등록
-	public int insertBoard(Board board);
-	
-	//문의글 전체 조회
-	public List<BoardListDto> findAllBoard(int startNum, int limit);
-	//전체 조회 페이징
-	public int countAllBoard();
-	
-	//문의글 상세 조회 
-	public BoardDetailDto findBoardDetail(int boardNo);
-	
-	//문의글 수정 (본인 확인 필요)
-	public void updateBoard(Board board);
-	public int findAuthorNo(int boardNo); //본인 확인용
-	
-	//문의글 삭제 (본인 확인 필요)
-	public void deleteBoard(int boardNo);
+	// 게시글 등록
+	int insertBoard(Board board);
+
+	// 문의글 목록 / 개수
+	List<BoardListDto> findAllBoard(int startNum, int limit);
+	int countAllBoard();
+
+	// 타입별 목록 / 개수
+	List<BoardListDto> findByType(String boardType, int startNum, int limit);
+	int countByType(String boardType);
+
+	// 전체 게시글 통합 조회 (홈 사이드바용)
+	List<BoardListDto> findRecentAll(int startNum, int limit);
+
+	// 상세 조회
+	BoardDetailDto findBoardDetail(int boardNo);
+
+	// 수정 / 삭제
+	void updateBoard(Board board);
+	void deleteBoard(int boardNo);
+
+	// 작성자 번호 (본인 확인용)
+	int findAuthorNo(int boardNo);
 }

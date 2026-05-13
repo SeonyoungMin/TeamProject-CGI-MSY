@@ -14,6 +14,7 @@ public class Board {
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
 	private Timestamp createdTime;
 	private String category;
+	private boolean pinned;
 	
 	public int getBoardNo() {
 		return boardNo;
@@ -60,5 +61,10 @@ public class Board {
 	public void setCategory(String category) {
 		this.category = category;
 	}
-	
+	public boolean isPinned() {
+		return pinned;
+	}
+	public void setPinned(boolean pinned) {
+		this.pinned = pinned;
+	}
 }

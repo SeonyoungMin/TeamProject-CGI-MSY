@@ -38,14 +38,16 @@
 	</c:if>
 
 	<c:forEach var="p" items="${list}">
-		<div>
+		<div style="position: relative; padding-bottom: 20px;">
 			<c:if test="${not empty p.imgPath}">
 				<img src="<c:url value='${p.imgPath}'/>" width="50" height="50" alt="${p.imgName}">
 			</c:if>
 			<a href="<c:url value='/product/${p.productNo}'/>">${p.productName}</a>
 			| ${p.category} | ${p.price}원 |
-			${p.tradeStatus == 'SALE' ? '판매중' : p.tradeStatus == 'RESERVED' ? '예약중' : '판매완료'}
+			${p.tradeStatus == '완료' ? '판매완료' : p.tradeStatus}
 			| ${p.sellerNickname}
+			<span style="position: absolute; bottom: 0; right: 0; font-size: 12px; color: #888;">
+				👁 ${p.viewCount} </span>
 		</div>
 		<hr>
 	</c:forEach>

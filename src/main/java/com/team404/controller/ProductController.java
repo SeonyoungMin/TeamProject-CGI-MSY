@@ -93,6 +93,11 @@ public class ProductController {
 
 		User loginUser = (User) session.getAttribute("loginUser");
 
+		// 본인 상품이 아니면 조회수 +1
+		if (product != null && (loginUser == null || loginUser.getUserNo() != product.getSellerNo())) {
+			productService.increaseViewCount(productNo);
+		}
+
 		boolean favorite = false;
 		if (loginUser != null) {
 			favorite = favoriteService.exists(loginUser.getUserNo(), productNo);

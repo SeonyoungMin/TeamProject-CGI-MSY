@@ -6,6 +6,10 @@
 <!-- jQuery (찜/댓글 AJAX용) -->
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 
+<!-- Font Awesome 6 (아이콘) -->
+<link rel="stylesheet"
+	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
 <style>
 /* ===== 공통 ===== */
 * {

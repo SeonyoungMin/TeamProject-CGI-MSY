@@ -16,6 +16,8 @@ public class ProductListRowMapper implements RowMapper<ProductListDto> {
 		productListDto.setCategory(rs.getString("category"));
 		productListDto.setPrice(rs.getLong("price"));
 		productListDto.setTradeStatus(rs.getNString("trade_status"));
+		productListDto.setViewCount(rs.getInt("view_count"));
+		productListDto.setFavoriteCount(rs.getInt("favorite_count"));
 		productListDto.setCreatedTime(rs.getTimestamp("created_time"));
 		productListDto.setSellerNo(rs.getInt("seller_no"));
 		productListDto.setSellerNickname(rs.getString("seller_nickname"));

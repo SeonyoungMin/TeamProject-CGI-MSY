@@ -18,6 +18,8 @@ public class ProductListDto {
 
 	private int favoriteCount;
 
+	private int viewCount;
+
 	// orders 테이블 데이터 (orders.product_no = product.product_no)
 	private int sellerNo;
 
@@ -118,6 +120,14 @@ public class ProductListDto {
 
 	public void setFavoriteCount(int favoriteCount) {
 		this.favoriteCount = favoriteCount;
+	}
+
+	public int getViewCount() {
+		return viewCount;
+	}
+
+	public void setViewCount(int viewCount) {
+		this.viewCount = viewCount;
 	}
 
 }

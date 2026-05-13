@@ -32,21 +32,125 @@ public class BoardController {
 	@Autowired
 	private CommentService commentService;
 
-	// 문의글 전체 목록 (페이징)
+	// 문의 게시판 목록
 	@GetMapping("/boardList")
 	public String getBoardList(@RequestParam(value = "pageNum", defaultValue = "1") int pageNum,
 			@RequestParam(value = "limit", defaultValue = "10") int limit, Model model) {
+		setBoardListModel("inquiry", "문의 게시판", "/boardList", pageNum, limit, model);
+		return "boardList";
+	}
 
+	// 공지사항 목록
+	@GetMapping("/notice")
+	public String getNoticeList(@RequestParam(value = "pageNum", defaultValue = "1") int pageNum,
+			@RequestParam(value = "limit", defaultValue = "10") int limit, HttpSession session, Model model) {
+		setBoardListModel("notice", "공지사항", "/notice", pageNum, limit, model);
+		User loginUser = (User) session.getAttribute("loginUser");
+		model.addAttribute("canWrite", loginUser != null && "ROLE_ADMIN".equals(loginUser.getUserRole()));
+		return "boardList";
+	}
+
+	// 자유 게시판 목록
+	@GetMapping("/freeBoard")
+	public String getFreeBoardList(@RequestParam(value = "pageNum", defaultValue = "1") int pageNum,
+			@RequestParam(value = "limit", defaultValue = "10") int limit, HttpSession session, Model model) {
+		setBoardListModel("free", "자유게시판", "/freeBoard", pageNum, limit, model);
+		model.addAttribute("canWrite", session.getAttribute("loginUser") != null);
+		return "boardList";
+	}
+
+	// 공지 등록 폼 (관리자만)
+	@GetMapping("/notice/addForm")
+	public String noticeAddForm(@ModelAttribute("newBoard") Board board, HttpSession session, Model model) {
+		User loginUser = (User) session.getAttribute("loginUser");
+		if (loginUser == null) {
+			return "redirect:/login";
+		}
+		if (!"ROLE_ADMIN".equals(loginUser.getUserRole())) {
+			return "redirect:/notice";
+		}
+		model.addAttribute("authorNo", loginUser.getUserNo());
+		model.addAttribute("authorNickname", loginUser.getUserNickName());
+		model.addAttribute("boardType", "notice");
+		model.addAttribute("boardTitle", "공지사항");
+		model.addAttribute("cancelUrl", "/notice");
+		model.addAttribute("isAdmin", true);
+		return "boardAddForm";
+	}
+
+	// 자유 게시판 등록 폼
+	@GetMapping("/freeBoard/addForm")
+	public String freeBoardAddForm(@ModelAttribute("newBoard") Board board, HttpSession session, Model model) {
+		User loginUser = (User) session.getAttribute("loginUser");
+		if (loginUser == null) {
+			return "redirect:/login";
+		}
+		model.addAttribute("authorNo", loginUser.getUserNo());
+		model.addAttribute("authorNickname", loginUser.getUserNickName());
+		model.addAttribute("boardType", "free");
+		model.addAttribute("boardTitle", "자유게시판");
+		model.addAttribute("cancelUrl", "/freeBoard");
+		model.addAttribute("isAdmin", "ROLE_ADMIN".equals(loginUser.getUserRole()));
+		return "boardAddForm";
+	}
+
+	// 글쓰기 폼 - 사용자가 타입 직접 선택
+	@GetMapping("/board/write")
+	public String boardWriteForm(@ModelAttribute("newBoard") Board board, HttpSession session, Model model) {
+		User loginUser = (User) session.getAttribute("loginUser");
+		if (loginUser == null) {
+			return "redirect:/login";
+		}
+		model.addAttribute("authorNo", loginUser.getUserNo());
+		model.addAttribute("authorNickname", loginUser.getUserNickName());
+		model.addAttribute("boardTitle", "게시글");
+		model.addAttribute("cancelUrl", "/home");
+		model.addAttribute("typeChoice", true);
+		model.addAttribute("isAdmin", "ROLE_ADMIN".equals(loginUser.getUserRole()));
+		return "boardAddForm";
+	}
+
+	// 게시글 등록 처리 (타입에 따라 다른 목록으로 이동)
+	@PostMapping("/board/type")
+	public String registerTypedBoard(@ModelAttribute Board board, HttpSession session) {
+		User loginUser = (User) session.getAttribute("loginUser");
+		if (loginUser == null) {
+			return "redirect:/login";
+		}
+		boolean isAdmin = "ROLE_ADMIN".equals(loginUser.getUserRole());
+		String type = board.getBoardType();
+		if ("notice".equals(type) && !isAdmin) {
+			return "redirect:/notice";
+		}
+		// 관리자만 핀 고정 가능
+		if (!isAdmin) {
+			board.setPinned(false);
+		}
+		board.setAuthorNo(loginUser.getUserNo());
+		boardService.registerBoard(board, loginUser.getUserNo());
+		return "redirect:" + listUrlByType(type);
+	}
+
+	// 타입별 목록 모델 세팅
+	private void setBoardListModel(String type, String pageTitle, String listUrl, int pageNum, int limit, Model model) {
 		int startNum = limit * (pageNum - 1);
-
-		List<BoardListDto> list = boardService.findAllInquiry(startNum, limit);
-		int totalNum = boardService.countAllInquiry();
+		List<BoardListDto> list = boardService.findAllByType(type, startNum, limit);
+		int totalNum = boardService.countAllByType(type);
 		int totalPages = (totalNum % limit) == 0 ? totalNum / limit : (totalNum / limit) + 1;
 
 		model.addAttribute("list", list);
 		model.addAttribute("totalPages", totalPages);
 		model.addAttribute("currentPage", pageNum);
-		return "boardList";
+		model.addAttribute("boardType", type);
+		model.addAttribute("boardTitle", pageTitle);
+		model.addAttribute("listUrl", listUrl);
+	}
+
+	// 타입별 목록 URL
+	private String listUrlByType(String type) {
+		if ("notice".equals(type)) return "/notice";
+		if ("free".equals(type)) return "/freeBoard";
+		return "/boardList";
 	}
 
 	// 문의글 상세 조회
@@ -61,7 +165,7 @@ public class BoardController {
 		return "boardDetail";
 	}
 
-	// 등록 폼
+	// 문의글 등록 폼
 	@GetMapping("/boardList/addForm")
 	public String registerForm(@ModelAttribute("newBoard") Board board, HttpSession session, Model model) {
 		User loginUser = (User) session.getAttribute("loginUser");
@@ -70,6 +174,10 @@ public class BoardController {
 		}
 		model.addAttribute("authorNo", loginUser.getUserNo());
 		model.addAttribute("authorNickname", loginUser.getUserNickName());
+		model.addAttribute("boardType", "inquiry");
+		model.addAttribute("boardTitle", "문의 게시판");
+		model.addAttribute("cancelUrl", "/boardList");
+		model.addAttribute("isAdmin", "ROLE_ADMIN".equals(loginUser.getUserRole()));
 		return "boardAddForm";
 	}
 
@@ -93,10 +201,12 @@ public class BoardController {
 			return "redirect:/login";
 		}
 		BoardDetailDto board = boardService.findBoardDetail(boardNo);
-		if (board.getAuthorNo() != loginUser.getUserNo() && !"ROLE_ADMIN".equals(loginUser.getUserRole())) {
+		boolean isAdmin = "ROLE_ADMIN".equals(loginUser.getUserRole());
+		if (board.getAuthorNo() != loginUser.getUserNo() && !isAdmin) {
 			return "redirect:/boardList/" + boardNo;
 		}
 		model.addAttribute("board", board);
+		model.addAttribute("isAdmin", isAdmin);
 		return "boardEditForm";
 	}
 
@@ -106,6 +216,11 @@ public class BoardController {
 		User loginUser = (User) session.getAttribute("loginUser");
 		if (loginUser == null) {
 			return "redirect:/login";
+		}
+		// 관리자가 아니면 기존 핀 값 유지
+		if (!"ROLE_ADMIN".equals(loginUser.getUserRole())) {
+			BoardDetailDto existing = boardService.findBoardDetail(boardNo);
+			board.setPinned(existing.isPinned());
 		}
 		board.setBoardNo(boardNo);
 		boardService.updateBoard(board, loginUser.getUserNo());
@@ -119,7 +234,8 @@ public class BoardController {
 		if (loginUser == null) {
 			return "redirect:/login";
 		}
+		String type = boardService.findBoardDetail(boardNo).getBoardType();
 		boardService.deleteBoard(boardNo, loginUser.getUserNo());
-		return "redirect:/boardList";
+		return "redirect:" + listUrlByType(type);
 	}
 }
