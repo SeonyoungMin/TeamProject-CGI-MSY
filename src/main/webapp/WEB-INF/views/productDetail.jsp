@@ -178,7 +178,7 @@
 				<div class="detail-image">
 					<div class="main-image">
 						<c:if test="${not empty product.imgPath}">
-							<img id="mainImage" src="${ctx}${product.imgPath}">
+							<img id="mainImage" src="${product.imgPath}">
 						</c:if>
 						<c:if test="${empty product.imgPath}">
 							<span style="color: #999;">이미지 없음</span>
@@ -187,7 +187,7 @@
 					<c:if test="${not empty product.images}">
 						<div class="thumb-list">
 							<c:forEach var="img" items="${product.images}">
-								<img src="${ctx}${img.filePath}" onclick="changeImage(this.src)">
+								<img src="${img.filePath}" onclick="changeImage(this.src)">
 							</c:forEach>
 						</div>
 					</c:if>

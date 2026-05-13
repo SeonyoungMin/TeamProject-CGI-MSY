@@ -42,9 +42,7 @@ public class BoardRepositoryImpl implements BoardRepository {
 	// 문의글 전체 목록
 	public List<BoardListDto> findAllBoard(int startNum, int limit) {
 		String SQL = "select b.board_no, b.title, b.board_type, b.pinned, b.created_time, u.nickname as author_nickname "
-				+ "from board b "
-				+ "left join users u on u.user_no = b.author_no "
-				+ "where b.board_type = 'inquiry' "
+				+ "from board b " + "left join users u on u.user_no = b.author_no " + "where b.board_type = 'inquiry' "
 				+ "order by b.pinned desc, b.created_time desc limit ?, ?";
 		return template.query(SQL, new BoardListRowMapper(), startNum, limit);
 	}
@@ -58,9 +56,7 @@ public class BoardRepositoryImpl implements BoardRepository {
 	// 타입별 목록 (inquiry / notice / free)
 	public List<BoardListDto> findByType(String boardType, int startNum, int limit) {
 		String SQL = "select b.board_no, b.title, b.board_type, b.pinned, b.created_time, u.nickname as author_nickname "
-				+ "from board b "
-				+ "left join users u on u.user_no = b.author_no "
-				+ "where b.board_type = ? "
+				+ "from board b " + "left join users u on u.user_no = b.author_no " + "where b.board_type = ? "
 				+ "order by b.pinned desc, b.created_time desc limit ?, ?";
 		return template.query(SQL, new BoardListRowMapper(), boardType, startNum, limit);
 	}
@@ -71,29 +67,34 @@ public class BoardRepositoryImpl implements BoardRepository {
 		return template.queryForObject(SQL, Integer.class, boardType);
 	}
 
-	// 전체 게시글 통합 조회 (홈 사이드바용, review 제외)
+	// 전체 게시글 통합 조회 (공지/문의/자유, review 제외)
 	public List<BoardListDto> findRecentAll(int startNum, int limit) {
 		String SQL = "select b.board_no, b.title, b.board_type, b.pinned, b.created_time, u.nickname as author_nickname "
-				+ "from board b "
-				+ "left join users u on u.user_no = b.author_no "
+				+ "from board b " + "left join users u on u.user_no = b.author_no "
 				+ "where b.board_type in ('notice', 'inquiry', 'free') "
 				+ "order by b.pinned desc, b.created_time desc limit ?, ?";
 		return template.query(SQL, new BoardListRowMapper(), startNum, limit);
+	}
+
+	// 전체 게시글 개수 (공지/문의/자유)
+	public int countRecentAll() {
+		String SQL = "select count(*) from board where board_type in ('notice', 'inquiry', 'free')";
+		return template.queryForObject(SQL, Integer.class);
 	}
 
 	// 게시글 상세
 	public BoardDetailDto findBoardDetail(int boardNo) {
 		String SQL = "select b.board_no, b.title, b.content, b.board_type, b.pinned, "
 				+ "b.author_no, b.created_time, u.nickname as author_nickname "
-				+ "from board b left join users u on u.user_no = b.author_no "
-				+ "where b.board_no = ?";
+				+ "from board b left join users u on u.user_no = b.author_no " + "where b.board_no = ?";
 		return template.queryForObject(SQL, new BoardDetailRowMapper(), boardNo);
 	}
 
 	// 게시글 수정
 	public void updateBoard(Board board) {
-		String SQL = "update board set title = ?, content = ?, pinned = ? where board_no = ?";
-		template.update(SQL, board.getTitle(), board.getContent(), board.isPinned(), board.getBoardNo());
+		String SQL = "update board set title = ?, content = ?, board_type = ?, pinned = ? where board_no = ?";
+		template.update(SQL, board.getTitle(), board.getContent(), board.getBoardType(), board.isPinned(),
+				board.getBoardNo());
 	}
 
 	// 작성자 번호 조회 (본인 확인용)

@@ -21,53 +21,57 @@
 			action="${ctx}/product/${product.productNo}/edit" method="post"
 			enctype="multipart/form-data">
 
-			<label class="form-label">상품명</label> <input type="text"
-				class="form-input" name="productName" value="${product.productName}"
-				required> <label class="form-label">판매자 번호</label> <input
-				type="text" class="form-input" name="sellerNo"
-				value="${product.sellerNo}" required> <label
-				class="form-label">카테고리</label> <select class="form-input"
-				name="category">
+			<label class="form-label">상품명</label>
+			<input type="text" class="form-input" name="productName" value="${product.productName}" required>
+
+			<label class="form-label">판매자 번호</label>
+			<input type="text" class="form-input" name="sellerNo" value="${product.sellerNo}" required>
+
+			<label class="form-label">카테고리</label>
+			<select class="form-input" name="category">
 				<option value="의류" ${product.category == '의류' ? 'selected' : ''}>의류</option>
 				<option value="잡화" ${product.category == '잡화' ? 'selected' : ''}>잡화</option>
 				<option value="가구" ${product.category == '가구' ? 'selected' : ''}>가구</option>
 				<option value="전자기기" ${product.category == '전자기기' ? 'selected' : ''}>전자기기</option>
 				<option value="도서" ${product.category == '도서' ? 'selected' : ''}>도서</option>
 				<option value="기타" ${product.category == '기타' ? 'selected' : ''}>기타</option>
-			</select> <label class="form-label">상품 상태</label> <select class="form-input"
-				name="tradeStatus" required>
-				<option value="판매중"
-					${product.tradeStatus == '판매중' ? 'selected' : ''}>판매중</option>
-				<option value="예약중"
-					${product.tradeStatus == '예약중' ? 'selected' : ''}>예약중</option>
+			</select>
+
+			<label class="form-label">상품 상태</label>
+			<select class="form-input" name="tradeStatus" required>
+				<option value="판매중" ${product.tradeStatus == '판매중' ? 'selected' : ''}>판매중</option>
+				<option value="예약중" ${product.tradeStatus == '예약중' ? 'selected' : ''}>예약중</option>
 				<option value="완료" ${product.tradeStatus == '완료' ? 'selected' : ''}>판매완료</option>
-			</select> <label class="form-label">가격</label> <input type="number"
-				class="form-input" name="price" value="${product.price}" required
-				min="0"> <label class="form-label">상품번호</label> <input
-				type="number" class="form-input" name="productNo"
-				value="${product.productNo}" required min="0"> <label
-				class="form-label">설명</label>
+			</select>
+
+			<label class="form-label">가격</label>
+			<input type="number" class="form-input" name="price" value="${product.price}" required min="0">
+
+			<label class="form-label">상품번호</label>
+			<input type="number" class="form-input" name="productNo" value="${product.productNo}" required min="0">
+
+			<label class="form-label">설명</label>
 			<textarea class="form-input" name="description">${product.description}</textarea>
+
 		</form>
 
-		<!-- 등록된 이미지 목록 + 대표 지정 + 삭제 (수정 폼 밖에 별도 form) -->
+		<!-- 이미지 영역 (등록된 이미지 + 이미지 추가 합침) -->
 		<div class="card">
+
+			<!-- 등록된 이미지 목록 -->
 			<c:if test="${not empty product.images}">
 				<h3 class="section-title">등록된 이미지</h3>
-				<div style="display: flex; gap: 15px; flex-wrap: wrap;">
+				<div style="display: flex; gap: 15px; flex-wrap: wrap; margin-bottom: 20px;">
 					<c:forEach var="img" items="${product.images}">
-						<div style="text-align: center;">
+						<div style="text-align: center; width: 120px; flex: 0 0 auto;">
 							<img src="${ctx}${img.filePath}"
 								style="width: 120px; height: 120px; object-fit: cover; border: 1px solid #ddd; border-radius: 4px;">
-							<div style="margin-top: 6px;">
+							<div style="margin-top: 6px; display: flex; flex-direction: column; gap: 4px; align-items: center;">
 
 								<c:if test="${img.thumbnail}">
-									<span
-										style="font-size: 12px; color: #121212; font-weight: bold;">★
-										대표 이미지</span>
-									<br>
+									<span style="font-size: 12px; color: #121212; font-weight: bold;">★ 대표 이미지</span>
 									<button type="button" class="btn"
-										style="font-size: 12px; padding: 4px 10px; margin-top: 4px;"
+										style="font-size: 12px; padding: 4px 10px;"
 										onclick="alert('대표 이미지는 삭제할 수 없습니다.')">삭제</button>
 								</c:if>
 
@@ -79,11 +83,10 @@
 											style="font-size: 12px; padding: 4px 10px;">대표로 지정</button>
 									</form>
 									<form action="${ctx}/images/delete" method="post"
-										style="margin: 0; margin-top: 4px;">
+										style="margin: 0;">
 										<input type="hidden" name="imageNo" value="${img.imageNo}">
 										<input type="hidden" name="entityType" value="product">
-										<input type="hidden" name="entityId"
-											value="${product.productNo}">
+										<input type="hidden" name="entityId" value="${product.productNo}">
 										<button type="submit" class="btn btn-danger"
 											style="font-size: 12px; padding: 4px 10px;"
 											onclick="return confirm('이미지를 삭제하시겠습니까?')">삭제</button>
@@ -95,16 +98,15 @@
 					</c:forEach>
 				</div>
 			</c:if>
+
 			<!-- 이미지 추가 form -->
 			<hr style="margin: 20px 0;">
 			<form action="${ctx}/product/${product.productNo}/addImage"
 				method="post" enctype="multipart/form-data">
 
-				<!-- 이미지 추가 글자 왼쪽, 사진 추가 버튼 오른쪽 -->
-				<div
-					style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-					<label  style="margin: 0;">이미지 추가</label>
-					<button type="submit" class="btn btn-primary">이미지 추가</button>
+				<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+					<label style="margin: 0; font-weight: bold;">이미지 추가</label>
+					<button type="submit" class="btn btn-primary">사진 추가</button>
 				</div>
 
 				<input type="file" class="form-input" name="imgFiles" multiple
@@ -114,12 +116,14 @@
 			</form>
 
 		</div>
+
+		<!-- 수정 완료 / 취소 버튼 (맨 아래) -->
 		<div style="margin-top: 20px; display: flex; gap: 10px;">
 			<button type="button" class="btn btn-primary btn-block"
-				onclick="document.getElementById('editForm').submit()">수정
-				완료</button>
+				onclick="document.getElementById('editForm').submit()">수정 완료</button>
 			<a href="${ctx}/product/${product.productNo}" class="btn btn-block">취소</a>
 		</div>
+
 	</div>
 
 	<script>

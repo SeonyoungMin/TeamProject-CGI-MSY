@@ -12,8 +12,7 @@
 <body>
 	<h3>유저 상세 정보</h3>
 
-	<img src="${pageContext.request.contextPath}${user.userImagePath}"
-		style="width: 30%">
+	<img src="${user.userImagePath}" style="width: 30%">
 	<br> 파일명: ${user.userImageName}
 	<br> 유저 No: ${user.userNo}
 	<br> 유저 ID: ${user.userId}

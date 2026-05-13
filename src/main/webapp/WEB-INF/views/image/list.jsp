@@ -21,8 +21,7 @@
 		<div
 			style="margin-bottom: 20px; border-bottom: 1px solid #eee; padding-bottom: 10px;">
 
-			<img src="${pageContext.request.contextPath}${img.filePath}"
-				width="200" />
+			<img src="${img.filePath}" width="200" />
 
 			<p>파일명: ${img.fileName}</p>
 

@@ -12,6 +12,8 @@ import org.springframework.stereotype.Service;
 
 import com.team404.service.UserService;
 
+
+//사용자 인증
 @Service("userDetailsService")
 public class SimpleUserDetailsService implements UserDetailsService {
 

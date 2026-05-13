@@ -367,7 +367,7 @@
 						<a href="${ctx}/product/${p.productNo}" class="card">
 							<div class="thumb">
 								<c:if test="${not empty p.imgPath}">
-									<img src="${ctx}${p.imgPath}">
+									<img src="${p.imgPath}">
 								</c:if>
 								<span class="view-badge"><i class="fa-solid fa-eye"></i> ${p.viewCount}</span>
 								<span class="fav-btn" data-product-no="${p.productNo}"
@@ -404,7 +404,7 @@
 						<a href="${ctx}/product/${p.productNo}" class="card">
 							<div class="thumb">
 								<c:if test="${not empty p.imgPath}">
-									<img src="${ctx}${p.imgPath}">
+									<img src="${p.imgPath}">
 								</c:if>
 								<span class="view-badge"><i class="fa-solid fa-eye"></i> ${p.viewCount}</span>
 								<span class="fav-btn" data-product-no="${p.productNo}"
@@ -432,7 +432,7 @@
 		<aside class="board-side">
 			<div class="board-side-header">
 				<h3>게시글</h3>
-				<a href="${ctx}/boardList" class="board-side-more">더보기 &gt;</a>
+				<a href="${ctx}/board/all" class="board-side-more">더보기 &gt;</a>
 			</div>
 
 			<a href="${ctx}/board/write" class="board-side-write">게시글 쓰기</a>

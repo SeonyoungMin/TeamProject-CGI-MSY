@@ -19,8 +19,9 @@ public interface BoardRepository {
 	List<BoardListDto> findByType(String boardType, int startNum, int limit);
 	int countByType(String boardType);
 
-	// 전체 게시글 통합 조회 (홈 사이드바용)
+	// 전체 게시글 통합 조회 (공지/문의/자유)
 	List<BoardListDto> findRecentAll(int startNum, int limit);
+	int countRecentAll();
 
 	// 상세 조회
 	BoardDetailDto findBoardDetail(int boardNo);
