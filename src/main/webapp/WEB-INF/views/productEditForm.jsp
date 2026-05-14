@@ -64,7 +64,7 @@
 				<div style="display: flex; gap: 15px; flex-wrap: wrap; margin-bottom: 20px;">
 					<c:forEach var="img" items="${product.images}">
 						<div style="text-align: center; width: 120px; flex: 0 0 auto;">
-							<img src="${ctx}${img.filePath}"
+							<img src="${img.filePath}"
 								style="width: 120px; height: 120px; object-fit: cover; border: 1px solid #ddd; border-radius: 4px;">
 							<div style="margin-top: 6px; display: flex; flex-direction: column; gap: 4px; align-items: center;">
 

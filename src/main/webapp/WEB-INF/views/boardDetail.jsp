@@ -3,10 +3,6 @@
 
 <%@ taglib prefix="c" uri="jakarta.tags.core"%>
 
-<<<<<<< HEAD
-
-=======
->>>>>>> refs/remotes/origin/main
 <!DOCTYPE html>
 <html>
 <head>

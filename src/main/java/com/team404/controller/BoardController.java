@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import com.team404.domain.Board;
 import com.team404.domain.BoardDetailDto;
 import com.team404.domain.BoardListDto;
+import com.team404.domain.Comment;
 import com.team404.domain.User;
 import com.team404.service.BoardService;
 import com.team404.service.CommentService;
@@ -27,12 +28,6 @@ public class BoardController {
 
 	@Autowired
 	private BoardService boardService;
-
-
-
-	// 문의글 전체 목록 조회 --> 전체, 필터링 : 재활용
-
-	// 문의글 전체 목록 (페이징)
 
 	@Autowired
 	private CommentService commentService;
@@ -185,10 +180,18 @@ public class BoardController {
 	// 문의글 상세 조회
 	@GetMapping("/boardList/{boardNo}")
 
-	public String getBoard(@PathVariable("boardNo") int boardNo, Model model) {
+	public String getBoard(@PathVariable("boardNo") int boardNo, Model model, HttpSession session) {
 		BoardDetailDto dto = boardService.findBoardDetail(boardNo);
-
 		model.addAttribute("board", dto);
+		
+		//댓글 목록
+		List<Comment> comments = commentService.getComments(boardNo);
+		model.addAttribute("comments", comments);
+		
+		//로그인 유저 확인
+		User loginUser = (User) session.getAttribute("loginUser");
+		model.addAttribute("loginUser", loginUser);
+		
 		return "boardDetail";
 	}
 

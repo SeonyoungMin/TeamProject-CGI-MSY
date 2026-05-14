@@ -252,8 +252,14 @@ public class UserController {
 
 	// 회원 정보 수정 처리
 	@PutMapping("/users/edit")
-	public String submitEditUserForm(@ModelAttribute("editUser") User editUser) {
+	public String submitEditUserForm(@ModelAttribute("editUser") User editUser, HttpSession session) {
 		userService.setEditUser(editUser);
+		
+		User loginUser = (User) session.getAttribute("loginUser");
+		if (loginUser != null && loginUser.getUserNo() == editUser.getUserNo()) {
+			User updatedUser = userService.getUserByNo(editUser.getUserNo());
+			session.setAttribute("loginUser", updatedUser);
+		}
 		return "redirect:/users/search/" + editUser.getUserNo();
 	}
 

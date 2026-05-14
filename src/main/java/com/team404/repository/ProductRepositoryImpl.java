@@ -31,14 +31,19 @@ public class ProductRepositoryImpl implements ProductRepository {
 	// 전체 데이터 개수 반환
 	public int countAll() {
 		String SQL = "select count(*) from product p where p.trade_status != '완료'";
-		return template.queryForObject(SQL, Integer.class);
+		Long total =  template.queryForObject(SQL, Long.class);
+		if (total == null) {
+			return 0;
+		}
+		
+		return total.intValue();
 	}
 
 	// 상품 상세 조회
 	public ProductDetailDto findProductDetail(int productNo) {
 		String SQL = "select p.product_no, p.name, p.category, p.price, p.description, p.trade_status, p.view_count, p.created_time, "
 
-				+ "p.seller_no, u.nickname as seller_nickname, i.file_name as img_name, i.file_path as img_path "
+				+ "p.seller_no, u.nickname as sellerNickname, i.file_name as img_name, i.file_path as img_path "
 				+ "from product p " + "left join users u on u.user_no = p.seller_no "
 				+ "left join image i on i.entity_type='product' and i.entity_id=p.product_no and i.is_thumbnail=1 "
 				+ "where p.product_no=?";

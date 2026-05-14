@@ -56,7 +56,7 @@
 	border-bottom: 1px solid #f0f0f0;
 	font-size: 14px;
 }
-
+ 
 .board-item .title {
 	flex: 1;
 	color: #222;
