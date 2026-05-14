@@ -1,8 +1,13 @@
 package com.team404.controller;
 
+import java.net.URI;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -13,7 +18,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.SessionAttribute;
+import org.springframework.web.client.RestTemplate;
 
 import com.team404.domain.Account;
 import com.team404.domain.BoardListDto;
@@ -26,6 +33,7 @@ import com.team404.domain.User;
 import com.team404.exception.NoUserFoundException;
 import com.team404.service.AccountService;
 import com.team404.service.BoardService;
+import com.team404.service.GeoService;
 import com.team404.service.ImageService;
 import com.team404.service.ProductService;
 import com.team404.service.RankingService;
@@ -59,6 +67,9 @@ public class UserController {
 
 	@Autowired
 	private BoardService boardService;
+
+	@Autowired
+	private GeoService geoService;
 
 	// 로그인한 사용자가 관리자인지 검사
 	private boolean isAdmin(HttpSession session) {
@@ -118,8 +129,47 @@ public class UserController {
 	// 회원가입 처리 — User 객체에 폼 값 자동 바인딩
 	@PostMapping("/users")
 	public String signup(@ModelAttribute User user) {
+		System.out.println(user.getLatitude());
+		System.out.println(user.getLongitude());
+		System.out.println(user.getVerifiedArea());
+		user.setVerifiedAt(new java.sql.Timestamp(System.currentTimeMillis()));
+
 		userService.setNewUser(user);
+
 		return "redirect:/login";
+	}
+
+	// 회원가입시 동네 인증 카카오 API 사용
+	@GetMapping(value = "/users/reverse-geocode", produces = "text/plain; charset=UTF-8")
+	@ResponseBody
+	public String reverseGeocode(@RequestParam("lat") double lat, @RequestParam("lng") double lng) {
+
+		String apiKey = "42a10ba0a3d99a111dca0c6e0bcd8c93";
+
+		String url = "https://dapi.kakao.com/v2/local/geo/coord2regioncode.json?x=" + lng + "&y=" + lat;
+
+		RestTemplate rest = new RestTemplate();
+
+		HttpHeaders headers = new HttpHeaders();
+		headers.set("Authorization", "KakaoAK " + apiKey);
+
+		HttpEntity<String> entity = new HttpEntity<>(headers);
+
+		ResponseEntity<String> response = rest.exchange(URI.create(url), HttpMethod.GET, entity, String.class);
+
+		String body = response.getBody();
+
+		int start = body.indexOf("\"address_name\":\"") + 16;
+		int end = body.indexOf("\"", start);
+
+		return body.substring(start, end);
+	}
+
+	@ResponseBody
+	@PostMapping("/location")
+	public String location(@RequestParam double lat, @RequestParam double lng) {
+
+		return geoService.getAddress(lat, lng);
 	}
 
 	// 로그인

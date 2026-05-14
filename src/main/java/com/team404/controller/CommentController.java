@@ -12,17 +12,22 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.team404.domain.Comment;
+import com.team404.domain.Product;
+import com.team404.domain.ProductDetailDto;
 import com.team404.domain.User;
 import com.team404.service.CommentService;
+import com.team404.service.ProductService;
 
 import jakarta.servlet.http.HttpSession;
-
 
 @Controller
 public class CommentController {
 
 	@Autowired
 	private CommentService commentService;
+
+	@Autowired
+	private ProductService productService;
 
 	// AJAX: 특정 상품의 댓글 목록을 JSON으로 돌려줌
 	@GetMapping("/comment/list")
@@ -33,10 +38,9 @@ public class CommentController {
 
 	// 댓글 등록 (일반 폼 submit). returnTo=board 이면 게시판으로 돌아감
 	@PostMapping("/comment/add")
-	public String add(@RequestParam("boardNo") int boardNo,
-			@RequestParam("content") String content,
-			@RequestParam(value = "returnTo", required = false) String returnTo,
-			HttpSession session) {
+	public String add(@RequestParam("boardNo") int boardNo, @RequestParam("content") String content,
+			@RequestParam("targetType") String targetType,
+			@RequestParam(value = "returnTo", required = false) String returnTo, HttpSession session) {
 
 		User loginUser = (User) session.getAttribute("loginUser");
 		if (loginUser == null) {
@@ -47,10 +51,27 @@ public class CommentController {
 		c.setBoardNo(boardNo);
 		c.setContent(content);
 		c.setAuthorNo(loginUser.getUserNo());
+		c.setTargetType(targetType);
+
 		commentService.addComment(c);
-		return "board".equals(returnTo)
-				? "redirect:/boardList/" + boardNo
-				: "redirect:/product/" + boardNo;
+
+		if ("BOARD".equals(targetType)) {
+			return "redirect:/boardList/" + boardNo;
+		} else {
+			return "redirect:/product/" + boardNo;
+		}
+	}
+
+	@GetMapping("/comment/product")
+	@ResponseBody
+	public List<Comment> productComments(@RequestParam("productNo") int productNo) {
+		return commentService.getProductComments(productNo);
+	}
+
+	@GetMapping("/comment/board")
+	@ResponseBody
+	public List<Comment> boardComments(@RequestParam("boardNo") int boardNo) {
+		return commentService.getComments(boardNo);
 	}
 
 	// 댓글 수정 폼 — 작성자 본인만 진입 가능
@@ -70,10 +91,8 @@ public class CommentController {
 
 	// 댓글 수정 처리
 	@PostMapping("/comment/{commentNo}/edit")
-	public String edit(@PathVariable("commentNo") int commentNo,
-			@RequestParam("content") String content,
-			@RequestParam("boardNo") int boardNo,
-			HttpSession session) {
+	public String edit(@PathVariable("commentNo") int commentNo, @RequestParam("content") String content,
+			@RequestParam("boardNo") int boardNo, HttpSession session) {
 
 		User loginUser = (User) session.getAttribute("loginUser");
 		if (loginUser == null) {
@@ -90,18 +109,14 @@ public class CommentController {
 
 	// 댓글 삭제 처리 — 본인 또는 관리자. returnTo=board 이면 게시판으로 돌아감
 	@PostMapping("/comment/{commentNo}/delete")
-	public String delete(@PathVariable("commentNo") int commentNo,
-			@RequestParam("boardNo") int boardNo,
-			@RequestParam(value = "returnTo", required = false) String returnTo,
-			HttpSession session) {
+	public String delete(@PathVariable("commentNo") int commentNo, @RequestParam("boardNo") int boardNo,
+			@RequestParam(value = "returnTo", required = false) String returnTo, HttpSession session) {
 
 		User loginUser = (User) session.getAttribute("loginUser");
 		if (loginUser == null) {
 			return "redirect:/login";
 		}
-		String back = "board".equals(returnTo)
-				? "redirect:/boardList/" + boardNo
-				: "redirect:/product/" + boardNo;
+		String back = "board".equals(returnTo) ? "redirect:/boardList/" + boardNo : "redirect:/product/" + boardNo;
 		Comment comment = commentService.getComment(commentNo);
 		boolean isAuthor = comment.getAuthorNo() == loginUser.getUserNo();
 		boolean isAdmin = "ROLE_ADMIN".equals(loginUser.getUserRole());

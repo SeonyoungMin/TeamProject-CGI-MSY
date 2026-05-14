@@ -228,6 +228,7 @@
 						<form action="${ctx}/comment/add" method="post"
 							style="margin-bottom: 20px;">
 							<input type="hidden" name="boardNo" value="${product.productNo}">
+							<input type="hidden" name="targetType" value="PRODUCT">
 							<textarea class="form-input" name="content"
 								style="width: 100%; height: 80px; margin-bottom: 10px;"
 								placeholder="댓글을 입력하세요" required></textarea>
@@ -281,7 +282,10 @@
 	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 	<script>
 		var ctx = "${ctx}";
-		var productNo = ${product.productNo};
+		var productNo = $
+		{
+			product.productNo
+		};
 
 		function changeImage(src) {
 			document.getElementById("mainImage").src = src;

@@ -71,12 +71,15 @@
 			</p>
 		</div>
 
-		<form action="${pageContext.request.contextPath}/order/complete"
+		<form action="${pageContext.request.contextPath}/order/route"
 			method="post">
 			<input type="hidden" name="productNo" value="${product.productNo}">
-			<button type="submit">직거래</button>
-			<br> <br>
-			<button type="submit">계좌이체(배송)</button>
+
+			<button type="submit" name="type" value="DIRECT"
+				class="btn btn-direct">직거래</button>
+
+			<button type="submit" name="type" value="TRANSFER"
+				class="btn btn-transfer">계좌이체(배송)</button>
 		</form>
 		<br>
 

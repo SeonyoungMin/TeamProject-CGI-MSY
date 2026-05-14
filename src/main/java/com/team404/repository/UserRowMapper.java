@@ -26,6 +26,11 @@ public class UserRowMapper implements RowMapper<User> {
 		user.setUserCreatedTime(rs.getTimestamp("created_time").toLocalDateTime());
 		user.setUserSellCount(rs.getInt("sell_count"));
 		user.setUserBuyCount(rs.getInt("buy_count"));
+
+		user.setLatitude(rs.getDouble("latitude"));
+		user.setLongitude(rs.getDouble("longitude"));
+		user.setVerifiedArea(rs.getString("verified_area"));
+		user.setVerifiedAt(rs.getTimestamp("verified_at"));
 		return user;
 	}
 }

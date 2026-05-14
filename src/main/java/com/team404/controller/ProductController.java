@@ -141,7 +141,7 @@ public class ProductController {
 			favorite = favoriteService.exists(loginUser.getUserNo(), productNo);
 		}
 
-		List<Comment> comments = commentService.getComments(productNo);
+		List<Comment> comments = commentService.getProductComments(productNo);
 
 		model.addAttribute("product", product);
 		model.addAttribute("loginUser", loginUser);

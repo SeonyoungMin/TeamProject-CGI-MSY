@@ -186,23 +186,34 @@ public class UserRepositoryImpl implements UserRepository {
 		return template.query(SQL, new UserRowMapper(), minCount, maxCount);
 	}
 
+	// 동네 인증까지
 	@Override
 	public void setNewUser(User newUser) {
-		String SQL = "INSERT INTO users(id, pw, name, nickname, age, address, phone) VALUES(?,?,?,?,?,?,?)";
-		template.update(SQL, newUser.getUserId(), newUser.getUserPw(), newUser.getUserName(),
-				newUser.getUserNickName(), newUser.getUserAge(), newUser.getUserAddress(), newUser.getUserPhone());
+
+		String SQL = "INSERT INTO users(" + "id, pw, name, nickname, age, address, phone, "
+				+ "latitude, longitude, verified_area, verified_at" + ") VALUES(?,?,?,?,?,?,?,?,?,?,?)";
+
+		template.update(SQL, newUser.getUserId(), newUser.getUserPw(), newUser.getUserName(), newUser.getUserNickName(),
+				newUser.getUserAge(), newUser.getUserAddress(), newUser.getUserPhone(), newUser.getLatitude(),
+				newUser.getLongitude(), newUser.getVerifiedArea(), newUser.getVerifiedAt());
 
 		Integer lastId = template.queryForObject("SELECT LAST_INSERT_ID()", Integer.class);
+
 		if (lastId != null) {
 			newUser.setUserNo(lastId);
 		}
 	}
 
+	// 동네 인증포함
 	@Override
 	public void setEditUser(User editUser) {
-		String SQL = "UPDATE users SET id = ?, pw = ?, name = ?, nickname = ?, age = ?, address = ?, phone = ? WHERE user_no = ?";
+
+		String SQL = "UPDATE users SET " + "id=?, pw=?, name=?, nickname=?, age=?, address=?, phone=?, "
+				+ "latitude=?, longitude=?, verified_area=?, verified_at=? " + "WHERE user_no=?";
+
 		template.update(SQL, editUser.getUserId(), editUser.getUserPw(), editUser.getUserName(),
 				editUser.getUserNickName(), editUser.getUserAge(), editUser.getUserAddress(), editUser.getUserPhone(),
+				editUser.getLatitude(), editUser.getLongitude(), editUser.getVerifiedArea(), editUser.getVerifiedAt(),
 				editUser.getUserNo());
 	}
 

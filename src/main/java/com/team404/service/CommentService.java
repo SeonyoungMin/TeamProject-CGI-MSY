@@ -5,13 +5,15 @@ import com.team404.domain.Comment;
 
 public interface CommentService {
 
-	List<Comment> getComments(int boardNo);
+	public List<Comment> getProductComments(int productNo);
+
+	public List<Comment> getComments(int boardNo);
 
 	void addComment(Comment comment);
 
 	void updateComment(Comment comment);
 
 	void deleteComment(int commentNo);
-	
+
 	Comment getComment(int commentNo);
 }

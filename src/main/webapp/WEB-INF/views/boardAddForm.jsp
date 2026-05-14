@@ -2,24 +2,14 @@
 	pageEncoding="UTF-8"%>
 
 <%@ taglib prefix="c" uri="jakarta.tags.core"%>
-<<<<<<< HEAD
-<<<<<<< HEAD
 
-=======
-=======
-
->>>>>>> refs/remotes/origin/main
 <c:set var="ctx" value="${pageContext.request.contextPath}" />
 <c:set var="title" value="${empty boardTitle ? '문의 게시판' : boardTitle}" />
 <c:set var="type" value="${empty boardType ? 'inquiry' : boardType}" />
-<<<<<<< HEAD
-<c:set var="cancel" value="${empty cancelUrl ? '/boardList' : cancelUrl}" />
->>>>>>> origin/member-MSY
-=======
 <c:set var="cancel"
 	value="${empty cancelUrl ? '/boardList' : cancelUrl}" />
 
->>>>>>> refs/remotes/origin/main
+
 <!DOCTYPE html>
 <html>
 <head>

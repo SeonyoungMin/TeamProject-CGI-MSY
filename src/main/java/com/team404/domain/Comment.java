@@ -9,6 +9,7 @@ public class Comment {
 	private String createdTime;
 
 	private String nickname;
+	private String targetType; // BOARD or PRODUCT
 
 	public int getCommentNo() {
 		return commentNo;
@@ -56,6 +57,14 @@ public class Comment {
 
 	public void setNickname(String nickname) {
 		this.nickname = nickname;
+	}
+
+	public String getTargetType() {
+		return targetType;
+	}
+
+	public void setTargetType(String targetType) {
+		this.targetType = targetType;
 	}
 
 }
