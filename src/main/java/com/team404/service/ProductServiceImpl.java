@@ -71,7 +71,7 @@ public class ProductServiceImpl implements ProductService {
 
 	// 내 판매 목록 (전체)
 	@Override
-	public List<ProductListDto> findBySeller(int sellerNo) {
+	public List<ProductListDto> findBySeller(int sellerNo, int loginUserNo) {
 		return productRepository.findBySeller(sellerNo);
 	}
 

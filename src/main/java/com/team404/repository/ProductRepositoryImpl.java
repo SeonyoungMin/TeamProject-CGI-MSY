@@ -81,10 +81,11 @@ public class ProductRepositoryImpl implements ProductRepository {
 	public List<ProductListDto> findBySeller(int sellerNo, int startNum, int limit) {
 		String SQL = "select p.product_no, p.name, p.category, p.price, p.trade_status, p.view_count, p.created_time, "
 				+ "p.seller_no, u.nickname as seller_nickname, i.file_name as img_name, i.file_path as img_path, "
-				+ "(select count(*) from favorite f where f.product_no = p.product_no) as favorite_count "
-				+ "from product p " + "left join users u on u.user_no = p.seller_no "
+				+ "(select count(*) from favorite f where f.product_no = p.product_no) as favorite_count, "
+				+ "0 as is_favorite " + "from product p " + "left join users u on u.user_no = p.seller_no "
 				+ "left join image i on i.entity_type = 'product' and i.entity_id = p.product_no and i.is_thumbnail = 1 "
-				+ "where p.seller_no=? order by p.created_time desc limit ?, ?";
+				+ "where p.seller_no=? " + "order by p.created_time desc limit ?, ?";
+
 		return template.query(SQL, new ProductListRowMapper(), sellerNo, startNum, limit);
 	}
 
@@ -99,10 +100,11 @@ public class ProductRepositoryImpl implements ProductRepository {
 	public List<ProductListDto> findBySeller(int sellerNo) {
 		String SQL = "select p.product_no, p.name, p.category, p.price, p.trade_status, p.view_count, p.created_time, "
 				+ "p.seller_no, u.nickname as seller_nickname, i.file_name as img_name, i.file_path as img_path, "
-				+ "(select count(*) from favorite f where f.product_no = p.product_no) as favorite_count "
-				+ "from product p " + "left join users u on u.user_no = p.seller_no "
+				+ "(select count(*) from favorite f where f.product_no = p.product_no) as favorite_count, "
+				+ "0 as is_favorite " + "from product p " + "left join users u on u.user_no = p.seller_no "
 				+ "left join image i on i.entity_type = 'product' and i.entity_id = p.product_no and i.is_thumbnail = 1 "
 				+ "where p.seller_no=?";
+
 		return template.query(SQL, new ProductListRowMapper(), sellerNo);
 	}
 
@@ -161,29 +163,31 @@ public class ProductRepositoryImpl implements ProductRepository {
 	// 인기 상품 (조회수 desc, 거래완료 제외, 카테고리 옵션)
 	@Override
 	public List<ProductListDto> findTopByViewCount(int limit, String category, int loginUserNo) {
-		// 먼저 로그인유저번호를 읽고
-		// 카테고리가 있을 때
+
 		if (category != null && !category.isEmpty()) {
-			return template.query(
-					"select p.product_no, p.name, p.category, p.price, p.trade_status, p.view_count, p.created_time, "
-							+ "p.seller_no, u.nickname as seller_nickname, i.file_name as img_name, i.file_path as img_path, "
-							+ "(select count(*) from favorite f where f.product_no = p.product_no) as favorite_count, "
-							+ "(select count(*) from favorite f where f.product_no = p.product_no and f.user_no = ?) as is_favorite "
-							+ "from product p " + "left join users u on u.user_no = p.seller_no "
-							+ "left join image i on i.entity_type = 'product' and i.entity_id = p.product_no and i.is_thumbnail = 1 "
-							+ "where p.trade_status != '완료' and p.category = ? " + "order by p.view_count desc limit ?",
-					new ProductListRowMapper(), loginUserNo, category, limit);
+
+			String SQL = "select p.product_no, p.name, p.category, p.price, p.trade_status, p.view_count, p.created_time, "
+					+ "p.seller_no, u.nickname as seller_nickname, "
+					+ "i.file_name as img_name, i.file_path as img_path, "
+					+ "(select count(*) from favorite f where f.product_no = p.product_no) as favorite_count, "
+					+ "(select count(*)\r\n" + " from favorite f\r\n" + " where f.product_no = p.product_no\r\n"
+					+ "   and f.user_no = ?) as is_favorite " + "from product p "
+					+ "left join users u on u.user_no = p.seller_no "
+					+ "left join image i on i.entity_type = 'product' and i.entity_id = p.product_no and i.is_thumbnail = 1 "
+					+ "where p.trade_status <> '완료' and p.category=? " + "order by p.view_count desc limit ?";
+
+			return template.query(SQL, new ProductListRowMapper(), loginUserNo, category, limit);
 		}
 
-		// 카테고리가 없을 때
-		return template.query(
-				"select p.product_no, p.name, p.category, p.price, p.trade_status, p.view_count, p.created_time, "
-						+ "p.seller_no, u.nickname as seller_nickname, i.file_name as img_name, i.file_path as img_path, "
-						+ "(select count(*) from favorite f where f.product_no = p.product_no) as favorite_count, "
-						+ "(select count(*) from favorite f where f.product_no = p.product_no and f.user_no = ?) as is_favorite "
-						+ "from product p " + "left join users u on u.user_no = p.seller_no "
-						+ "left join image i on i.entity_type = 'product' and i.entity_id = p.product_no and i.is_thumbnail = 1 "
-						+ "where p.trade_status != '완료' " + "order by p.view_count desc limit ?",
-				new ProductListRowMapper(), loginUserNo, limit);
+		String SQL = "select p.product_no, p.name, p.category, p.price, p.trade_status, p.view_count, p.created_time, "
+				+ "p.seller_no, u.nickname as seller_nickname, " + "i.file_name as img_name, i.file_path as img_path, "
+				+ "(select count(*) from favorite f where f.product_no = p.product_no) as favorite_count, "
+				+ "(select count(*) from favorite f\r\n" + " where f.product_no = p.product_no\r\n"
+				+ " and f.user_no = ?) as is_favorite " + "from product p "
+				+ "left join users u on u.user_no = p.seller_no "
+				+ "left join image i on i.entity_type = 'product' and i.entity_id = p.product_no and i.is_thumbnail = 1 "
+				+ "where p.trade_status <> '완료' " + "order by p.view_count desc limit ?";
+
+		return template.query(SQL, new ProductListRowMapper(), loginUserNo, limit);
 	}
 }

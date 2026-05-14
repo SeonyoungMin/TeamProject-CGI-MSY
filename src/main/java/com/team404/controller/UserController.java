@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.SessionAttribute;
 
 import com.team404.domain.Account;
 import com.team404.domain.BoardListDto;
@@ -154,9 +155,11 @@ public class UserController {
 	// 유저 페이지
 	@GetMapping("/users/search/{userNo}")
 	public String userPage(@PathVariable("userNo") int userNo,
-			@RequestParam(value = "page", defaultValue = "1") int page, Model model) {
+			@RequestParam(value = "page", defaultValue = "1") int page,
+			@SessionAttribute(name = "loginUser", required = false) User loginUser, Model model) {
+		int loginUserNo = (loginUser != null) ? loginUser.getUserNo() : 0;
 		User user = userService.getUserByNo(userNo);
-		List<ProductListDto> myProducts = productService.findBySeller(userNo);
+		List<ProductListDto> myProducts = productService.findBySeller(userNo, loginUserNo);
 
 		// 프로필 이미지
 		List<Image> profileImages = imageService.getImages("user", userNo);

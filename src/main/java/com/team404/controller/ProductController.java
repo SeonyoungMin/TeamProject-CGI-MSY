@@ -68,7 +68,7 @@ public class ProductController {
 		return "productList";
 	}
 
-	//공통 로직 분리
+	// 공통 로직 분리
 	private Map<String, Object> getProductData(int pageNum, int limit, int loginUserNo) {
 		int start = (pageNum - 1) * limit;
 
