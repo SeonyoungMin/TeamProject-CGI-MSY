@@ -11,13 +11,13 @@ import com.team404.domain.ProductListDto;
 public interface ProductRepository {
 
 	// 상품 목록 조회 (+페이징)
-	List<ProductListDto> findAll(int startNum, int limit);
+	List<ProductListDto> findAll(int startNum, int limit, int loginUserNo);
 
 	public int countAll();
 	// 전체 데이터 개수 반환
 
 	// 상품 상세 조회 (productNo 기준)
-	public ProductDetailDto findProductDetail(int productNo); 
+	public ProductDetailDto findProductDetail(int productNo);
 
 	// 상품 조건 조회(키워드 검색)
 	public List<ProductListDto> findByKeyword(String keyword);
@@ -55,5 +55,5 @@ public interface ProductRepository {
 	public void increaseViewCount(int productNo);
 
 	// 인기 상품 (조회수 desc, 거래완료 제외, 카테고리 옵션)
-	public List<ProductListDto> findTopByViewCount(int limit, String category);
+	public List<ProductListDto> findTopByViewCount(int limit, String category, int loginUserNo);
 }

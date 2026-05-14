@@ -301,9 +301,20 @@
 	vertical-align: middle;
 }
 
-.tag-notice { background: #fdecec; color: #c0392b; }
-.tag-inquiry { background: #eef3fb; color: #2c6ab1; }
-.tag-free { background: #f1f5ee; color: #5a7a3a; }
+.tag-notice {
+	background: #fdecec;
+	color: #c0392b;
+}
+
+.tag-inquiry {
+	background: #eef3fb;
+	color: #2c6ab1;
+}
+
+.tag-free {
+	background: #f1f5ee;
+	color: #5a7a3a;
+}
 
 .pin {
 	font-size: 11px;
@@ -312,7 +323,7 @@
 }
 
 /* ===== 반응형 ===== */
-@media (max-width: 900px) {
+@media ( max-width : 900px) {
 	.home-layout {
 		flex-direction: column;
 	}
@@ -333,20 +344,19 @@
 
 	<!-- 카테고리 메뉴 -->
 	<nav class="category-bar">
-		<a href="${ctx}/home">전체</a>
-		<a href="${ctx}/home?category=의류">의류</a>
-		<a href="${ctx}/home?category=잡화">잡화</a>
-		<a href="${ctx}/home?category=가구">가구</a>
-		<a href="${ctx}/home?category=전자기기">전자기기</a>
-		<a href="${ctx}/home?category=도서">도서</a>
-		<a href="${ctx}/home?category=기타">기타</a>
+		<a href="${ctx}/home">전체</a> <a href="${ctx}/home?category=의류">의류</a>
+		<a href="${ctx}/home?category=잡화">잡화</a> <a
+			href="${ctx}/home?category=가구">가구</a> <a
+			href="${ctx}/home?category=전자기기">전자기기</a> <a
+			href="${ctx}/home?category=도서">도서</a> <a
+			href="${ctx}/home?category=기타">기타</a>
 	</nav>
 
 	<!-- 메인 배너 -->
 	<div class="hero">
 		<h1>쉽고 안전한 중고거래</h1>
-		<a href="${ctx}/productList" class="btn btn-primary">상품 둘러보기</a>
-		<a href="${ctx}/product/new" class="btn">글쓰기</a>
+		<a href="${ctx}/productList" class="btn btn-primary">상품 둘러보기</a> <a
+			href="${ctx}/product/new" class="btn">글쓰기</a>
 	</div>
 
 	<div class="app-container home-layout">
@@ -354,11 +364,14 @@
 
 			<!-- 인기상품 -->
 			<div class="section-head">
-				<h2><i class="fa-solid fa-fire"></i> 인기상품</h2>
+				<h2>
+					<i class="fa-solid fa-fire"></i> 인기상품
+				</h2>
 			</div>
 
 			<c:if test="${empty popularList}">
-				<div class="card" style="text-align: center; color: #888;">인기상품이 없습니다.</div>
+				<div class="card" style="text-align: center; color: #888;">인기상품이
+					없습니다.</div>
 			</c:if>
 
 			<c:if test="${not empty popularList}">
@@ -369,17 +382,19 @@
 								<c:if test="${not empty p.imgPath}">
 									<img src="${p.imgPath}">
 								</c:if>
-								<span class="view-badge"><i class="fa-solid fa-eye"></i> ${p.viewCount}</span>
-								<span class="fav-btn" data-product-no="${p.productNo}"
-									onclick="toggleFavorite(event, this)">
-									<i class="fav-icon ${p.favoriteCount > 0 ? 'fa-solid' : 'fa-regular'} fa-heart"></i>
+								<span class="view-badge"><i class="fa-solid fa-eye"></i>
+									${p.viewCount}</span> <span class="fav-btn"
+									data-product-no="${p.productNo}"
+									onclick="toggleFavorite(event, this)"> <i
+									class="fav-icon ${p.isFavorite > 0 ? 'fa-solid' : 'fa-regular'} fa-heart"></i>
 									<span class="fav-count">${p.favoriteCount}</span>
 								</span>
 							</div>
 							<div class="product-name">${p.productName}</div>
 							<div class="product-seller">${p.sellerNickname}</div>
 							<div class="product-price">
-								<fmt:formatNumber value="${p.price}" />원
+								<fmt:formatNumber value="${p.price}" />
+								원
 							</div>
 						</a>
 					</c:forEach>
@@ -395,7 +410,8 @@
 			</div>
 
 			<c:if test="${empty productList}">
-				<div class="card" style="text-align: center; color: #888;">등록된 상품이 없습니다.</div>
+				<div class="card" style="text-align: center; color: #888;">등록된
+					상품이 없습니다.</div>
 			</c:if>
 
 			<c:if test="${not empty productList}">
@@ -406,10 +422,11 @@
 								<c:if test="${not empty p.imgPath}">
 									<img src="${p.imgPath}">
 								</c:if>
-								<span class="view-badge"><i class="fa-solid fa-eye"></i> ${p.viewCount}</span>
-								<span class="fav-btn" data-product-no="${p.productNo}"
-									onclick="toggleFavorite(event, this)">
-									<i class="fav-icon ${p.favoriteCount > 0 ? 'fa-solid' : 'fa-regular'} fa-heart"></i>
+								<span class="view-badge"><i class="fa-solid fa-eye"></i>
+									${p.viewCount}</span> <span class="fav-btn"
+									data-product-no="${p.productNo}"
+									onclick="toggleFavorite(event, this)"> <i
+									class="fav-icon ${p.isFavorite > 0 ? 'fa-solid' : 'fa-regular'} fa-heart"></i>
 									<span class="fav-count">${p.favoriteCount}</span>
 								</span>
 							</div>
@@ -419,7 +436,8 @@
 							</div>
 							<div class="product-seller">${p.sellerNickname}</div>
 							<div class="product-price">
-								<fmt:formatNumber value="${p.price}" />원
+								<fmt:formatNumber value="${p.price}" />
+								원
 							</div>
 						</a>
 					</c:forEach>
@@ -444,12 +462,10 @@
 			<c:if test="${not empty recentBoards}">
 				<ul class="board-side-list">
 					<c:forEach var="b" items="${recentBoards}">
-						<li>
-							<a href="${ctx}/boardList/${b.boardNo}">
-								<c:if test="${b.pinned}">
+						<li><a href="${ctx}/boardList/${b.boardNo}"> <c:if
+									test="${b.pinned}">
 									<i class="pin fa-solid fa-thumbtack"></i>
-								</c:if>
-								<c:choose>
+								</c:if> <c:choose>
 									<c:when test="${b.boardType == 'notice'}">
 										<span class="tag tag-notice">공지</span>
 									</c:when>
@@ -459,14 +475,12 @@
 									<c:otherwise>
 										<span class="tag tag-inquiry">문의</span>
 									</c:otherwise>
-								</c:choose>
-								<span class="board-side-title">${b.title}</span>
-							</a>
+								</c:choose> <span class="board-side-title">${b.title}</span>
+						</a>
 							<div class="board-side-meta">
 								${b.authorNickname} ·
 								<fmt:formatDate value="${b.createdTime}" pattern="MM.dd" />
-							</div>
-						</li>
+							</div></li>
 					</c:forEach>
 				</ul>
 			</c:if>
@@ -479,34 +493,43 @@
 			event.preventDefault();
 			event.stopPropagation();
 
-			var productNo = el.getAttribute('data-product-no');
-			var iconEl = el.querySelector('.fav-icon');
-			var countEl = el.querySelector('.fav-count');
+			var $el = $(el);
+			var productNo = $el.attr('data-product-no');
+			var $allRelatedBtns = $('.fav-btn[data-product-no="' + productNo
+					+ '"]');
 
-			var form = new URLSearchParams();
-			form.append('productNo', productNo);
+			$.ajax({
+				url : '${ctx}/favorite/toggle',
+				type : 'POST',
+				data : {
+					productNo : productNo
+				},
+				success : function(result) {
+					if (result === 'login') {
+						alert('로그인이 필요합니다.');
+						location.href = '${ctx}/login';
+						return;
+					}
 
-			fetch('${ctx}/favorite/toggle', {
-				method: 'POST',
-				headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-				body: form.toString()
-			}).then(function(res) {
-				return res.text();
-			}).then(function(result) {
-				if (result === 'login') {
-					alert('로그인이 필요합니다.');
-					location.href = '${ctx}/login';
-					return;
+					var $firstCount = $allRelatedBtns.first()
+							.find('.fav-count');
+					var count = parseInt($firstCount.text()) || 0;
+
+					if (result === 'added') {
+						count++;
+						$allRelatedBtns.find('.fav-icon').removeClass(
+								'fa-regular').addClass('fa-solid');
+					} else if (result === 'removed') {
+						count = Math.max(0, count - 1);
+						$allRelatedBtns.find('.fav-icon').removeClass(
+								'fa-solid').addClass('fa-regular');
+					}
+
+					$allRelatedBtns.find('.fav-count').text(count);
+				},
+				error : function() {
+					alert('처리 중 오류가 발생했습니다.');
 				}
-				var count = parseInt(countEl.textContent, 10) || 0;
-				if (result === 'added') count += 1;
-				else if (result === 'removed') count = Math.max(0, count - 1);
-
-				countEl.textContent = count;
-				iconEl.classList.remove('fa-solid', 'fa-regular');
-				iconEl.classList.add(count > 0 ? 'fa-solid' : 'fa-regular');
-			}).catch(function() {
-				alert('처리 중 오류가 발생했습니다.');
 			});
 		}
 	</script>

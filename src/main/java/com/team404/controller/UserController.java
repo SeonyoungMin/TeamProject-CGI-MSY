@@ -73,26 +73,27 @@ public class UserController {
 	// 홈
 	@GetMapping("/home")
 	public String home(@RequestParam(value = "category", required = false) String category,
-			@RequestParam(value = "pageNum", defaultValue = "1") int pageNum, Model model) {
+			@RequestParam(value = "pageNum", defaultValue = "1") int pageNum, HttpSession session, // 1. 세션 파라미터 추가
+			Model model) {
 
+		User loginUser = (User) session.getAttribute("loginUser");
+		int loginUserNo = (loginUser != null) ? loginUser.getUserNo() : 0;
 		int limit = 9;
 		int startNum = limit * (pageNum - 1);
 
-		// 카테고리 있으면 필터링, 없으면 전체 조회
 		List<ProductListDto> productList;
 		if (category != null && !category.isEmpty()) {
 			productList = productService.findByCategory(category);
 		} else {
-			productList = productService.findAll(startNum, limit);
+			productList = productService.findAll(startNum, limit, loginUserNo);
 		}
+
 		int totalNum = productService.countAll();
 		int totalPages = (totalNum % limit) == 0 ? totalNum / limit : (totalNum / limit) + 1;
 
 		List<Rangking> topSellers = rankingService.findTopSellers(3);
 		List<Rangking> topBuyers = rankingService.findTopBuyers(3);
-
-		List<ProductListDto> popularList = productService.findTopByViewCount(3, category);
-
+		List<ProductListDto> popularList = productService.findTopByViewCount(3, category, loginUserNo);
 		List<BoardListDto> recentBoards = boardService.findRecentAll(0, 8);
 
 		model.addAttribute("productList", productList);
@@ -251,7 +252,7 @@ public class UserController {
 	// 회원 정보 수정 처리
 	@PutMapping("/users/edit")
 	public String submitEditUserForm(@ModelAttribute("editUser") User editUser, HttpSession session) {
-		
+
 		userService.setEditUser(editUser);
 		User loginUser = (User) session.getAttribute("loginUser");
 

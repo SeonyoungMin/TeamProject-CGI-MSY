@@ -17,14 +17,16 @@ public class ProductRepositoryImpl implements ProductRepository {
 	private JdbcTemplate template;
 
 	// 상품 목록 조회
-	public List<ProductListDto> findAll(int startNum, int limit) {
+	public List<ProductListDto> findAll(int startNum, int limit, int loginUserNo) {
 		String SQL = "select p.product_no, p.name, p.category, p.price, p.trade_status, p.view_count, p.created_time, "
-				+ "p.seller_no, u.nickname as seller_nickname, " + "i.file_name as img_name, i.file_path as img_path, "
-				+ "(select count(*) from favorite f where f.product_no = p.product_no) as favorite_count "
+				+ "p.seller_no, u.nickname as seller_nickname, i.file_name as img_name, i.file_path as img_path, "
+				+ "(select count(*) from favorite f where f.product_no = p.product_no) as favorite_count, "
+				+ "(select count(*) from favorite f where f.product_no = p.product_no and f.user_no = ?) as is_favorite "
 				+ "from product p " + "left join users u on u.user_no = p.seller_no "
-				+ "left join image i on i.entity_type = 'product' and i.entity_id = p.product_no and i.is_thumbnail=1 "
-				+ "where p.trade_status != '완료' " + "order by p.created_time desc limit ?, ? ";
-		return template.query(SQL, new ProductListRowMapper(), startNum, limit);
+				+ "left join image i on i.entity_type = 'product' and i.entity_id = p.product_no and i.is_thumbnail = 1 "
+				+ "where p.trade_status != '완료' " + "order by p.created_time desc limit ?, ?";
+
+		return template.query(SQL, new ProductListRowMapper(), loginUserNo, startNum, limit);
 	}
 
 	// 전체 데이터 개수 반환
@@ -158,19 +160,30 @@ public class ProductRepositoryImpl implements ProductRepository {
 
 	// 인기 상품 (조회수 desc, 거래완료 제외, 카테고리 옵션)
 	@Override
-	public List<ProductListDto> findTopByViewCount(int limit, String category) {
-		String base = "select p.product_no, p.name, p.category, p.price, p.trade_status, p.view_count, p.created_time, "
-				+ "p.seller_no, u.nickname as seller_nickname, " + "i.file_name as img_name, i.file_path as img_path, "
-				+ "(select count(*) from favorite f where f.product_no = p.product_no) as favorite_count "
-				+ "from product p " + "left join users u on u.user_no = p.seller_no "
-				+ "left join image i on i.entity_type = 'product' and i.entity_id = p.product_no and i.is_thumbnail = 1 "
-				+ "where p.trade_status <> '완료' ";
-
+	public List<ProductListDto> findTopByViewCount(int limit, String category, int loginUserNo) {
+		// 먼저 로그인유저번호를 읽고
+		// 카테고리가 있을 때
 		if (category != null && !category.isEmpty()) {
-			String SQL = base + "and p.category = ? order by p.view_count desc limit ?";
-			return template.query(SQL, new ProductListRowMapper(), category, limit);
+			return template.query(
+					"select p.product_no, p.name, p.category, p.price, p.trade_status, p.view_count, p.created_time, "
+							+ "p.seller_no, u.nickname as seller_nickname, i.file_name as img_name, i.file_path as img_path, "
+							+ "(select count(*) from favorite f where f.product_no = p.product_no) as favorite_count, "
+							+ "(select count(*) from favorite f where f.product_no = p.product_no and f.user_no = ?) as is_favorite "
+							+ "from product p " + "left join users u on u.user_no = p.seller_no "
+							+ "left join image i on i.entity_type = 'product' and i.entity_id = p.product_no and i.is_thumbnail = 1 "
+							+ "where p.trade_status != '완료' and p.category = ? " + "order by p.view_count desc limit ?",
+					new ProductListRowMapper(), loginUserNo, category, limit);
 		}
-		String SQL = base + "order by p.view_count desc limit ?";
-		return template.query(SQL, new ProductListRowMapper(), limit);
+
+		// 카테고리가 없을 때
+		return template.query(
+				"select p.product_no, p.name, p.category, p.price, p.trade_status, p.view_count, p.created_time, "
+						+ "p.seller_no, u.nickname as seller_nickname, i.file_name as img_name, i.file_path as img_path, "
+						+ "(select count(*) from favorite f where f.product_no = p.product_no) as favorite_count, "
+						+ "(select count(*) from favorite f where f.product_no = p.product_no and f.user_no = ?) as is_favorite "
+						+ "from product p " + "left join users u on u.user_no = p.seller_no "
+						+ "left join image i on i.entity_type = 'product' and i.entity_id = p.product_no and i.is_thumbnail = 1 "
+						+ "where p.trade_status != '완료' " + "order by p.view_count desc limit ?",
+				new ProductListRowMapper(), loginUserNo, limit);
 	}
 }

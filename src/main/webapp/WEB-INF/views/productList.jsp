@@ -20,38 +20,39 @@ body {
 	max-width: 1400px;
 	margin: 40px auto;
 	padding: 30px;
-	background: white;
-	border-radius: 12px;
 }
 
 .top-bar {
 	display: flex;
 	justify-content: space-between;
 	align-items: center;
-	margin-bottom: 30px;
+	margin-bottom: 24px;
 }
 
 .write-btn {
 	padding: 10px 20px;
-	background: black;
+	background: #121212;
 	color: white;
 	text-decoration: none;
 	border-radius: 8px;
 }
 
+/* 홈이랑 동일 카드 배열 */
 .product-grid {
 	display: grid;
 	grid-template-columns: repeat(5, 1fr);
-	gap: 20px;
+	gap: 15px;
 }
 
 .product-card {
-	border: 1px solid #eee;
-	border-radius: 10px;
-	overflow: hidden;
-	background: white;
+	display: block;
 	text-decoration: none;
-	color: black;
+	color: inherit;
+	border: 1px solid #eee;
+	padding: 10px;
+	border-radius: 8px;
+	position: relative;
+	background: #fff;
 	transition: .2s;
 }
 
@@ -60,43 +61,112 @@ body {
 	box-shadow: 0 4px 12px rgba(0, 0, 0, .08);
 }
 
-.product-card img {
-	width: 100%;
-	height: 160px;
-	object-fit: cover;
+/* 썸네일 */
+.img-wrap {
+	height: 180px;
+	background: #f0f0f0;
+	border-radius: 4px;
+	overflow: hidden;
+	position: relative;
 }
 
-.no-img {
-	height: 160px;
+.product-card img, .no-img {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	background: #f3f3f3;
 	color: #aaa;
+	background: #f0f0f0;
 }
 
+/* 하단 조회수 + 찜 */
+.bottom-badges {
+	position: absolute;
+	left: 8px;
+	right: 8px;
+	bottom: 8px;
+	display: flex;
+	justify-content: space-between;
+}
+
+.badge {
+	background: rgba(255, 255, 255, .88);
+	padding: 4px 8px;
+	border-radius: 14px;
+	font-size: 12px;
+	display: flex;
+	align-items: center;
+	gap: 4px;
+}
+
+.view-badge {
+	position: absolute;
+	bottom: 8px;
+	left: 8px;
+	background: rgba(0, 0, 0, 0.55);
+	color: #fff;
+	font-size: 11px;
+	padding: 2px 6px;
+	border-radius: 10px;
+}
+
+.fav-btn {
+	position: absolute;
+	bottom: 8px;
+	right: 8px;
+	display: inline-flex;
+	align-items: center;
+	gap: 4px;
+	padding: 3px 8px;
+	background: rgba(255, 255, 255, 0.85);
+	border-radius: 14px;
+	cursor: pointer;
+	user-select: none;
+}
+
+.fav-btn:hover {
+	background: #fff;
+}
+
+.fav-btn .fav-icon {
+	color: #ff4d4d;
+	font-size: 15px;
+}
+
+.fav-btn .fav-count {
+	font-size: 12px;
+	font-weight: bold;
+	color: #111;
+}
+/* 텍스트 */
 .info {
-	padding: 14px;
+	padding-top: 8px;
 }
 
 .name {
-	font-weight: bold;
-	margin-bottom: 8px;
+	font-size: 15px;
+	font-weight: 600;
 	white-space: nowrap;
 	overflow: hidden;
 	text-overflow: ellipsis;
+	margin-top: 4px;
 }
 
 .meta {
-	color: #777;
-	font-size: 13px;
-	margin-bottom: 6px;
+	font-size: 12px;
+	color: #888;
+	margin-top: 2px;
 }
 
 .price {
 	font-weight: bold;
+	margin-top: 4px;
+	font-size: 15px;
 }
 
+/* 페이지네이션 */
 .pagination {
 	text-align: center;
 	margin-top: 30px;
@@ -129,33 +199,47 @@ body {
 			<a href="${ctx}/product/new" class="write-btn">글쓰기</a>
 		</div>
 
-		<c:if test="${empty list}">
-			<p style="text-align: center; color: #888;">등록된 상품이 없습니다.</p>
-		</c:if>
-
 		<div class="product-grid">
 			<c:forEach var="p" items="${list}">
-				<a href="${ctx}/product/${p.productNo}" class="product-card"> <c:choose>
-						<c:when test="${not empty p.imgPath}">
-							<img src="${p.imgPath}">
-						</c:when>
-						<c:otherwise>
-							<div class="no-img">이미지 없음</div>
-						</c:otherwise>
-					</c:choose>
+				<a href="${ctx}/product/${p.productNo}" class="product-card">
+
+					<div class="img-wrap">
+
+						<c:choose>
+							<c:when test="${not empty p.imgPath}">
+								<img src="${p.imgPath}">
+							</c:when>
+							<c:otherwise>
+								<div class="no-img">이미지 없음</div>
+							</c:otherwise>
+						</c:choose>
+
+						<div class="bottom-badges">
+
+							<div class="view-badge">
+								<i class="fa-solid fa-eye"></i> ${p.viewCount}
+							</div>
+
+							<div class="fav-btn" data-product-no="${p.productNo}"
+								onclick="toggleFavorite(event,this)">
+								<i
+									class="fav-icon ${p.isFavorite > 0 ? 'fa-solid':'fa-regular'} fa-heart"></i>
+								<span class="fav-count">${p.favoriteCount}</span>
+							</div>
+
+						</div>
+					</div>
 
 					<div class="info">
 						<div class="name">${p.productName}</div>
-
-						<div class="meta">${p.category} · ${p.sellerNickname}</div>
-
-						<div class="meta">조회수 ${p.viewCount}</div>
+						<div class="meta">${p.category}</div>
 
 						<div class="price">
 							<fmt:formatNumber value="${p.price}" />
 							원
 						</div>
 					</div>
+
 				</a>
 			</c:forEach>
 		</div>
@@ -168,7 +252,7 @@ body {
 							<strong>${i}</strong>
 						</c:when>
 						<c:otherwise>
-							<a href="${ctx}/productList?pageNum=${i}"> ${i} </a>
+							<a href="${ctx}/productList?pageNum=${i}">${i}</a>
 						</c:otherwise>
 					</c:choose>
 				</c:forEach>
@@ -177,6 +261,53 @@ body {
 
 	</div>
 
+	<script>
+		function toggleFavorite(event, el) {
+			event.preventDefault();
+			event.stopPropagation();
+
+			var $el = $(el);
+			var productNo = $el.attr('data-product-no');
+			var $allRelatedBtns = $('.fav-btn[data-product-no="' + productNo
+					+ '"]');
+
+			$.ajax({
+				url : '${ctx}/favorite/toggle',
+				type : 'POST',
+				data : {
+					productNo : productNo
+				},
+				success : function(result) {
+					if (result === 'login') {
+						alert('로그인이 필요합니다.');
+						location.href = '${ctx}/login';
+						return;
+					}
+
+					var $firstCount = $allRelatedBtns.first()
+							.find('.fav-count');
+					var count = parseInt($firstCount.text()) || 0;
+
+					if (result === 'added') {
+						count++;
+						$allRelatedBtns.find('.fav-icon').removeClass(
+								'fa-regular').addClass('fa-solid');
+					} else if (result === 'removed') {
+						count = Math.max(0, count - 1);
+						$allRelatedBtns.find('.fav-icon').removeClass(
+								'fa-solid').addClass('fa-regular');
+					}
+
+					$allRelatedBtns.find('.fav-count').text(count);
+				},
+				error : function() {
+					alert('처리 중 오류가 발생했습니다.');
+				}
+			});
+		}
+	</script>
+
 	<%@ include file="/WEB-INF/views/footer.jsp"%>
+
 </body>
 </html>

@@ -281,10 +281,7 @@
 	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 	<script>
 		var ctx = "${ctx}";
-		var productNo = $
-		{
-			product.productNo
-		};
+		var productNo = ${product.productNo};
 
 		function changeImage(src) {
 			document.getElementById("mainImage").src = src;

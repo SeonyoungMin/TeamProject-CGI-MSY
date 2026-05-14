@@ -47,20 +47,19 @@ public class ProductController {
 
 	// 상품 전체 목록
 	@GetMapping("/productList")
-	public String list(@RequestParam(value = "pageNum", defaultValue = "1") int pageNum, Model model) {
+	public String list(@RequestParam(value = "pageNum", defaultValue = "1") int pageNum, HttpSession session, // 세션 추가
+			Model model) {
+
+		User loginUser = (User) session.getAttribute("loginUser");
+		int loginUserNo = (loginUser != null) ? loginUser.getUserNo() : 0; // 로그인 안했으면 0
 
 		int limit = 15;
 		int start = (pageNum - 1) * limit;
 
-		List<ProductListDto> list = productService.findAll(start, limit);
+		List<ProductListDto> list = productService.findAll(start, limit, loginUserNo);
 		int total = productService.countAll();
 
-		int totalPages;
-		if (total % limit == 0) {
-			totalPages = total / limit;
-		} else {
-			totalPages = (total / limit) + 1;
-		}
+		int totalPages = (total % limit == 0) ? (total / limit) : (total / limit) + 1;
 
 		model.addAttribute("list", list);
 		model.addAttribute("currentPage", pageNum);
@@ -69,14 +68,11 @@ public class ProductController {
 		return "productList";
 	}
 
-	// =========================
-	// ⭐ 공통 로직 분리
-	// =========================
-	private Map<String, Object> getProductData(int pageNum, int limit) {
-
+	//공통 로직 분리
+	private Map<String, Object> getProductData(int pageNum, int limit, int loginUserNo) {
 		int start = (pageNum - 1) * limit;
 
-		List<ProductListDto> list = productService.findAll(start, limit);
+		List<ProductListDto> list = productService.findAll(start, limit, loginUserNo);
 		int total = productService.countAll();
 
 		int totalPages = (int) Math.ceil((double) total / limit);
@@ -88,8 +84,6 @@ public class ProductController {
 
 		return map;
 	}
-
-	// 상품 조건 조회
 
 	// 검색어로 상품 찾기
 	@GetMapping("/product/search")

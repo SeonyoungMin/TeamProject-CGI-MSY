@@ -9,7 +9,7 @@ import com.team404.domain.ProductListDto;
 
 public class ProductListRowMapper implements RowMapper<ProductListDto> {
 	public ProductListDto mapRow(ResultSet rs, int rowNum) throws SQLException {
-		
+
 		ProductListDto productListDto = new ProductListDto();
 		productListDto.setProductNo(rs.getInt("product_no"));
 		productListDto.setProductName(rs.getString("name"));
@@ -24,7 +24,8 @@ public class ProductListRowMapper implements RowMapper<ProductListDto> {
 		productListDto.setImgName(rs.getString("img_name"));
 		productListDto.setImgPath(rs.getString("img_path"));
 		productListDto.setViewCount(rs.getInt("view_count"));
-		
+		productListDto.setIsFavorite(rs.getInt("is_favorite"));
+
 		return productListDto;
 	}
 }
