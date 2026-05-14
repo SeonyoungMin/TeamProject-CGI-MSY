@@ -43,7 +43,7 @@ public class UserController {
 
 	@Autowired
 	private ProductService productService;
-	
+
 	@Autowired
 	private ReviewService reviewService;
 
@@ -72,24 +72,22 @@ public class UserController {
 
 	// 홈
 	@GetMapping("/home")
-	public String home(@RequestParam(value = "category", required = false) String category, @RequestParam(value = "pageNum", defaultValue = "1") int pageNum, Model model) {
-		
-		
+	public String home(@RequestParam(value = "category", required = false) String category,
+			@RequestParam(value = "pageNum", defaultValue = "1") int pageNum, Model model) {
+
 		int limit = 9;
 		int startNum = limit * (pageNum - 1);
 
-	    // 카테고리 있으면 필터링, 없으면 전체 조회
-	    List<ProductListDto> productList;
-	    if (category != null && !category.isEmpty()) {
-	        productList = productService.findByCategory(category);
-	    } else {
-	        productList = productService.findAll(startNum, limit);
-	    }
+		// 카테고리 있으면 필터링, 없으면 전체 조회
+		List<ProductListDto> productList;
+		if (category != null && !category.isEmpty()) {
+			productList = productService.findByCategory(category);
+		} else {
+			productList = productService.findAll(startNum, limit);
+		}
 		int totalNum = productService.countAll();
 		int totalPages = (totalNum % limit) == 0 ? totalNum / limit : (totalNum / limit) + 1;
 
-		
-		
 		List<Rangking> topSellers = rankingService.findTopSellers(3);
 		List<Rangking> topBuyers = rankingService.findTopBuyers(3);
 
@@ -252,8 +250,16 @@ public class UserController {
 
 	// 회원 정보 수정 처리
 	@PutMapping("/users/edit")
-	public String submitEditUserForm(@ModelAttribute("editUser") User editUser) {
+	public String submitEditUserForm(@ModelAttribute("editUser") User editUser, HttpSession session) {
+		
 		userService.setEditUser(editUser);
+		User loginUser = (User) session.getAttribute("loginUser");
+
+		if (loginUser != null) {
+			User updatedUser = userService.getUserByNo(editUser.getUserNo());
+			session.setAttribute("loginUser", updatedUser);
+		}
+
 		return "redirect:/users/search/" + editUser.getUserNo();
 	}
 

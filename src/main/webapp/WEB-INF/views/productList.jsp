@@ -2,66 +2,181 @@
 <%@ taglib prefix="c" uri="jakarta.tags.core"%>
 <%@ taglib prefix="fmt" uri="jakarta.tags.fmt"%>
 <c:set var="ctx" value="${pageContext.request.contextPath}" />
+
 <!DOCTYPE html>
 <html>
 <head>
 <meta charset="UTF-8">
 <title>상품 목록</title>
+
+<style>
+body {
+	margin: 0;
+	font-family: Arial, sans-serif;
+	background: #f8f9fa;
+}
+
+.container {
+	max-width: 1400px;
+	margin: 40px auto;
+	padding: 30px;
+	background: white;
+	border-radius: 12px;
+}
+
+.top-bar {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin-bottom: 30px;
+}
+
+.write-btn {
+	padding: 10px 20px;
+	background: black;
+	color: white;
+	text-decoration: none;
+	border-radius: 8px;
+}
+
+.product-grid {
+	display: grid;
+	grid-template-columns: repeat(5, 1fr);
+	gap: 20px;
+}
+
+.product-card {
+	border: 1px solid #eee;
+	border-radius: 10px;
+	overflow: hidden;
+	background: white;
+	text-decoration: none;
+	color: black;
+	transition: .2s;
+}
+
+.product-card:hover {
+	transform: translateY(-4px);
+	box-shadow: 0 4px 12px rgba(0, 0, 0, .08);
+}
+
+.product-card img {
+	width: 100%;
+	height: 160px;
+	object-fit: cover;
+}
+
+.no-img {
+	height: 160px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	background: #f3f3f3;
+	color: #aaa;
+}
+
+.info {
+	padding: 14px;
+}
+
+.name {
+	font-weight: bold;
+	margin-bottom: 8px;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.meta {
+	color: #777;
+	font-size: 13px;
+	margin-bottom: 6px;
+}
+
+.price {
+	font-weight: bold;
+}
+
+.pagination {
+	text-align: center;
+	margin-top: 30px;
+}
+
+.pagination a, .pagination strong {
+	display: inline-block;
+	padding: 8px 14px;
+	margin: 0 4px;
+	border: 1px solid #ddd;
+	border-radius: 8px;
+	text-decoration: none;
+	color: #444;
+}
+
+.pagination strong {
+	background: black;
+	color: white;
+}
+</style>
 </head>
 <body>
-	<a href="${ctx}/home">홈</a>
 
 	<%@ include file="/WEB-INF/views/header.jsp"%>
 
-	<h1>상품 목록</h1>
-	<hr>
+	<div class="container">
 
-	<a href="<c:url value='/product/new'/>">상품 등록></a>
-	<br>
-	<br>
-
-	<form action="<c:url value='/product/search'/>" method="get">
-		<input type="text" name="keyword" placeholder="검색어 입력"
-			value="${keyword}">
-		<button type="submit">검색</button>
-	</form>
-	<a href="<c:url value='/product/mylist'/>">내 판매목록</a>
-	<br>
-
-	<a href="<c:url value='/product/category?category=의류'/>">의류</a> |
-	<a href="<c:url value='/product/category?category=잡화'/>">잡화</a> |
-	<a href="<c:url value='/product/category?category=가구'/>">가구</a> |
-	<a href="<c:url value='/product/category?category=전자기기'/>">전자기기</a> |
-	<a href="<c:url value='/product/category?category=도서'/>">도서</a> |
-	<a href="<c:url value='/productList'/>">전체</a>
-	<br>
-	<br>
-
-	<c:if test="${empty list}">
-		<p>등록된 상품이 없습니다.</p>
-	</c:if>
-
-	<c:forEach var="p" items="${list}">
-		<div style="position: relative; padding-bottom: 20px;">
-			<c:if test="${not empty p.imgPath}">
-				<img src="${ctx}${p.imgPath}" width="50" height="50"
-					alt="${p.imgName}">
-			</c:if>
-			<a href="<c:url value='/product/${p.productNo}'/>">${p.productName}</a>
-			| ${p.category} | ${p.price}원 | ${p.tradeStatus == '완료' ? '판매완료' : p.tradeStatus}
-			| ${p.sellerNickname} <span
-				style="position: absolute; bottom: 0; right: 0; font-size: 12px; color: #888;">
-				👁 ${p.viewCount} </span>
+		<div class="top-bar">
+			<h2>상품 목록</h2>
+			<a href="${ctx}/product/new" class="write-btn">글쓰기</a>
 		</div>
-		<hr>
-	</c:forEach>
 
-	<c:if test="${not empty totalPages}">
-		<c:forEach var="i" begin="1" end="${totalPages}">
-			<a href="<c:url value='/productList?pageNum=${i}'/>"
-				style="${i == currentPage ? 'font-weight:bold' : ''}">${i}</a>
-		</c:forEach>
-	</c:if>
+		<c:if test="${empty list}">
+			<p style="text-align: center; color: #888;">등록된 상품이 없습니다.</p>
+		</c:if>
+
+		<div class="product-grid">
+			<c:forEach var="p" items="${list}">
+				<a href="${ctx}/product/${p.productNo}" class="product-card"> <c:choose>
+						<c:when test="${not empty p.imgPath}">
+							<img src="${p.imgPath}">
+						</c:when>
+						<c:otherwise>
+							<div class="no-img">이미지 없음</div>
+						</c:otherwise>
+					</c:choose>
+
+					<div class="info">
+						<div class="name">${p.productName}</div>
+
+						<div class="meta">${p.category} · ${p.sellerNickname}</div>
+
+						<div class="meta">조회수 ${p.viewCount}</div>
+
+						<div class="price">
+							<fmt:formatNumber value="${p.price}" />
+							원
+						</div>
+					</div>
+				</a>
+			</c:forEach>
+		</div>
+
+		<c:if test="${totalPages > 0}">
+			<div class="pagination">
+				<c:forEach var="i" begin="1" end="${totalPages}">
+					<c:choose>
+						<c:when test="${i == currentPage}">
+							<strong>${i}</strong>
+						</c:when>
+						<c:otherwise>
+							<a href="${ctx}/productList?pageNum=${i}"> ${i} </a>
+						</c:otherwise>
+					</c:choose>
+				</c:forEach>
+			</div>
+		</c:if>
+
+	</div>
+
 	<%@ include file="/WEB-INF/views/footer.jsp"%>
 </body>
 </html>

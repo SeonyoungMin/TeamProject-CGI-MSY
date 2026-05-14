@@ -32,7 +32,7 @@ public class ProductController {
 
 	@Autowired
 	private ProductService productService;
-	
+
 	@Autowired
 	private ReviewService reviewService;
 
@@ -47,9 +47,25 @@ public class ProductController {
 
 	// 상품 전체 목록
 	@GetMapping("/productList")
-	public String list(Model model) {
-		List<ProductListDto> list = productService.findAll(0, 100);
+	public String list(@RequestParam(value = "pageNum", defaultValue = "1") int pageNum, Model model) {
+
+		int limit = 15;
+		int start = (pageNum - 1) * limit;
+
+		List<ProductListDto> list = productService.findAll(start, limit);
+		int total = productService.countAll();
+
+		int totalPages;
+		if (total % limit == 0) {
+			totalPages = total / limit;
+		} else {
+			totalPages = (total / limit) + 1;
+		}
+
 		model.addAttribute("list", list);
+		model.addAttribute("currentPage", pageNum);
+		model.addAttribute("totalPages", totalPages);
+
 		return "productList";
 	}
 
@@ -93,16 +109,15 @@ public class ProductController {
 
 	// 내가 등록한 상품 (로그인 필요, 페이징)
 	@GetMapping("/product/mylist")
-	public String myList(@RequestParam(value = "pageNum", defaultValue = "1") int pageNum,
-			Model model, HttpSession session) {
+	public String myList(@RequestParam(value = "pageNum", defaultValue = "1") int pageNum, Model model,
+			HttpSession session) {
 		User loginUser = (User) session.getAttribute("loginUser");
 		if (loginUser == null) {
 			return "redirect:/login";
 		}
 		int limit = 10;
 		int startNum = limit * (pageNum - 1);
-		model.addAttribute("list",
-				productService.findBySeller(loginUser.getUserNo(), startNum, limit));
+		model.addAttribute("list", productService.findBySeller(loginUser.getUserNo(), startNum, limit));
 		int total = productService.countBySeller(loginUser.getUserNo());
 		int totalPages = (total % limit) == 0 ? total / limit : (total / limit) + 1;
 		model.addAttribute("totalPages", totalPages);
@@ -138,11 +153,11 @@ public class ProductController {
 		model.addAttribute("loginUser", loginUser);
 		model.addAttribute("favorite", favorite);
 		model.addAttribute("comments", comments);
-		
-		//후기 추가
+
+		// 후기 추가
 		ReviewDto review = reviewService.findReviewByProduct(productNo);
-		model.addAttribute("review",review);
-		
+		model.addAttribute("review", review);
+
 		return "productDetail";
 	}
 
@@ -258,7 +273,7 @@ public class ProductController {
 			return "redirect:/login";
 		}
 		ProductDetailDto origin = productService.findProductDetail(productNo);
-		
+
 		System.out.println("loginUser.getUserNo(): " + loginUser.getUserNo());
 		System.out.println("origin.getSellerNo(): " + origin.getSellerNo());
 		if (!canManage(loginUser, origin.getSellerNo())) {
@@ -267,10 +282,11 @@ public class ProductController {
 		imageService.setThumbnail(imageNo, "product", productNo);
 		return "redirect:/product/" + productNo + "/edit";
 	}
-	
-	//이미지 추가 후 redirect
+
+	// 이미지 추가 후 redirect
 	@PostMapping("/product/{productNo}/addImage")
-	public String addImage(@PathVariable("productNo") int productNo, @RequestParam(value = "imgFiles", required = false) List<MultipartFile> imgFiles) {
+	public String addImage(@PathVariable("productNo") int productNo,
+			@RequestParam(value = "imgFiles", required = false) List<MultipartFile> imgFiles) {
 		if (imgFiles != null && !imgFiles.isEmpty()) {
 			imageService.upload(imgFiles, "product", productNo);
 		}

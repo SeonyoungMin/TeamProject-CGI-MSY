@@ -7,13 +7,8 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<<<<<<< HEAD
-
-=======
 <title>${product.productName}</title>
->>>>>>> refs/heads/member_CGI
 <style>
-<<<<<<< HEAD
 .detail-container {
 	max-width: 1100px;
 	margin: 30px auto;
@@ -21,10 +16,7 @@
 	font-family: 'Pretendard', sans-serif;
 }
 
-.top-section {
-=======
 .detail-top {
->>>>>>> refs/heads/member_CGI
 	display: flex;
 	gap: 30px;
 	align-items: flex-start;
@@ -100,7 +92,6 @@
 	margin-bottom: 20px;
 }
 
-/* 판매자 섹션 스타일 추가 */
 .seller-profile-box {
 	display: flex;
 	align-items: center;
@@ -117,14 +108,6 @@
 	gap: 12px;
 }
 
-.seller-img {
-	width: 45px;
-	height: 45px;
-	border-radius: 50%;
-	background: #f0f0f0;
-	overflow: hidden;
-}
-
 .seller-name-link {
 	text-decoration: none;
 	color: #121212;
@@ -134,35 +117,6 @@
 
 .seller-name-link:hover {
 	text-decoration: underline;
-}
-
-.desc-box {
-	background: #f7f7f7;
-	border-radius: 6px;
-	padding: 15px;
-	min-height: 120px;
-	white-space: pre-wrap;
-}
-
-/* 댓글 */
-.comment-item {
-	border-bottom: 1px solid #eee;
-	padding: 12px 0;
-}
-
-.comment-author {
-	font-weight: bold;
-}
-
-.comment-date {
-	font-size: 12px;
-	color: #999;
-	margin-left: 8px;
-}
-
-.comment-content {
-	margin: 6px 0;
-	white-space: pre-wrap;
 }
 
 .btn-order {
@@ -185,11 +139,11 @@
 
 	<%@ include file="/WEB-INF/views/header.jsp"%>
 
-	<div class="app-container">
-
+	<div class="detail-container">
+		<!-- app-container 대신 더 넓은 detail-container 사용 -->
 		<div class="card">
 			<div class="detail-top">
-
+				<!-- 이미지 섹션 -->
 				<div class="detail-image">
 					<div class="main-image">
 						<c:if test="${not empty product.imgPath}">
@@ -208,6 +162,7 @@
 					</c:if>
 				</div>
 
+				<!-- 상품 정보 섹션 -->
 				<div class="detail-info">
 					<div class="product-status">${product.tradeStatus == '판매중' ? '판매중' : product.tradeStatus == '예약중' ? '예약중' : '판매완료'}
 					</div>
@@ -231,13 +186,10 @@
 						카테고리 : ${product.category}<br> 등록일 :
 						<fmt:formatDate value="${product.createdTime}"
 							pattern="yyyy.MM.dd" />
-						<br>
-						<div class="product-meta">상품번호 : ${product.productNo}</div>
-
+						<br> 상품번호 : ${product.productNo}
 
 						<div style="margin-top: 20px; display: flex; gap: 10px;">
-							<a
-								href="${pageContext.request.contextPath}/order/select?productNo=${product.productNo}"
+							<a href="${ctx}/order/select?productNo=${product.productNo}"
 								class="btn-order">구매하기</a>
 
 							<c:if test="${not empty loginUser}">
@@ -260,13 +212,12 @@
 							</div>
 						</c:if>
 					</div>
-
 				</div>
 			</div>
 
-			<div class="card">
+			<!-- 댓글 섹션 -->
+			<div class="card" style="margin-top: 40px;">
 				<h3 class="section-title">댓글</h3>
-
 				<c:choose>
 					<c:when test="${empty loginUser}">
 						<div style="color: #888;">
@@ -278,6 +229,7 @@
 							style="margin-bottom: 20px;">
 							<input type="hidden" name="boardNo" value="${product.productNo}">
 							<textarea class="form-input" name="content"
+								style="width: 100%; height: 80px; margin-bottom: 10px;"
 								placeholder="댓글을 입력하세요" required></textarea>
 							<button type="submit" class="btn btn-primary">댓글 등록</button>
 						</form>
@@ -289,27 +241,26 @@
 								</c:when>
 								<c:otherwise>
 									<c:forEach var="c" items="${comments}">
-										<div class="comment-item">
-											<span class="comment-author"> <c:choose>
-													<c:when test="${empty c.nickname}">익명</c:when>
-													<c:otherwise>${c.nickname}</c:otherwise>
-												</c:choose>
-											</span> <span class="comment-date">${c.createdTime}</span>
-											<div class="comment-content">${c.content}</div>
+										<div class="comment-item"
+											style="border-bottom: 1px solid #eee; padding: 10px 0;">
+											<span class="comment-author">${empty c.nickname ? '익명' : c.nickname}</span>
+											<span class="comment-date"
+												style="font-size: 12px; color: #999; margin-left: 10px;">${c.createdTime}</span>
+											<div class="comment-content" style="margin: 5px 0;">${c.content}</div>
 
 											<c:if
 												test="${c.authorNo == loginUser.userNo || loginUser.userRole == 'ROLE_ADMIN'}">
-												<div style="display: flex; gap: 5px; margin-top: 6px;">
+												<div style="display: flex; gap: 5px;">
 													<c:if test="${c.authorNo == loginUser.userNo}">
-														<a href="${ctx}/comment/${c.commentNo}/edit" class="btn"
-															style="padding: 3px 10px; font-size: 12px;">수정</a>
+														<a href="${ctx}/comment/${c.commentNo}/edit"
+															style="font-size: 12px;">수정</a>
 													</c:if>
 													<form action="${ctx}/comment/${c.commentNo}/delete"
 														method="post" style="margin: 0;">
 														<input type="hidden" name="boardNo"
 															value="${product.productNo}">
-														<button type="submit" class="btn btn-danger"
-															style="padding: 3px 10px; font-size: 12px;"
+														<button type="submit"
+															style="font-size: 12px; background: none; border: none; color: red; cursor: pointer;"
 															onclick="return confirm('삭제하시겠습니까?')">삭제</button>
 													</form>
 												</div>
@@ -322,32 +273,36 @@
 					</c:otherwise>
 				</c:choose>
 			</div>
-
 		</div>
+	</div>
 
-		<%@ include file="/WEB-INF/views/footer.jsp"%>
+	<%@ include file="/WEB-INF/views/footer.jsp"%>
 
-		<script>
-	var ctx = "${ctx}";
-	var productNo = ${product.productNo};
-	var loginUserNo = ${empty loginUser ? 0 : loginUser.userNo};
+	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+	<script>
+		var ctx = "${ctx}";
+		var productNo = $
+		{
+			product.productNo
+		};
 
-	function changeImage(src) {
-		document.getElementById("mainImage").src = src;
-	}
+		function changeImage(src) {
+			document.getElementById("mainImage").src = src;
+		}
 
-	// ==== 찜하기 ====
-	function toggleFavorite() {
-		$.post(ctx + "/favorite/toggle", { productNo: productNo }, function(result) {
-			if (result === "added") {
-				$("#favBtn").text("♥ 찜 취소");
-			} else if (result === "removed") {
-				$("#favBtn").text("♡ 찜하기");
-			} else {
-				alert("로그인이 필요합니다.");
-			}
-		});
-	}
-</script>
+		function toggleFavorite() {
+			$.post(ctx + "/favorite/toggle", {
+				productNo : productNo
+			}, function(result) {
+				if (result === "added") {
+					$("#favBtn").text("♥ 찜 취소");
+				} else if (result === "removed") {
+					$("#favBtn").text("♡ 찜하기");
+				} else {
+					alert("로그인이 필요합니다.");
+				}
+			});
+		}
+	</script>
 </body>
 </html>
