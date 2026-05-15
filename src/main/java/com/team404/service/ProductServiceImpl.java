@@ -163,4 +163,14 @@ public class ProductServiceImpl implements ProductService {
 	public List<ProductListDto> findBoughtListByBuyerNo(int buyerNo) {
 		return productRepository.findBoughtListByBuyerNo(buyerNo);
 	}
+
+	@Override
+	public List<ProductListDto> findBoughtListByBuyerNo(int buyerNo, int startNum, int limit) {
+		return productRepository.findBoughtListByBuyerNo(buyerNo, startNum, limit);
+	}
+
+	@Override
+	public int countBoughtByBuyerNo(int buyerNo) {
+		return productRepository.countBoughtByBuyerNo(buyerNo);
+	}
 }

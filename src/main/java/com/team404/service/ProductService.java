@@ -55,4 +55,10 @@ public interface ProductService {
 	// 구매내역조회
 	List<ProductListDto> findBoughtListByBuyerNo(int userNo);
 
+	// 구매내역 (페이징)
+	List<ProductListDto> findBoughtListByBuyerNo(int buyerNo, int startNum, int limit);
+
+	// 구매내역 총 개수
+	int countBoughtByBuyerNo(int buyerNo);
+
 }

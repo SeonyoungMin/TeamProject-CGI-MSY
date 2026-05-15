@@ -74,37 +74,48 @@ public class CommentController {
 		return commentService.getComments(boardNo);
 	}
 
-	// 댓글 수정 폼 — 작성자 본인만 진입 가능
+	// 댓글 수정 폼 — 작성자 본인만 진입 가능 (관리자도 수정 불가)
 	@GetMapping("/comment/{commentNo}/edit")
-	public String editForm(@PathVariable("commentNo") int commentNo, Model model, HttpSession session) {
+	public String editForm(@PathVariable("commentNo") int commentNo,
+			@RequestParam(value = "returnTo", required = false) String returnTo,
+			Model model, HttpSession session) {
 		User loginUser = (User) session.getAttribute("loginUser");
 		if (loginUser == null) {
 			return "redirect:/login";
 		}
 		Comment comment = commentService.getComment(commentNo);
+		String back = "board".equals(returnTo)
+				? "redirect:/boardList/" + comment.getBoardNo()
+				: "redirect:/product/" + comment.getBoardNo();
 		if (comment.getAuthorNo() != loginUser.getUserNo()) {
-			return "redirect:/product/" + comment.getBoardNo();
+			return back;
 		}
 		model.addAttribute("comment", comment);
+		model.addAttribute("returnTo", returnTo);
 		return "commentUpdateForm";
 	}
 
-	// 댓글 수정 처리
+	// 댓글 수정 처리 — 작성자 본인만
 	@PostMapping("/comment/{commentNo}/edit")
 	public String edit(@PathVariable("commentNo") int commentNo, @RequestParam("content") String content,
-			@RequestParam("boardNo") int boardNo, HttpSession session) {
+			@RequestParam("boardNo") int boardNo,
+			@RequestParam(value = "returnTo", required = false) String returnTo,
+			HttpSession session) {
 
 		User loginUser = (User) session.getAttribute("loginUser");
 		if (loginUser == null) {
 			return "redirect:/login";
 		}
+		String back = "board".equals(returnTo)
+				? "redirect:/boardList/" + boardNo
+				: "redirect:/product/" + boardNo;
 		Comment comment = commentService.getComment(commentNo);
 		if (comment.getAuthorNo() != loginUser.getUserNo()) {
-			return "redirect:/product/" + boardNo;
+			return back;
 		}
 		comment.setContent(content);
 		commentService.updateComment(comment);
-		return "redirect:/product/" + boardNo;
+		return back;
 	}
 
 	// 댓글 삭제 처리 — 본인 또는 관리자. returnTo=board 이면 게시판으로 돌아감

@@ -131,12 +131,20 @@
 		</c:forEach>
 
 
-		<h3 class="section-subtitle" style="margin-top: 40px;">구매 내역</h3>
+		<div
+			style="display: flex; justify-content: space-between; align-items: center; margin-top: 40px; border-bottom: 2px solid #121212; padding-bottom: 10px; margin-bottom: 20px;">
+			<h3 class="section-title" style="margin: 0; border-bottom: none;">
+				구매 내역 <span
+					style="font-size: 13px; color: #999; font-weight: normal;">(${totalBought})</span>
+			</h3>
+			<a href="${ctx}/mypage/bought" style="font-size: 14px; color: #666;">전체보기
+				&gt;</a>
+		</div>
 		<div class="card">
 			<c:choose>
 				<c:when test="${not empty boughtList}">
 					<div class="product-grid"
-						style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 20px;">
+						style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px;">
 
 						<c:forEach var="item" items="${boughtList}">
 							<div class="product-item"
@@ -144,7 +152,7 @@
 								onclick="location.href='${ctx}/product/${item.productNo}'">
 
 								<div class="product-img"
-									style="height: 150px; background: #f4f4f4; display: flex; align-items: center; justify-content: center;">
+									style="height: 140px; background: #f4f4f4; display: flex; align-items: center; justify-content: center;">
 									<c:choose>
 										<c:when test="${not empty item.imgPath}">
 											<img src="${item.imgPath}"
@@ -161,7 +169,7 @@
 									<div
 										style="font-weight: bold; margin-bottom: 5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
 										${item.productName}</div>
-									<div style="color: #ff8a3d; font-weight: bold;">
+									<div style="font-weight: bold;">
 										<fmt:formatNumber value="${item.price}" pattern="#,###" />
 										원
 									</div>
@@ -181,9 +189,43 @@
 			</c:choose>
 		</div>
 
+		<!-- 받은 후기 -->
+		<div
+			style="display: flex; justify-content: space-between; align-items: center; margin-top: 40px; border-bottom: 2px solid #121212; padding-bottom: 10px; margin-bottom: 20px;">
+			<h3 class="section-title" style="margin: 0; border-bottom: none;">
+				받은 후기 <span
+					style="font-size: 13px; color: #999; font-weight: normal;">(${totalMyReviews})</span>
+			</h3>
+			<a href="${ctx}/mypage/reviews" style="font-size: 14px; color: #666;">전체보기
+				&gt;</a>
+		</div>
+		<c:choose>
+			<c:when test="${empty myReviews}">
+				<div class="card" style="text-align: center; color: #888;">아직
+					받은 후기가 없습니다.</div>
+			</c:when>
+			<c:otherwise>
+				<c:forEach var="r" items="${myReviews}">
+					<div class="card" style="padding: 16px 20px; margin-bottom: 10px;">
+						<div
+							style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+							<span style="font-weight: bold; color: #333;">${r.productName}</span>
+							<span style="font-size: 12px; color: #999;"> <fmt:formatDate
+									value="${r.createdTime}" pattern="yyyy.MM.dd" />
+							</span>
+						</div>
+						<div style="font-size: 14px; color: #444; line-height: 1.6;">${r.content}</div>
+						<div
+							style="font-size: 12px; color: #aaa; margin-top: 8px; text-align: right;">
+							작성자: ${r.sellerNickname}</div>
+					</div>
+				</c:forEach>
+			</c:otherwise>
+		</c:choose>
+
 		<!-- 가계부 (최근 5건) -->
 		<div
-			style="display: flex; justify-content: space-between; align-items: center; margin-top: 40px;">
+			style="display: flex; justify-content: space-between; align-items: center; margin-top: 40px; border-bottom: 2px solid #121212; padding-bottom: 10px; margin-bottom: 20px;">
 			<h3 class="section-title" style="margin: 0; border-bottom: none;">가계부</h3>
 			<a href="${ctx}/accountList" style="font-size: 14px; color: #666;">전체보기
 				&gt;</a>
@@ -229,50 +271,68 @@
 
 	</div>
 	<script>
-		// 가계부 메모 저장 — 페이지 이동 없이 AJAX 처리
-		$(document).on('click', '.memo-save-btn', function() {
-			var $btn = $(this);
-			var $form = $btn.closest('.memo-form');
-			var orderNo = $form.data('order-no');
-			var memo = $form.find('input[name="memo"]').val();
-			var originalText = $btn.text();
-			var originalBg = $btn.css('background-color');
-			var originalColor = $btn.css('color');
+		$(document)
+				.on(
+						'click',
+						'.memo-save-btn',
+						function() {
+							var $btn = $(this);
+							var $form = $btn.closest('.memo-form');
+							var orderNo = $form.data('order-no');
+							var memo = $form.find('input[name="memo"]').val();
+							var originalText = $btn.text();
+							var originalBg = $btn.css('background-color');
+							var originalColor = $btn.css('color');
 
-			$btn.prop('disabled', true).text('저장 중...');
+							$btn.prop('disabled', true).text('저장 중...');
 
-			$.ajax({
-				url : '${ctx}/account/' + orderNo + '/memo',
-				type : 'POST',
-				data : {
-					memo : memo
-				},
-				success : function(res) {
-					if (res === 'success') {
-						$btn.text('저장됨').css({
-							'background-color' : '#28a745',
-							'color' : '#fff'
+							$
+									.ajax({
+										url : '${ctx}/account/' + orderNo
+												+ '/memo',
+										type : 'POST',
+										data : {
+											memo : memo
+										},
+										success : function(res) {
+											if (res === 'success') {
+												$btn
+														.text('저장됨')
+														.css(
+																{
+																	'background-color' : '#28a745',
+																	'color' : '#fff'
+																});
+												setTimeout(
+														function() {
+															$btn
+																	.prop(
+																			'disabled',
+																			false)
+																	.text(
+																			originalText)
+																	.css(
+																			{
+																				'background-color' : originalBg,
+																				'color' : originalColor
+																			});
+														}, 1200);
+											} else if (res === 'unauthorized') {
+												alert('로그인이 필요합니다.');
+												location.href = '${ctx}/login';
+											} else {
+												alert('저장에 실패했습니다.');
+												$btn.prop('disabled', false)
+														.text(originalText);
+											}
+										},
+										error : function() {
+											alert('서버 통신 중 오류가 발생했습니다.');
+											$btn.prop('disabled', false).text(
+													originalText);
+										}
+									});
 						});
-						setTimeout(function() {
-							$btn.prop('disabled', false).text(originalText).css({
-								'background-color' : originalBg,
-								'color' : originalColor
-							});
-						}, 1200);
-					} else if (res === 'unauthorized') {
-						alert('로그인이 필요합니다.');
-						location.href = '${ctx}/login';
-					} else {
-						alert('저장에 실패했습니다.');
-						$btn.prop('disabled', false).text(originalText);
-					}
-				},
-				error : function() {
-					alert('서버 통신 중 오류가 발생했습니다.');
-					$btn.prop('disabled', false).text(originalText);
-				}
-			});
-		});
 
 		function deleteProduct(productNo) {
 			if (confirm('상품을 삭제하시겠습니까?')) {

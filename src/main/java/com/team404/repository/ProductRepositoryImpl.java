@@ -206,4 +206,28 @@ public class ProductRepositoryImpl implements ProductRepository {
 		return template.query(SQL, new ProductListRowMapper(), buyerNo);
 	}
 
+	// 구매내역 (페이징)
+	@Override
+	public List<ProductListDto> findBoughtListByBuyerNo(int buyerNo, int startNum, int limit) {
+		String SQL = "select p.product_no, p.name, p.category, p.price, p.trade_status, "
+				+ "p.view_count, p.created_time, p.seller_no, "
+				+ "u.nickname as seller_nickname, i.file_name as img_name, i.file_path as img_path, "
+				+ "0 as favorite_count, 0 as is_favorite "
+				+ "from orders o "
+				+ "join product p on p.product_no = o.product_no "
+				+ "left join users u on u.user_no = p.seller_no "
+				+ "left join image i on i.entity_type = 'product' and i.entity_id = p.product_no and i.is_thumbnail = 1 "
+				+ "where o.buyer_no = ? and o.order_status = '완료' "
+				+ "order by o.created_time desc limit ?, ?";
+
+		return template.query(SQL, new ProductListRowMapper(), buyerNo, startNum, limit);
+	}
+
+	// 구매내역 총 개수
+	@Override
+	public int countBoughtByBuyerNo(int buyerNo) {
+		String SQL = "select count(*) from orders where buyer_no = ? and order_status = '완료'";
+		return template.queryForObject(SQL, Integer.class, buyerNo);
+	}
+
 }

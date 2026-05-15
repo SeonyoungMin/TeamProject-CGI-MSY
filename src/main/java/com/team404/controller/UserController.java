@@ -205,7 +205,7 @@ public class UserController {
 		return "login";
 	}
 
-	// 마이페이지 — 내 정보 + 최근 상품/가계부 미리보기
+	// 마이페이지 — 내 정보 + 최근 상품/가계부/구매내역/받은 후기 미리보기
 	@GetMapping("/mypage")
 	public String myPage(HttpSession session, Model model) {
 		User loginUser = (User) session.getAttribute("loginUser");
@@ -213,20 +213,97 @@ public class UserController {
 			return "redirect:/login";
 		}
 
-		List<ProductListDto> myProducts = productService.findBySeller(loginUser.getUserNo(), 0, 5);
+		int userNo = loginUser.getUserNo();
 
-		List<Image> profileImages = imageService.getImages("user", loginUser.getUserNo());
+		List<ProductListDto> myProducts = productService.findBySeller(userNo, 0, 5);
+
+		List<Image> profileImages = imageService.getImages("user", userNo);
 		Image profileImage = profileImages.isEmpty() ? null : profileImages.get(0);
 
-		List<Account> accountList = accountService.findAllByBuyer(loginUser.getUserNo(), 0, 6);
-		List<ProductListDto> boughtList = productService.findBoughtListByBuyerNo(loginUser.getUserNo());
+		List<Account> accountList = accountService.findAllByBuyer(userNo, 0, 6);
+
+		// 최근 구매내역은 4건만
+		List<ProductListDto> boughtList = productService.findBoughtListByBuyerNo(userNo, 0, 4);
+		int totalBought = productService.countBoughtByBuyerNo(userNo);
+
+		// 나에게 작성된 후기 (최근 5건만 미리보기)
+		List<ReviewDto> allMyReviews = reviewService.findReviewsByUser(userNo);
+		int totalMyReviews = allMyReviews.size();
+		List<ReviewDto> recentMyReviews = allMyReviews.size() > 5 ? allMyReviews.subList(0, 5) : allMyReviews;
 
 		model.addAttribute("boughtList", boughtList);
+		model.addAttribute("totalBought", totalBought);
 		model.addAttribute("user", loginUser);
 		model.addAttribute("myProducts", myProducts);
 		model.addAttribute("profileImage", profileImage);
 		model.addAttribute("accountList", accountList);
+		model.addAttribute("myReviews", recentMyReviews);
+		model.addAttribute("totalMyReviews", totalMyReviews);
 		return "myPage";
+	}
+
+	// 구매내역 전체보기 (페이지당 15개)
+	@GetMapping("/mypage/bought")
+	public String boughtListPage(@RequestParam(value = "page", defaultValue = "1") int page,
+			HttpSession session, Model model) {
+		User loginUser = (User) session.getAttribute("loginUser");
+		if (loginUser == null) {
+			return "redirect:/login";
+		}
+
+		int userNo = loginUser.getUserNo();
+		int pageSize = 15;
+		int total = productService.countBoughtByBuyerNo(userNo);
+		int totalPages = (total + pageSize - 1) / pageSize;
+		if (page < 1) {
+			page = 1;
+		}
+		if (totalPages > 0 && page > totalPages) {
+			page = totalPages;
+		}
+		int startNum = (page - 1) * pageSize;
+
+		List<ProductListDto> boughtList = total > 0
+				? productService.findBoughtListByBuyerNo(userNo, startNum, pageSize)
+				: new java.util.ArrayList<>();
+
+		model.addAttribute("boughtList", boughtList);
+		model.addAttribute("totalBought", total);
+		model.addAttribute("currentPage", page);
+		model.addAttribute("totalPages", totalPages);
+		return "boughtList";
+	}
+
+	// 받은 후기 전체보기
+	@GetMapping("/mypage/reviews")
+	public String myReviewsPage(@RequestParam(value = "page", defaultValue = "1") int page,
+			HttpSession session, Model model) {
+		User loginUser = (User) session.getAttribute("loginUser");
+		if (loginUser == null) {
+			return "redirect:/login";
+		}
+
+		int userNo = loginUser.getUserNo();
+		List<ReviewDto> all = reviewService.findReviewsByUser(userNo);
+
+		int pageSize = 10;
+		int total = all.size();
+		int totalPages = (total + pageSize - 1) / pageSize;
+		if (page < 1) {
+			page = 1;
+		}
+		if (totalPages > 0 && page > totalPages) {
+			page = totalPages;
+		}
+		int start = (page - 1) * pageSize;
+		int end = Math.min(start + pageSize, total);
+		List<ReviewDto> paged = (start < total) ? all.subList(start, end) : new java.util.ArrayList<>();
+
+		model.addAttribute("reviews", paged);
+		model.addAttribute("totalMyReviews", total);
+		model.addAttribute("currentPage", page);
+		model.addAttribute("totalPages", totalPages);
+		return "myReviews";
 	}
 
 	// 유저 페이지

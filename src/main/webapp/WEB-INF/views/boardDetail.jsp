@@ -109,6 +109,11 @@ body {
 	font-size: 12px;
 	display: flex;
 	gap: 10px;
+	align-items: center;
+}
+
+.comment-actions form {
+	margin: 0;
 }
 
 .comment-actions button {
@@ -117,6 +122,17 @@ body {
 	color: red;
 	cursor: pointer;
 	font-size: 12px;
+	padding: 0;
+}
+
+.comment-actions a {
+	color: #333;
+	text-decoration: none;
+	font-size: 12px;
+}
+
+.comment-actions a:hover {
+	text-decoration: underline;
 }
 
 .empty {
@@ -198,10 +214,15 @@ body {
 										test="${loginUser != null && (loginUser.userNo == c.authorNo || loginUser.userRole == 'ROLE_ADMIN')}">
 										<div class="comment-actions">
 
+											<c:if test="${loginUser.userNo == c.authorNo}">
+												<a href="${ctx}/comment/${c.commentNo}/edit?returnTo=board">수정</a>
+											</c:if>
+
 											<form action="${ctx}/comment/${c.commentNo}/delete"
 												method="post">
 												<input type="hidden" name="boardNo" value="${board.boardNo}">
 												<input type="hidden" name="targetType" value="BOARD">
+												<input type="hidden" name="returnTo" value="board">
 												<button type="submit" onclick="return confirm('삭제하시겠습니까?')">삭제</button>
 											</form>
 
