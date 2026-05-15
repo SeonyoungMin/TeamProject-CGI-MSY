@@ -12,9 +12,12 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import com.team404.domain.Product;
+import com.team404.domain.ProductDetailDto;
 import com.team404.domain.ReviewDto;
 import com.team404.domain.User;
-
+import com.team404.service.NotificationService;
+import com.team404.service.ProductService;
 import com.team404.service.ReviewService;
 
 import jakarta.servlet.http.HttpSession;
@@ -25,6 +28,12 @@ public class ReviewController {
 	@Autowired
 	private ReviewService reviewService;
 
+	@Autowired
+    private ProductService productService; // 상품 정보(판매자) 조회용
+ 
+    @Autowired
+    private NotificationService notificationService; // 알림 서비스
+    
 	//테스트용 매핑 합칠 때 없애면 됨
 	@GetMapping("/reviewTest")
 	public String reviewTest(HttpSession session, Model model) {
@@ -69,6 +78,14 @@ public class ReviewController {
 
 		// 작성자는 로그인한 유저, 타겟은 sellerNo를 가진 판매자
 		reviewService.registerReview(productNo, loginUser.getUserNo(), content);
+		
+		// 구매후기 알림
+		try {
+			ProductDetailDto product = productService.findProductDetail(productNo);
+			notificationService.notifyReview(loginUser.getUserNo(), sellerNo, productNo, product.getProductName(), loginUser.getUserNickName());
+		} catch (Exception e) {
+			
+		}
 
 		// 등록 후 다시 보던 판매자의 유저페이지로 이동
 		return "redirect:/users/search/" + sellerNo;

@@ -17,9 +17,9 @@ public class BoardServiceImpl implements BoardService {
 	private BoardRepository boardRepository;
 
 	// 등록
-	public void registerBoard(Board board, int loginMemberNo) {
+	public int registerBoard(Board board, int loginMemberNo) {
 		board.setAuthorNo(loginMemberNo);
-		boardRepository.insertBoard(board);
+		return boardRepository.insertBoard(board);
 	}
 
 	// 문의글 목록 / 개수

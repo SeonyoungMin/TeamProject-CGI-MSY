@@ -9,7 +9,7 @@ import com.team404.domain.BoardListDto;
 public interface BoardService {
 
 	// 등록
-	void registerBoard(Board board, int loginMemberNo);
+	int registerBoard(Board board, int loginMemberNo);
 
 	// 문의글 목록 / 개수
 	List<BoardListDto> findAllInquiry(int startNum, int limit);
