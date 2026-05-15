@@ -38,6 +38,59 @@
 	background: #EDEBE7;
 }
 
+/* ===== 이달의 왕 배너 ===== */
+.king-banner {
+	display: flex;
+	gap: 16px;
+	justify-content: center;
+	padding: 20px;
+	background: #FAF8F4;
+	border-bottom: 1px solid #eee;
+}
+
+.king-card {
+	flex: 1;
+	max-width: 420px;
+	background: #fff;
+	border: 1px solid #ececec;
+	border-radius: 8px;
+	padding: 14px 18px;
+}
+
+.king-card h3 {
+	margin: 0 0 10px;
+	font-size: 15px;
+	color: #333;
+}
+
+.king-list {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+}
+
+.king-list li {
+	display: flex;
+	justify-content: space-between;
+	padding: 4px 0;
+	font-size: 13px;
+	color: #444;
+}
+
+.king-rank {
+	display: inline-block;
+	width: 20px;
+	color: #c0392b;
+	font-weight: bold;
+}
+
+.king-empty {
+	font-size: 12px;
+	color: #999;
+	text-align: center;
+	padding: 6px 0;
+}
+
 .hero h1 {
 	font-size: 44px;
 	margin: 0 0 24px;
@@ -353,11 +406,82 @@
 	</nav>
 
 	<!-- 메인 배너 -->
-	<div class="hero">
-		<h1>쉽고 안전한 중고거래</h1>
-		<a href="${ctx}/productList" class="btn btn-primary">상품 둘러보기</a> <a
-			href="${ctx}/product/new" class="btn">글쓰기</a>
-	</div>
+	<section class="hero">
+		<c:choose>
+			<c:when test="${not empty loginUser}">
+				<div style="margin-bottom: 15px; font-size: 16px; color: #555;">
+					<i class="fa-solid fa-location-dot""></i>
+					<c:choose>
+						<c:when test="${not empty loginUser.verifiedArea}">
+                        현재 인증된 동네: <strong>${loginUser.verifiedArea}</strong>
+						</c:when>
+						<c:otherwise>
+							<strong style="color: #e74c3c;">아직 동네인증을 하지 않은 유저입니다.</strong>
+
+							<a href="${pageContext.request.contextPath}/mypage"
+								style="font-size: 13px; color: #007bff; margin-left: 10px; text-decoration: underline;">
+								인증하기</a>
+						</c:otherwise>
+					</c:choose>
+				</div>
+				<h1>근처에서 상품찾기</h1>
+				<a href="${ctx}/productList"
+					style="background-color: #121212; color: #ffffff; padding: 12px 24px; border-radius: 6px; text-decoration: none; font-weight: 600; font-size: 14px; display: inline-block; text-align: center; border: 1px solid #121212;">
+					상품 둘러보기 </a>
+				<a href="${ctx}/product/new"
+					style="background-color: #ffffff; color: #121212; padding: 12px 24px; border-radius: 6px; text-decoration: none; font-weight: 600; font-size: 14px; display: inline-block; text-align: center; border: 1px solid #121212;">
+					글쓰기 </a>
+
+			</c:when>
+			<c:otherwise>
+				<h1>
+					우리 동네에서 찾는<br>쉽고빠른 직거래
+				</h1>
+			</c:otherwise>
+		</c:choose>
+
+	</section>
+
+	<!-- 이달의 판매왕 / 소비왕 배너 -->
+	<section class="king-banner">
+		<div class="king-card">
+			<h3>
+				<i class="fa-solid fa-crown"></i> 이달의 판매왕
+			</h3>
+			<c:choose>
+				<c:when test="${empty topSellers}">
+					<div class="king-empty">이번 달 판매 기록이 없습니다.</div>
+				</c:when>
+				<c:otherwise>
+					<ol class="king-list">
+						<c:forEach var="r" items="${topSellers}" varStatus="s">
+							<li><span><span class="king-rank">${s.index + 1}.</span>
+									${r.nickname}</span> <span>${r.tradeCount}건</span></li>
+						</c:forEach>
+					</ol>
+				</c:otherwise>
+			</c:choose>
+		</div>
+
+		<div class="king-card">
+			<h3>
+				<i class="fa-solid fa-sack-dollar"></i> 이달의 소비왕
+			</h3>
+			<c:choose>
+				<c:when test="${empty topBuyers}">
+					<div class="king-empty">이번 달 구매 기록이 없습니다.</div>
+				</c:when>
+				<c:otherwise>
+					<ol class="king-list">
+						<c:forEach var="r" items="${topBuyers}" varStatus="s">
+							<li><span><span class="king-rank">${s.index + 1}.</span>
+									${r.nickname}</span> <span>${r.tradeCount}건</span></li>
+						</c:forEach>
+					</ol>
+				</c:otherwise>
+			</c:choose>
+		</div>
+	</section>
 
 	<div class="app-container home-layout">
 		<div class="home-main">

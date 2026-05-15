@@ -24,6 +24,7 @@ import com.team404.service.FavoriteService;
 import com.team404.service.ImageService;
 import com.team404.service.ProductService;
 import com.team404.service.ReviewService;
+import com.team404.service.UserService;
 
 import jakarta.servlet.http.HttpSession;
 
@@ -44,6 +45,9 @@ public class ProductController {
 
 	@Autowired
 	private CommentService commentService;
+
+	@Autowired
+	private UserService userService;
 
 	// 상품 전체 목록
 	@GetMapping("/productList")
@@ -127,6 +131,12 @@ public class ProductController {
 		if (product != null && ("완료".equals(product.getTradeStatus()))) {
 			model.addAttribute("product", product);
 			return "orderComplete";
+		}
+
+		// 판매자 정보
+		if (product != null) {
+			User seller = userService.getUserByNo(product.getSellerNo());
+			model.addAttribute("seller", seller);
 		}
 
 		User loginUser = (User) session.getAttribute("loginUser");

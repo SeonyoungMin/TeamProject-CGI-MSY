@@ -22,4 +22,16 @@ public class OrderRepositoryImpl implements OrderRepository {
 				+ "VALUES (?, ?, ?, ?, '완료', NOW())";
 		template.update(SQL, productNo, sellerNo, buyerNo, price);
 	}
+
+	@Override
+	public void increaseSellCount(int userNo) {
+		String SQL = "UPDATE users SET sell_count = sell_count + 1 WHERE user_no = ?";
+		template.update(SQL, userNo);
+	}
+
+	@Override
+	public void increaseBuyCount(int userNo) {
+		String SQL = "UPDATE users SET buy_count = buy_count + 1 WHERE user_no = ?";
+		template.update(SQL, userNo);
+	}
 }

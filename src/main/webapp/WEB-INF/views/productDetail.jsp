@@ -178,6 +178,16 @@
 								<a href="${ctx}/users/search/${product.sellerNo}"
 									class="seller-name-link"> ${product.sellerNickname} </a> <span
 									style="font-size: 12px; color: #888;">판매자 프로필 보기</span>
+
+								<c:choose>
+									<c:when test="${not empty seller.verifiedArea}">
+										<span style="font-size: 13px; color: #555; margin-top: 2px;">${seller.verifiedArea}</span>
+									</c:when>
+									<c:otherwise>
+										<span style="font-size: 13px; color: #ccc; margin-top: 2px;">동네
+											미인증</span>
+									</c:otherwise>
+								</c:choose>
 							</div>
 						</div>
 					</div>
@@ -282,10 +292,7 @@
 	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 	<script>
 		var ctx = "${ctx}";
-		var productNo = $
-		{
-			product.productNo
-		};
+		var productNo = ${product.productNo};
 
 		function changeImage(src) {
 			document.getElementById("mainImage").src = src;

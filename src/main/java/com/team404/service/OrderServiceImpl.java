@@ -6,6 +6,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.team404.domain.ProductDetailDto;
 import com.team404.repository.OrderRepository;
+import com.team404.repository.ProductRepository;
 
 @Service
 public class OrderServiceImpl implements OrderService {
@@ -14,15 +15,33 @@ public class OrderServiceImpl implements OrderService {
 	private OrderRepository orderRepository;
 
 	@Autowired
-	private ProductService productService;
+	private ProductRepository productRepository;
 
-	@Override
+	// 주문 처리 핵심 로직
+	@Transactional
 	public void processOrder(int productNo, int buyerNo) {
-		ProductDetailDto product = productService.findProductDetail(productNo);
+
+		// 상품 정보 조회
+		ProductDetailDto product = productRepository.findProductDetail(productNo);
+
+		if (product == null) {
+			throw new IllegalArgumentException("상품이 존재하지 않습니다.");
+		}
+
+		// 이미 판매된 상품이면 차단
+		if ("완료".equals(product.getTradeStatus())) {
+			throw new IllegalStateException("이미 판매된 상품입니다.");
+		}
+
 		int sellerNo = product.getSellerNo();
 		long price = product.getPrice();
 
-		orderRepository.updateProductStatus(productNo, "완료");
+		// 주문 저장
 		orderRepository.insertOrder(productNo, sellerNo, buyerNo, price);
+		orderRepository.updateProductStatus(productNo, "완료");
+
+		// 거래 누적 카운트 갱신 (판매자 sell_count, 구매자 buy_count)
+		orderRepository.increaseSellCount(sellerNo);
+		orderRepository.increaseBuyCount(buyerNo);
 	}
 }

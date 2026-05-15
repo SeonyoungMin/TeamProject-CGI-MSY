@@ -32,11 +32,11 @@ public class Rangking {
 	}
 
 
-	public long gettradeCount() {
+	public long getTradeCount() {
 		return tradeCount;
 	}
 
-	public void settradeCount(long tradeCount) {
+	public void setTradeCount(long tradeCount) {
 		this.tradeCount = tradeCount;
 
 	}

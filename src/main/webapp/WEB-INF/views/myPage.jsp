@@ -48,6 +48,31 @@
 					<b>연락처</b><br>${user.userPhone}</div>
 				<div>
 					<b>등급</b><br>${user.userRole}</div>
+
+				<c:if test="${not empty loginUser.verifiedArea}">
+					<div
+						style="padding: 15px; background-color: #f1f3f5; border-radius: 8px;; margin-top: 10px;">
+						<div style="color: #888; font-size: 13px; margin-bottom: 5px;">동네
+							인증 상태</div>
+						<div style="font-weight: 600;">
+							<i class="fa-solid fa-circle-check"></i> 인증 완료
+							(${loginUser.verifiedArea})
+						</div>
+					</div>
+				</c:if>
+
+				<c:if test="${empty loginUser.verifiedArea}">
+					<div
+						style="padding: 15px; background-color: #fff5f5; border-radius: 8px; margin-top: 10px;">
+						<div style="color: #888; font-size: 13px; margin-bottom: 5px;">동네
+							인증 상태</div>
+						<div style="font-weight: 600;">
+							아직 동네인증을 하지 않은 유저입니다.
+							<button type="button" class="btn btn-secondary"
+								onclick="verifyLocation()">지금 인증하기</button>
+						</div>
+					</div>
+				</c:if>
 			</div>
 			<div style="margin-top: 20px; display: flex; gap: 10px;">
 				<a href="${ctx}/users/edit/${user.userNo}" class="btn btn-primary">내
@@ -65,7 +90,8 @@
 
 		<div
 			style="display: flex; justify-content: space-between; align-items: center; margin-top: 40px; border-bottom: 2px solid #121212; padding-bottom: 10px; margin-bottom: 20px;">
-			<h3 class="section-title" style="margin: 0; border-bottom: none;">내가 등록한 상품</h3>
+			<h3 class="section-title" style="margin: 0; border-bottom: none;">내가
+				등록한 상품</h3>
 			<a href="${ctx}/product/mylist" style="font-size: 14px; color: #666;">전체보기
 				&gt;</a>
 		</div>
@@ -118,10 +144,12 @@
 					완료된 내역이 없습니다.</div>
 			</c:when>
 			<c:otherwise>
-				<div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px;">
+				<div
+					style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px;">
 					<c:forEach var="a" items="${accountList}">
 						<div class="card">
-							<div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
+							<div
+								style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
 								<div>
 									<div style="font-weight: 600;">${a.productName}</div>
 									<div style="font-size: 12px; color: #888; margin-top: 4px;">
@@ -129,7 +157,8 @@
 									</div>
 								</div>
 								<div style="font-weight: bold;">
-									<fmt:formatNumber value="${a.price}" />원
+									<fmt:formatNumber value="${a.price}" />
+									원
 								</div>
 							</div>
 							<form action="${ctx}/account/${a.orderNo}" method="post"
@@ -137,7 +166,8 @@
 								<input type="text" name="memo" value="${a.memo}"
 									class="form-input" placeholder="메모를 입력하세요"
 									style="flex: 1; margin: 0; font-size: 13px;">
-								<button type="submit" class="btn" style="padding: 5px 14px; font-size: 13px;">저장</button>
+								<button type="submit" class="btn"
+									style="padding: 5px 14px; font-size: 13px;">저장</button>
 							</form>
 						</div>
 					</c:forEach>
@@ -162,6 +192,53 @@
 					}
 				});
 			}
+		}
+
+		function verifyLocation() {
+			if (!navigator.geolocation) {
+				alert("위치 서비스 미지원");
+				return;
+			}
+
+			navigator.geolocation.getCurrentPosition(function(pos) {
+				let lat = pos.coords.latitude;
+				let lng = pos.coords.longitude;
+
+				$.ajax({
+					url : "${ctx}/users/reverse-geocode",
+					type : "GET",
+					data : {
+						lat : lat,
+						lng : lng
+					},
+					success : function(area) {
+						$.ajax({
+							url : "${ctx}/users/update-location-ajax",
+							type : "POST",
+							data : {
+								userNo : "${user.userNo}",
+								address : area,
+								lat : lat,
+								lng : lng
+							},
+							success : function(response) {
+								if (response === "success") {
+									alert("동네 인증 및 주소 업데이트가 완료되었습니다!");
+									location.reload();
+								} else {
+									alert("DB 저장 중 오류가 발생했습니다.");
+								}
+							},
+							error : function() {
+								alert("서버 통신 실패");
+							}
+						});
+					},
+					error : function() {
+						alert("위치 인증 실패");
+					}
+				});
+			});
 		}
 	</script>
 

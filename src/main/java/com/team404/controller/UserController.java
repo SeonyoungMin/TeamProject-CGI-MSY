@@ -172,6 +172,31 @@ public class UserController {
 		return geoService.getAddress(lat, lng);
 	}
 
+	// 마이페이지에서 즉시 위치 인증 처리
+	@PostMapping("/users/update-location-ajax")
+	@ResponseBody
+	public String updateLocationAjax(@RequestParam("userNo") int userNo, @RequestParam("address") String address,
+			@RequestParam("lat") Double lat, @RequestParam("lng") Double lng, HttpSession session) {
+
+		try {
+			User user = userService.getUserByNo(userNo);
+
+			user.setUserAddress(address);
+			user.setVerifiedArea(address);
+			user.setLatitude(lat);
+			user.setLongitude(lng);
+			user.setVerifiedAt(new java.sql.Timestamp(System.currentTimeMillis()));
+
+			userService.setEditUser(user);
+			session.setAttribute("loginUser", user);
+
+			return "success";
+		} catch (Exception e) {
+			e.printStackTrace();
+			return "error";
+		}
+	}
+
 	// 로그인
 	@GetMapping("/login")
 	public String loginForm(@RequestParam(value = "redirect", required = false) String redirect, Model model) {
@@ -291,30 +316,39 @@ public class UserController {
 	@GetMapping("/users/edit/{userNo}")
 	public String getEditUserForm(@PathVariable("userNo") int userNo, Model model, HttpSession session) {
 		User loginUser = (User) session.getAttribute("loginUser");
+
 		if (loginUser == null) {
 			return "redirect:/login";
 		}
+
 		if (loginUser.getUserNo() != userNo && !isAdmin(session)) {
 			return "redirect:/home";
 		}
+
 		User userByNo = userService.getUserByNo(userNo);
 		model.addAttribute("editUser", userByNo);
 		return "editUser";
 	}
 
-	// 회원 정보 수정 처리
-	@PutMapping("/users/edit")
+	// 회원 정보 수정 처리 403 Forbidden 에러 방지를 위해 @PutMapping 대신 @PostMapping을 사용
+	@PostMapping("/users/edit")
 	public String submitEditUserForm(@ModelAttribute("editUser") User editUser, HttpSession session) {
+
+		if (editUser.getLatitude() != null) {
+			editUser.setVerifiedAt(new java.sql.Timestamp(System.currentTimeMillis()));
+		}
 
 		userService.setEditUser(editUser);
 		User loginUser = (User) session.getAttribute("loginUser");
 
 		if (loginUser != null) {
-			User updatedUser = userService.getUserByNo(editUser.getUserNo());
-			session.setAttribute("loginUser", updatedUser);
-		}
 
-		return "redirect:/users/search/" + editUser.getUserNo();
+			if (loginUser.getUserNo() == editUser.getUserNo()) {
+				User updatedUser = userService.getUserByNo(editUser.getUserNo());
+				session.setAttribute("loginUser", updatedUser);
+			}
+		}
+		return "redirect:/mypage";
 	}
 
 	// 회원 삭제 (관리자 전용)

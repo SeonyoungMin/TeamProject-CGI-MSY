@@ -6,4 +6,8 @@ public interface OrderRepository {
 
 	void insertOrder(int productNo, int sellerNo, int buyerNo, long price);
 
+	void increaseSellCount(int userNo);
+
+	void increaseBuyCount(int userNo);
+
 }
