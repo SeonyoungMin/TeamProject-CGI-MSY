@@ -15,6 +15,9 @@
 	<http auto-config="true" use-expressions="true"
 		servlet-api-provision="false">
 
+		<oauth2-login login-page="/login"
+			authentication-success-handler-ref="oAuth2SuccessHandler" />
+
 		<!-- 로그인 필요한 경로 -->
 		<intercept-url pattern="/product/new"
 			access="isAuthenticated()" />
@@ -36,7 +39,7 @@
 			access="hasRole('ADMIN')" />
 		<intercept-url pattern="/users/edit/**"
 			access="isAuthenticated()" />
-		
+
 
 		<!-- 그 외 전부 허용 (홈, 상품 목록·상세, 로그인·회원가입 페이지) -->
 		<intercept-url pattern="/**" access="permitAll" />
@@ -60,11 +63,20 @@
 	<beans:bean id="mvcHandlerMappingIntrospector"
 		class="org.springframework.web.servlet.handler.HandlerMappingIntrospector" />
 
+	
+	
+	<!-- 카카오 ClientRegistration 
+	<beans:bean id="kakaoClientRegistration"
+	    class="org.springframework.security.oauth2.client.registration.ClientRegistration"
+	    factory-method="withRegistrationId">
+	</beans:bean> -->
+
 	<!-- 인증 매니저 — DB 의 users 테이블에서 사용자 조회 -->
 	<authentication-manager>
 		<authentication-provider
 			user-service-ref="userDetailsService" />
 	</authentication-manager>
+	
 
 
 </beans:beans>

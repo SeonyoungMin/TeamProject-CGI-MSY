@@ -58,4 +58,10 @@ public interface UserService {
 	// 유저 회원탈퇴
 	void setDeleteUser(int userNo);
 	
+	// 구글, 카카오 로그인
+	User findByEmail(String email);
+	
+	// OAuth 유저 자동 가입
+	void registerOAuthUser(User user);
+	
 }

@@ -1,8 +1,14 @@
 package com.team404.controller;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -26,6 +32,7 @@ import com.team404.exception.NoUserFoundException;
 import com.team404.service.AccountService;
 import com.team404.service.BoardService;
 import com.team404.service.ImageService;
+import com.team404.service.KakaoService;
 import com.team404.service.ProductService;
 import com.team404.service.RankingService;
 import com.team404.service.ReviewService;
@@ -58,6 +65,9 @@ public class UserController {
 
 	@Autowired
 	private BoardService boardService;
+	
+	@Autowired
+	private KakaoService kakaoService;
 
 	// 로그인한 사용자가 관리자인지 검사
 	private boolean isAdmin(HttpSession session) {
@@ -293,5 +303,52 @@ public class UserController {
 	public String noUserFoundHandler(NoUserFoundException exception, Model model) {
 		model.addAttribute("invalidUserNo", exception.getUserNo());
 		return "noUserFound";
+	}
+	
+	// 카카오 로그인
+	@GetMapping("/login/kakao/callback")
+	public String kakaoCallback(@RequestParam("code") String code, HttpSession session) {
+	    try {
+	        // 토큰 받기
+	        String accessToken = kakaoService.getAccessToken(code);
+
+	        // 사용자 정보 받기
+	        Map<String, Object> userInfo = kakaoService.getUserInfo(accessToken);
+	        System.out.println("=== 카카오 userInfo: " + userInfo);
+
+	        String kakaoId = String.valueOf(userInfo.get("id"));
+	        String userId = "kakao_" + kakaoId;
+
+	        Map<String, Object> properties = (Map<String, Object>) userInfo.get("properties");
+	        String nickname = properties != null ? (String) properties.get("nickname") : "카카오유저";
+
+	        // DB 조회 및 자동 가입
+	        User user = userService.findByEmail(userId);
+	        if (user == null) {
+	            user = new User();
+	            user.setUserId(userId);
+	            user.setUserNickName(nickname);
+	            userService.registerOAuthUser(user);
+	            user = userService.findByEmail(userId);
+	        }
+
+	        // 세션 저장
+	        session.setAttribute("loginUser", user);
+	        
+	        List<GrantedAuthority> authorities = Collections.singletonList(
+	        	    new SimpleGrantedAuthority("ROLE_USER")
+	        	);
+	        	UsernamePasswordAuthenticationToken authToken = 
+	        	    new UsernamePasswordAuthenticationToken(user.getUserId(), null, authorities);
+	        	SecurityContextHolder.getContext().setAuthentication(authToken);
+	        	
+	        	session.setAttribute("SPRING_SECURITY_CONTEXT", SecurityContextHolder.getContext());
+	        	
+	        return "redirect:/home";
+
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	        return "redirect:/login?error=true";
+	    }
 	}
 }

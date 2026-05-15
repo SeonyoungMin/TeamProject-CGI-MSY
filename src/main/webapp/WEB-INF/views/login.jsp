@@ -28,14 +28,23 @@
 				계정이 없으신가요? <a href="${ctx}/signup" style="font-weight: bold;">회원가입</a>
 			</div>
 		</form>
+		
+		<hr>
+		<!-- 구글 로그인 -->
+		<a href="/minimarket/oauth2/authorization/google"
+			style="display: block; padding: 10px; background: #4285f4; color: #fff; text-align: center; border-radius: 4px; margin-top: 10px;">
+			Google로 로그인 </a>
 
+		<!-- 카카오 로그인 -->
+		<a href="https://kauth.kakao.com/oauth/authorize?client_id=a933e91e3b0fedfcea1130e48a0c9ad9&redirect_uri=http://localhost:8080/minimarket/login/kakao/callback&response_type=code"
+			style="display: block; padding: 10px; background: #FEE500; color: #000; text-align: center; border-radius: 4px; margin-top: 10px; font-weight: bold;">
+			카카오로 로그인 </a>
 	</div>
 
 	<%@ include file="/WEB-INF/views/footer.jsp"%>
 
 
 	<script>
-		
 		const urlParams = new URLSearchParams(window.location.search);
 
 		if (urlParams.has('error')) {

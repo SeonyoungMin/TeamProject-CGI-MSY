@@ -61,5 +61,10 @@ public interface UserRepository {
 
 	// 유저 회원탈퇴
 	void setDeleteUser(int userNo);
+	
+	//구글, 카카오 로그인
+	User findByEmail(String email);
+	
+	void insertOAuthUser(User user);
 
 }
