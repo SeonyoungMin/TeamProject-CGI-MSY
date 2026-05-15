@@ -56,8 +56,8 @@ public class ProductRepositoryImpl implements ProductRepository {
 	public List<ProductListDto> findByKeyword(String keyword) {
 		String SQL = "select p.product_no, p.name, p.category, p.price, p.trade_status, p.view_count, p.created_time, "
 				+ "p.seller_no, u.nickname as seller_nickname, i.file_name as img_name, i.file_path as img_path, "
-				+ "(select count(*) from favorite f where f.product_no = p.product_no) as favorite_count " // ← 추가
-				+ "from product p " + "left join users u on u.user_no = p.seller_no "
+				+ "(select count(*) from favorite f where f.product_no = p.product_no) as favorite_count, "
+				+ "0 as is_favorite " + "from product p " + "left join users u on u.user_no = p.seller_no "
 				+ "left join image i on i.entity_type = 'product' and i.entity_id = p.product_no and i.is_thumbnail = 1 "
 				+ "where p.name like ? and p.trade_status != '완료'";
 		return template.query(SQL, new ProductListRowMapper(), "%" + keyword + "%");
@@ -68,9 +68,8 @@ public class ProductRepositoryImpl implements ProductRepository {
 
 		String SQL = "select p.product_no, p.name, p.category, p.price, p.trade_status, p.view_count, p.created_time, "
 				+ "p.seller_no, u.nickname as seller_nickname, i.file_name as img_name, i.file_path as img_path, "
-				+ "(select count(*) from favorite f where f.product_no = p.product_no) as favorite_count "
-				+ "from product p " + "left join users u on u.user_no = p.seller_no "
-
+				+ "(select count(*) from favorite f where f.product_no = p.product_no) as favorite_count, "
+				+ "0 as is_favorite " + "from product p " + "left join users u on u.user_no = p.seller_no "
 				+ "left join image i on i.entity_type = 'product' and i.entity_id = p.product_no and i.is_thumbnail = 1 "
 				+ "where p.category=? and p.trade_status != '완료'";
 		return template.query(SQL, new ProductListRowMapper(), category);
