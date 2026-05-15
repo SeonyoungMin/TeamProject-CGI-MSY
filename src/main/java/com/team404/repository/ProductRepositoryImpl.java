@@ -31,8 +31,8 @@ public class ProductRepositoryImpl implements ProductRepository {
 
 	// 전체 데이터 개수 반환
 	public int countAll() {
-		String SQL = "select count(*) from product where trade_status != '완료'";
-		Long total = template.queryForObject(SQL, Long.class);
+		String SQL = "select count(*) from product p where p.trade_status != '완료'";
+		Long total =  template.queryForObject(SQL, Long.class);
 		if (total == null) {
 			return 0;
 		}

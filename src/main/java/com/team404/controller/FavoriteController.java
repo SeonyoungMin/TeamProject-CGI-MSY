@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.team404.domain.ProductDetailDto;
 import com.team404.domain.User;
 import com.team404.service.FavoriteService;
+import com.team404.service.NotificationService;
 import com.team404.service.ProductService;
 
 import jakarta.servlet.http.HttpSession;
@@ -27,6 +28,9 @@ public class FavoriteController {
 
 	@Autowired
 	private ProductService productService;
+	
+	@Autowired
+	private NotificationService notificationService;
 
 	// 내 찜 목록 페이지 (페이지당 8개)
 	@GetMapping("/favorite")
@@ -84,6 +88,13 @@ public class FavoriteController {
 			return "removed";
 		} else {
 			favoriteService.insertFavorite(userNo, productNo);
+			
+			try {
+				ProductDetailDto product = productService.findProductDetail(productNo);
+				notificationService.notifyFavorite(loginUser.getUserNo(), product.getSellerNo(), productNo, product.getProductName(), loginUser.getUserNickName());
+			}catch (Exception e) {
+				
+			}
 			return "added";
 		}
 	}

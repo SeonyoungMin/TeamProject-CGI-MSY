@@ -20,6 +20,7 @@ import com.team404.domain.Comment;
 import com.team404.domain.User;
 import com.team404.service.BoardService;
 import com.team404.service.CommentService;
+import com.team404.service.NotificationService;
 
 import jakarta.servlet.http.HttpSession;
 
@@ -29,12 +30,11 @@ public class BoardController {
 	@Autowired
 	private BoardService boardService;
 
-	// 문의글 전체 목록 조회 --> 전체, 필터링 : 재활용
-
-	// 문의글 전체 목록 (페이징)
-
 	@Autowired
 	private CommentService commentService;
+
+	@Autowired
+	private NotificationService notificationService;
 
 	// 전체 게시글 목록 (공지/문의/자유)
 	@GetMapping("/board/all")
@@ -150,7 +150,16 @@ public class BoardController {
 			board.setPinned(false);
 		}
 		board.setAuthorNo(loginUser.getUserNo());
-		boardService.registerBoard(board, loginUser.getUserNo());
+		int newBoardNo = boardService.registerBoard(board, loginUser.getUserNo());
+
+		// 공지사항 등록 시 전체 유저에게 알림
+		if ("notice".equals(type)) {
+			try {
+				notificationService.notifyNotice(newBoardNo, board.getTitle());
+			} catch (Exception e) {
+
+			}
+		}
 		return "redirect:" + listUrlByType(type);
 	}
 
@@ -187,9 +196,11 @@ public class BoardController {
 		BoardDetailDto dto = boardService.findBoardDetail(boardNo);
 		model.addAttribute("board", dto);
 
+		// 댓글 목록
 		List<Comment> comments = commentService.getComments(boardNo);
 		model.addAttribute("comments", comments);
 
+		// 로그인 유저 확인
 		User loginUser = (User) session.getAttribute("loginUser");
 		model.addAttribute("loginUser", loginUser);
 

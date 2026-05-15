@@ -187,22 +187,23 @@ public class UserRepositoryImpl implements UserRepository {
 	}
 
 	// 동네 인증까지
-	@Override
-	public void setNewUser(User newUser) {
+		@Override
+		public void setNewUser(User newUser) {
 
-		String SQL = "INSERT INTO users(" + "id, pw, name, nickname, age, address, phone, "
-				+ "latitude, longitude, verified_area, verified_at" + ") VALUES(?,?,?,?,?,?,?,?,?,?,?)";
+			String SQL = "INSERT INTO users(" + "id, pw, name, nickname, age, address, phone, "
+					+ "latitude, longitude, verified_area, verified_at" + ") VALUES(?,?,?,?,?,?,?,?,?,?,?)";
 
-		template.update(SQL, newUser.getUserId(), newUser.getUserPw(), newUser.getUserName(), newUser.getUserNickName(),
-				newUser.getUserAge(), newUser.getUserAddress(), newUser.getUserPhone(), newUser.getLatitude(),
-				newUser.getLongitude(), newUser.getVerifiedArea(), newUser.getVerifiedAt());
+			template.update(SQL, newUser.getUserId(), newUser.getUserPw(), newUser.getUserName(), newUser.getUserNickName(),
+					newUser.getUserAge(), newUser.getUserAddress(), newUser.getUserPhone(), newUser.getLatitude(),
+					newUser.getLongitude(), newUser.getVerifiedArea(), newUser.getVerifiedAt());
 
-		Integer lastId = template.queryForObject("SELECT LAST_INSERT_ID()", Integer.class);
+			Integer lastId = template.queryForObject("SELECT LAST_INSERT_ID()", Integer.class);
 
-		if (lastId != null) {
-			newUser.setUserNo(lastId);
+			if (lastId != null) {
+				newUser.setUserNo(lastId);
+			}
 		}
-	}
+
 
 	// 동네 인증포함
 	@Override
@@ -221,5 +222,25 @@ public class UserRepositoryImpl implements UserRepository {
 	public void setDeleteUser(int userNo) {
 		String SQL = "DELETE FROM users WHERE user_no = ?";
 		template.update(SQL, userNo);
+	}
+
+	// 이메일로 유저 조회 (id 컬럼에 이메일 저장)
+	public User findByEmail(String email) {
+		String SQL = "select * from users where id = ?";
+		List<User> result = template.query(SQL, new UserRowMapper(), email);
+		return result.isEmpty() ? null : result.get(0);
+	}
+
+	public void insertOAuthUser(User user) {
+		String uniqueNickname = user.getUserNickName() + "_" + user.getUserId().replace("kakao_", "");
+		String SQL = "INSERT INTO users(id, pw, name, nickname) VALUES(?, ?, ?, ?)";
+		template.update(SQL, user.getUserId(), "OAUTH_NO_PW", // pw 기본값
+				user.getUserNickName() != null ? user.getUserNickName() : "소셜유저", // name 기본값
+				uniqueNickname);
+
+		Integer lastId = template.queryForObject("SELECT LAST_INSERT_ID()", Integer.class);
+		if (lastId != null) {
+			user.setUserNo(lastId);
+		}
 	}
 }

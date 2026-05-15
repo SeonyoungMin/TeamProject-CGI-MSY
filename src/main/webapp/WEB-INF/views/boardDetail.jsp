@@ -2,8 +2,11 @@
 	pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="jakarta.tags.core"%>
 
+<<<<<<< HEAD
 <c:set var="ctx" value="${pageContext.request.contextPath}" />
 
+=======
+>>>>>>> refs/heads/member_CGI
 <!DOCTYPE html>
 <html>
 <head>

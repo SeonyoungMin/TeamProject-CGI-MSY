@@ -196,4 +196,15 @@ public class UserServiceImpl implements UserService {
 		// 4. 마지막으로 유저 삭제
 		userRepository.setDeleteUser(userNo);
 	}
+
+	@Override
+	public User findByEmail(String email) {
+		return userRepository.findByEmail(email);
+	}
+
+	@Override
+	public void registerOAuthUser(User user) {
+	    userRepository.insertOAuthUser(user);
+	}
+
 }

@@ -22,6 +22,7 @@ public class SimpleUserDetailsService implements UserDetailsService {
 
 	@Override
 	public UserDetails loadUserByUsername(String userId) throws UsernameNotFoundException {
+	    System.out.println("=== loadUserByUsername 호출됨: " + userId);
 		com.team404.domain.User user = userService.getUserById(userId);
 		if (user == null) {
 			throw new UsernameNotFoundException("아이디를 찾을 수 없습니다: " + userId);
@@ -32,6 +33,11 @@ public class SimpleUserDetailsService implements UserDetailsService {
 			role = "ROLE_USER";
 		}
 
+	    String pw = user.getUserPw();
+	    if (pw == null || pw.equals("OAUTH_NO_PW")) {
+	        pw = "OAUTH_NO_PW";
+	    }
+		
 		return User.builder()
 				.username(user.getUserId())
 				.password("{noop}" + user.getUserPw())
