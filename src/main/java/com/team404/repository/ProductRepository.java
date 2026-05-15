@@ -55,4 +55,7 @@ public interface ProductRepository {
 
 	// 인기 상품
 	List<ProductListDto> findTopByViewCount(int limit, String category, int loginUserNo);
+
+	// 구매내역
+	List<ProductListDto> findBoughtListByBuyerNo(int buyerNo);
 }

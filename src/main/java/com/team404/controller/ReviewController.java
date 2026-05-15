@@ -25,7 +25,7 @@ public class ReviewController {
 	@Autowired
 	private ReviewService reviewService;
 
-	//테스트용 매핑 합칠 때 없애면 됨
+	// 테스트용 매핑 합칠 때 없애면 됨
 	@GetMapping("/reviewTest")
 	public String reviewTest(HttpSession session, Model model) {
 		int loginMemberNo = 30001; // 임시
@@ -41,17 +41,15 @@ public class ReviewController {
 	}
 
 	@PostMapping("/review")
-	public String registerReview(
-			@RequestParam("productNo") int productNo,
-			@RequestParam("content") String content,
+	public String registerReview(@RequestParam("productNo") int productNo, @RequestParam("content") String content,
 			HttpSession session) {
- 
+
 //		if (session.getAttribute("loginMemberNo") == null) {
 //			return "redirect:/login";
 //		}
 //		int loginMemberNo = (int) session.getAttribute("loginMemberNo");
 		int loginMemberNo = 30001; // 임시 - 로그인 연동 후 변경
- 
+
 		reviewService.registerReview(productNo, loginMemberNo, content);
 		return "redirect:/reviewTest";
 	}
@@ -65,6 +63,11 @@ public class ReviewController {
 
 		if (loginUser == null) {
 			return "redirect:/login";
+		}
+
+		// 이미 이 상품에 후기를 작성한 경우 등록 차단
+		if (reviewService.existsReview(productNo, loginUser.getUserNo())) {
+			return "redirect:/users/search/" + sellerNo + "?productNo=" + productNo;
 		}
 
 		// 작성자는 로그인한 유저, 타겟은 sellerNo를 가진 판매자

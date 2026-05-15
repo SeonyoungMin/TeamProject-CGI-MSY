@@ -60,4 +60,12 @@ public class ReviewRepositoryImpl implements ReviewRepository {
 		return result.isEmpty() ? 0 : result.get(0);
 	}
 
+	// 같은 유저가 같은 상품에 이미 후기를 썼는지 검사
+	public boolean existsReview(int productNo, int authorNo) {
+		String SQL = "select count(*) from board "
+				+ "where product_no = ? and author_no = ? and board_type = 'review'";
+		Integer count = template.queryForObject(SQL, Integer.class, productNo, authorNo);
+		return count != null && count > 0;
+	}
+
 }

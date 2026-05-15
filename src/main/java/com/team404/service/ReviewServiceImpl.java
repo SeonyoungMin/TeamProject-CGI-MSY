@@ -34,4 +34,8 @@ public class ReviewServiceImpl implements ReviewService {
 		reviewRepository.deleteReview(boardNo);
 	}
 
+	public boolean existsReview(int productNo, int authorNo) {
+		return reviewRepository.existsReview(productNo, authorNo);
+	}
+
 }

@@ -43,8 +43,7 @@ public class ProductRepositoryImpl implements ProductRepository {
 	// 상품 상세 조회
 	public ProductDetailDto findProductDetail(int productNo) {
 		String SQL = "select p.product_no, p.name, p.category, p.price, p.description, p.trade_status, p.view_count, p.created_time, "
-
-				+ "p.seller_no, u.nickname as seller_nickname, i.file_name as img_name, i.file_path as img_path "
+				+ "p.seller_no, p.buyer_no,u.nickname as seller_nickname, i.file_name as img_name, i.file_path as img_path "
 				+ "from product p " + "left join users u on u.user_no = p.seller_no "
 				+ "left join image i on i.entity_type='product' and i.entity_id=p.product_no and i.is_thumbnail=1 "
 				+ "where p.product_no=?";
@@ -189,4 +188,22 @@ public class ProductRepositoryImpl implements ProductRepository {
 
 		return template.query(SQL, new ProductListRowMapper(), loginUserNo, limit);
 	}
+
+	// 구매내역 — orders 테이블 기반 (product.buyer_no 누락 케이스도 포함)
+	@Override
+	public List<ProductListDto> findBoughtListByBuyerNo(int buyerNo) {
+		String SQL = "select p.product_no, p.name, p.category, p.price, p.trade_status, "
+				+ "p.view_count, p.created_time, p.seller_no, "
+				+ "u.nickname as seller_nickname, i.file_name as img_name, i.file_path as img_path, "
+				+ "0 as favorite_count, 0 as is_favorite "
+				+ "from orders o "
+				+ "join product p on p.product_no = o.product_no "
+				+ "left join users u on u.user_no = p.seller_no "
+				+ "left join image i on i.entity_type = 'product' and i.entity_id = p.product_no and i.is_thumbnail = 1 "
+				+ "where o.buyer_no = ? and o.order_status = '완료' "
+				+ "order by o.created_time desc";
+
+		return template.query(SQL, new ProductListRowMapper(), buyerNo);
+	}
+
 }

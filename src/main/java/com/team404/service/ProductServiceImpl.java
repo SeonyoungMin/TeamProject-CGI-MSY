@@ -157,4 +157,10 @@ public class ProductServiceImpl implements ProductService {
 	public List<ProductListDto> findTopByViewCount(int limit, String category, int loginUserNo) {
 		return productRepository.findTopByViewCount(limit, category, loginUserNo);
 	}
+
+	// 구매내역
+	@Override
+	public List<ProductListDto> findBoughtListByBuyerNo(int buyerNo) {
+		return productRepository.findBoughtListByBuyerNo(buyerNo);
+	}
 }

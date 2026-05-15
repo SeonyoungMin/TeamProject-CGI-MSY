@@ -131,6 +131,56 @@
 		</c:forEach>
 
 
+		<h3 class="section-subtitle" style="margin-top: 40px;">구매 내역</h3>
+		<div class="card">
+			<c:choose>
+				<c:when test="${not empty boughtList}">
+					<div class="product-grid"
+						style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 20px;">
+
+						<c:forEach var="item" items="${boughtList}">
+							<div class="product-item"
+								style="border: 1px solid #eee; border-radius: 10px; overflow: hidden; cursor: pointer;"
+								onclick="location.href='${ctx}/product/${item.productNo}'">
+
+								<div class="product-img"
+									style="height: 150px; background: #f4f4f4; display: flex; align-items: center; justify-content: center;">
+									<c:choose>
+										<c:when test="${not empty item.imgPath}">
+											<img src="${item.imgPath}"
+												style="width: 100%; height: 100%; object-fit: cover;"
+												onerror="this.onerror=null;this.src='https://via.placeholder.com/150?text=No+Image';">
+										</c:when>
+										<c:otherwise>
+											<span style="color: #ccc;">이미지 없음</span>
+										</c:otherwise>
+									</c:choose>
+								</div>
+
+								<div style="padding: 10px;">
+									<div
+										style="font-weight: bold; margin-bottom: 5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+										${item.productName}</div>
+									<div style="color: #ff8a3d; font-weight: bold;">
+										<fmt:formatNumber value="${item.price}" pattern="#,###" />
+										원
+									</div>
+									<div style="font-size: 12px; color: #999; margin-top: 5px;">
+										거래 완료</div>
+								</div>
+							</div>
+						</c:forEach>
+
+					</div>
+				</c:when>
+
+				<c:otherwise>
+					<div style="text-align: center; padding: 40px 0; color: #999;">
+						구매한 내역이 없습니다.</div>
+				</c:otherwise>
+			</c:choose>
+		</div>
+
 		<!-- 가계부 (최근 5건) -->
 		<div
 			style="display: flex; justify-content: space-between; align-items: center; margin-top: 40px;">
@@ -161,12 +211,13 @@
 									원
 								</div>
 							</div>
-							<form action="${ctx}/account/${a.orderNo}" method="post"
+							<form class="memo-form" data-order-no="${a.orderNo}"
+								onsubmit="return false;"
 								style="display: flex; gap: 5px; margin: 0;">
 								<input type="text" name="memo" value="${a.memo}"
-									class="form-input" placeholder="메모를 입력하세요"
+									class="form-input memo-input" placeholder="메모를 입력하세요"
 									style="flex: 1; margin: 0; font-size: 13px;">
-								<button type="submit" class="btn"
+								<button type="button" class="btn memo-save-btn"
 									style="padding: 5px 14px; font-size: 13px;">저장</button>
 							</form>
 						</div>
@@ -178,6 +229,51 @@
 
 	</div>
 	<script>
+		// 가계부 메모 저장 — 페이지 이동 없이 AJAX 처리
+		$(document).on('click', '.memo-save-btn', function() {
+			var $btn = $(this);
+			var $form = $btn.closest('.memo-form');
+			var orderNo = $form.data('order-no');
+			var memo = $form.find('input[name="memo"]').val();
+			var originalText = $btn.text();
+			var originalBg = $btn.css('background-color');
+			var originalColor = $btn.css('color');
+
+			$btn.prop('disabled', true).text('저장 중...');
+
+			$.ajax({
+				url : '${ctx}/account/' + orderNo + '/memo',
+				type : 'POST',
+				data : {
+					memo : memo
+				},
+				success : function(res) {
+					if (res === 'success') {
+						$btn.text('저장됨').css({
+							'background-color' : '#28a745',
+							'color' : '#fff'
+						});
+						setTimeout(function() {
+							$btn.prop('disabled', false).text(originalText).css({
+								'background-color' : originalBg,
+								'color' : originalColor
+							});
+						}, 1200);
+					} else if (res === 'unauthorized') {
+						alert('로그인이 필요합니다.');
+						location.href = '${ctx}/login';
+					} else {
+						alert('저장에 실패했습니다.');
+						$btn.prop('disabled', false).text(originalText);
+					}
+				},
+				error : function() {
+					alert('서버 통신 중 오류가 발생했습니다.');
+					$btn.prop('disabled', false).text(originalText);
+				}
+			});
+		});
+
 		function deleteProduct(productNo) {
 			if (confirm('상품을 삭제하시겠습니까?')) {
 				$.ajax({

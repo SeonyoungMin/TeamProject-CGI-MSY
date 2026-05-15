@@ -129,7 +129,14 @@ public class ProductController {
 		ProductDetailDto product = productService.findProductDetail(productNo);
 
 		if (product != null && ("완료".equals(product.getTradeStatus()))) {
+			User loginUserForReview = (User) session.getAttribute("loginUser");
+			boolean alreadyReviewed = false;
+			if (loginUserForReview != null) {
+				alreadyReviewed = reviewService.existsReview(productNo, loginUserForReview.getUserNo());
+			}
 			model.addAttribute("product", product);
+			model.addAttribute("loginUser", loginUserForReview);
+			model.addAttribute("alreadyReviewed", alreadyReviewed);
 			return "orderComplete";
 		}
 

@@ -52,4 +52,7 @@ public interface ProductService {
 	// 인기 상품 (조회수 desc, 거래완료 제외, 카테고리 옵션)
 	public List<ProductListDto> findTopByViewCount(int limit, String category, int loginUserNo);
 
+	// 구매내역조회
+	List<ProductListDto> findBoughtListByBuyerNo(int userNo);
+
 }

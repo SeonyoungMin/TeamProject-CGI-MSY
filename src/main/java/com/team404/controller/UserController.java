@@ -219,7 +219,9 @@ public class UserController {
 		Image profileImage = profileImages.isEmpty() ? null : profileImages.get(0);
 
 		List<Account> accountList = accountService.findAllByBuyer(loginUser.getUserNo(), 0, 6);
+		List<ProductListDto> boughtList = productService.findBoughtListByBuyerNo(loginUser.getUserNo());
 
+		model.addAttribute("boughtList", boughtList);
 		model.addAttribute("user", loginUser);
 		model.addAttribute("myProducts", myProducts);
 		model.addAttribute("profileImage", profileImage);
@@ -231,10 +233,26 @@ public class UserController {
 	@GetMapping("/users/search/{userNo}")
 	public String userPage(@PathVariable("userNo") int userNo,
 			@RequestParam(value = "page", defaultValue = "1") int page,
+			@RequestParam(value = "productPage", defaultValue = "1") int productPage,
+			@RequestParam(value = "productNo", required = false) Integer productNo,
 			@SessionAttribute(name = "loginUser", required = false) User loginUser, Model model) {
 		int loginUserNo = (loginUser != null) ? loginUser.getUserNo() : 0;
 		User user = userService.getUserByNo(userNo);
-		List<ProductListDto> myProducts = productService.findBySeller(userNo, loginUserNo);
+
+		// 후기 작성 대상 상품이 지정된 경우, 같은 유저가 이미 작성했는지 검사
+		boolean alreadyReviewed = false;
+		if (productNo != null && loginUser != null) {
+			alreadyReviewed = reviewService.existsReview(productNo, loginUser.getUserNo());
+		}
+		model.addAttribute("alreadyReviewed", alreadyReviewed);
+		model.addAttribute("selectedProductNo", productNo);
+
+		// 판매 상품 페이징 (한 페이지 8개)
+		int productPageSize = 8;
+		int productStartNum = (productPage - 1) * productPageSize;
+		List<ProductListDto> myProducts = productService.findBySeller(userNo, productStartNum, productPageSize);
+		int totalMyProducts = productService.countBySeller(userNo);
+		int totalProductPages = (totalMyProducts + productPageSize - 1) / productPageSize;
 
 		// 프로필 이미지
 		List<Image> profileImages = imageService.getImages("user", userNo);
@@ -254,6 +272,9 @@ public class UserController {
 
 		model.addAttribute("user", user);
 		model.addAttribute("myProducts", myProducts);
+		model.addAttribute("totalMyProducts", totalMyProducts);
+		model.addAttribute("currentProductPage", productPage);
+		model.addAttribute("totalProductPages", totalProductPages);
 		model.addAttribute("profileImage", profileImage);
 		model.addAttribute("reviews", pagedReviews);
 		model.addAttribute("currentPage", page);

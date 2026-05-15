@@ -38,7 +38,8 @@ public class OrderServiceImpl implements OrderService {
 
 		// 주문 저장
 		orderRepository.insertOrder(productNo, sellerNo, buyerNo, price);
-		orderRepository.updateProductStatus(productNo, "완료");
+		// product.trade_status='완료' + buyer_no 함께 기록 (구매내역/후기 분기에서 사용)
+		orderRepository.markProductAsSold(productNo, buyerNo);
 
 		// 거래 누적 카운트 갱신 (판매자 sell_count, 구매자 buy_count)
 		orderRepository.increaseSellCount(sellerNo);

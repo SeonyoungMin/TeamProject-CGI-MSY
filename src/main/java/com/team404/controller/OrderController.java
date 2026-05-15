@@ -13,6 +13,7 @@ import com.team404.domain.ProductDetailDto;
 import com.team404.domain.User;
 import com.team404.service.OrderService;
 import com.team404.service.ProductService;
+import com.team404.service.ReviewService;
 import com.team404.service.UserService;
 
 import jakarta.servlet.http.HttpSession;
@@ -28,6 +29,9 @@ public class OrderController {
 
 	@Autowired
 	private UserService userService;
+
+	@Autowired
+	private ReviewService reviewService;
 
 	// 거래 방식 선택 페이지
 	@GetMapping("/order/select")
@@ -114,9 +118,19 @@ public class OrderController {
 
 	// 완료 페이지
 	@GetMapping("/complete")
-	public String completePage(@RequestParam("productNo") int productNo, Model model) {
+	public String completePage(@RequestParam("productNo") int productNo, HttpSession session, Model model) {
 
-		model.addAttribute("product", productService.findProductDetail(productNo));
+		ProductDetailDto product = productService.findProductDetail(productNo);
+		User loginUser = (User) session.getAttribute("loginUser");
+
+		boolean alreadyReviewed = false;
+		if (loginUser != null) {
+			alreadyReviewed = reviewService.existsReview(productNo, loginUser.getUserNo());
+		}
+
+		model.addAttribute("product", product);
+		model.addAttribute("loginUser", loginUser);
+		model.addAttribute("alreadyReviewed", alreadyReviewed);
 
 		return "orderComplete";
 	}

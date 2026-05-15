@@ -15,12 +15,6 @@
 	padding: 40px;
 }
 
-.icon {
-	font-size: 50px;
-	color: #4CAF50;
-	margin-bottom: 20px;
-}
-
 .msg-main {
 	font-size: 24px;
 	font-weight: bold;
@@ -53,7 +47,7 @@
 .btn-home {
 	display: inline-block;
 	padding: 12px 30px;
-	background: #4CAF50;
+	background: black;
 	color: white;
 	text-decoration: none;
 	border-radius: 5px;
@@ -65,22 +59,52 @@
 
 	<%@ include file="/WEB-INF/views/header.jsp"%>
 	<div class="complete-container">
-
-		<div class="msg-main">판매 완료</div>
-		<p>판매 완료된 게시글 입니다
+		<h2 class="msg-main">거래가 완료된 상품입니다</h2>
 		<div class="info-box">
 			<div class="info-item">
-				<span>거래 상품</span> <strong>${product.productName}</strong>
+				<span>상품명</span> <span>${product.productName}</span>
 			</div>
 			<div class="info-item">
-				<span>거래 금액</span> <strong>${product.price}원</strong>
-			</div>
-			<div class="info-item">
-				<span>상태</span> <span style="color: #e91e63; font-weight: bold;">판매완료</span>
+				<span>거래 상태</span> <span style="color: #e74c3c; font-weight: bold;">판매완료</span>
 			</div>
 		</div>
 
-		<a href="${ctx}/home"><button>돌아가기</button></a>
+		<c:choose>
+			<c:when
+				test="${loginUser.userNo == product.buyerNo and alreadyReviewed}">
+				<p class="msg-sub">
+					이 상품에는 이미 후기를 작성하셨습니다.<br>소중한 후기 감사합니다!
+				</p>
+				<div class="btn-group"
+					style="display: flex; flex-direction: column; gap: 10px;">
+					<a href="${ctx}/users/search/${product.sellerNo}#reviewList"
+						class="btn-submit"
+						style="background: #ff8a3d; color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-weight: bold;">
+						내 후기 보러가기 </a> <a href="${ctx}/home" class="btn-home"
+						style="color: #999; font-size: 14px; text-decoration: none;">홈으로
+						가기</a>
+				</div>
+			</c:when>
+			<c:when test="${loginUser.userNo == product.buyerNo}">
+				<p class="msg-sub">
+					방금 구매하신 상품입니다!<br>판매자에게 후기를 남기시겠습니까?
+				</p>
+				<div class="btn-group"
+					style="display: flex; flex-direction: column; gap: 10px;">
+					<a
+						href="${ctx}/users/search/${product.sellerNo}?productNo=${product.productNo}"
+						class="btn-submit"
+						style="background: #ff8a3d; color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-weight: bold;">
+						판매자에게 후기 작성하러 가기 </a> <a href="${ctx}/home" class="btn-home"
+						style="color: #999; font-size: 14px; text-decoration: none;">나중에
+						하기</a>
+				</div>
+			</c:when>
+			<c:otherwise>
+				<p class="msg-sub">이미 판매가 완료된 상품입니다.</p>
+				<a href="${ctx}/home" class="btn-home">홈으로 가기</a>
+			</c:otherwise>
+		</c:choose>
 	</div>
 	<%@ include file="/WEB-INF/views/footer.jsp"%>
 </body>

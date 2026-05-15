@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.team404.domain.Account;
 import com.team404.domain.User;
@@ -23,14 +24,14 @@ public class AccountController {
 	private AccountService accountService;
 	
 	@GetMapping("/accountList")
-	public String getAccountList(@RequestParam(value="pageNum", defaultValue="1") int pageNum, 
+	public String getAccountList(@RequestParam(value="pageNum", defaultValue="1") int pageNum,
 			@RequestParam(value="limit", defaultValue="5") int limit, HttpSession session, Model model) {
-//	if (session.getAttribute("loginMemberNo") == null) {
-//		return "redirect:/login";
-//	}
-//	int loginMemberNo = (int) session.getAttribute("loginMemberNo");
-		int loginMemberNo = 3;
-			
+		User loginUser = (User) session.getAttribute("loginUser");
+		if (loginUser == null) {
+			return "redirect:/login";
+		}
+		int loginMemberNo = loginUser.getUserNo();
+
 	int startNum = limit * (pageNum - 1);
 	
 	List<Account> list = accountService.findAllByBuyer(loginMemberNo, startNum, limit);
@@ -56,7 +57,7 @@ public class AccountController {
 	return "accountList";
 	}
 	
-	// 메모 수정
+	// 메모 수정 (구버전, 폼 submit용 — 호환 유지)
 	@PostMapping("/account/{orderNo}")
 	public String updateMemo(@PathVariable("orderNo") int orderNo, @RequestParam("memo") String memo,
 			HttpSession session) {
@@ -67,5 +68,23 @@ public class AccountController {
 		}
 		accountService.updateMemo(orderNo, memo);
 		return "redirect:/accountList";
+	}
+
+	// 메모 수정 (AJAX) — 페이지 이동 없이 저장
+	@PostMapping("/account/{orderNo}/memo")
+	@ResponseBody
+	public String updateMemoAjax(@PathVariable("orderNo") int orderNo, @RequestParam("memo") String memo,
+			HttpSession session) {
+
+		User loginUser = (User) session.getAttribute("loginUser");
+		if (loginUser == null) {
+			return "unauthorized";
+		}
+		try {
+			accountService.updateMemo(orderNo, memo);
+			return "success";
+		} catch (Exception e) {
+			return "error";
+		}
 	}
 }
