@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans:beans
+	xmlns="http://www.springframework.org/schema/security"
+	xmlns:beans="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="
+                 http://www.springframework.org/schema/beans
+                 http://www.springframework.org/schema/beans/spring-beans.xsd
+                 http://www.springframework.org/schema/security
+                 http://www.springframework.org/schema/security/spring-security.xsd">
+
+	<http pattern="/resources/**" security="none" />
+	<http pattern="/team404_upload/**" security="none" />
+
+	<http auto-config="true" use-expressions="true"
+		servlet-api-provision="false">
+
+		<oauth2-login login-page="/login"
+			authentication-success-handler-ref="oAuth2SuccessHandler" />
+
+		<!-- 로그인 필요한 경로 -->
+		<intercept-url pattern="/product/new"
+			access="isAuthenticated()" />
+		<intercept-url pattern="/product/*/edit"
+			access="isAuthenticated()" />
+		<intercept-url pattern="/product/*/delete"
+			access="isAuthenticated()" />
+		<intercept-url pattern="/product/mylist"
+			access="isAuthenticated()" />
+		<intercept-url pattern="/mypage/**"
+			access="isAuthenticated()" />
+		<intercept-url pattern="/mypage"
+			access="isAuthenticated()" />
+		<intercept-url pattern="/order/**"
+			access="isAuthenticated()" />
+		<intercept-url pattern="/account/**"
+			access="isAuthenticated()" />
+		<intercept-url pattern="/direct-complete"
+			access="isAuthenticated()" />
+		<intercept-url pattern="/location-auth/**"
+			access="isAuthenticated()" />
+		<intercept-url pattern="/favorite/**"
+			access="isAuthenticated()" />
+		<intercept-url pattern="/comment/**"
+			access="isAuthenticated()" />
+		<intercept-url pattern="/review/**"
+			access="isAuthenticated()" />
+		<intercept-url pattern="/notification/**"
+			access="isAuthenticated()" />
+
+		<!-- 관리자만 접근 가능 — hasRole('ADMIN') 은 자동으로 ROLE_ 접두어 붙음 -->
+		<intercept-url pattern="/users/search/allUsers"
+			access="hasRole('ADMIN')" />
+		<intercept-url pattern="/users/search/**"
+			access="isAuthenticated()" />
+		<intercept-url pattern="/users/edit/**"
+			access="isAuthenticated()" />
+
+
+		<!-- 그 외 전부 허용 (홈, 상품 목록·상세, 로그인·회원가입 페이지) -->
+		<intercept-url pattern="/**" access="permitAll" />
+
+		<!-- 로그인 폼 -->
+		<form-login login-page="/login"
+			login-processing-url="/login" username-parameter="userId"
+			password-parameter="userPw"
+			authentication-success-handler-ref="loginSuccessHandler"
+			authentication-failure-url="/login?error=true" />
+
+		<!-- 로그아웃 -->
+		<logout logout-url="/logout" logout-success-url="/home"
+			invalidate-session="true" delete-cookies="JSESSIONID" />
+
+		<!-- CSRF 비활성화 (form 처리 단순화) -->
+		<csrf disabled="true" />
+
+	</http>
+
+	<beans:bean id="mvcHandlerMappingIntrospector"
+		class="org.springframework.web.servlet.handler.HandlerMappingIntrospector" />
+
+
+
+	<!-- 카카오 ClientRegistration <beans:bean id="kakaoClientRegistration" class="org.springframework.security.oauth2.client.registration.ClientRegistration" 
+		factory-method="withRegistrationId"> </beans:bean> -->
+
+	<!-- 인증 매니저 — DB 의 users 테이블에서 사용자 조회 -->
+	<authentication-manager>
+		<authentication-provider
+			user-service-ref="userDetailsService" />
+	</authentication-manager>
+
+
+
+</beans:beans>
