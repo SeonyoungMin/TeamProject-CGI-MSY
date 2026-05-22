@@ -140,8 +140,8 @@
 }
 
 .product-grid.popular .card {
-    height: 240px;
-    overflow: hidden;
+	height: 240px;
+	overflow: hidden;
 }
 
 .card {
@@ -578,7 +578,7 @@
 		<aside class="board-side">
 			<div class="board-side-header">
 				<h3>게시글</h3>
-				<a href="${ctx}/board/all" class="board-side-more">더보기 &gt;</a>
+				<a href="${ctx}/board/all" class="board-side-more">전체보기 &gt;</a>
 			</div>
 
 			<a href="${ctx}/board/write" class="board-side-write">게시글 쓰기</a>
@@ -590,13 +590,7 @@
 			<c:if test="${not empty recentBoards}">
 				<ul class="board-side-list">
 					<c:forEach var="b" items="${recentBoards}">
-						<li><a href="${ctx}/boardList/${b.boardNo}"> <c:if
-									test="${b.pinned}">
-									<i class="pin fa-solid fa-thumbtack"></i>
-								</c:if> <c:choose>
-									<c:when test="${b.boardType == 'notice'}">
-										<span class="tag tag-notice">공지</span>
-									</c:when>
+						<li><a href="${ctx}/boardList/${b.boardNo}"> <c:choose>
 									<c:when test="${b.boardType == 'free'}">
 										<span class="tag tag-free">자유</span>
 									</c:when>

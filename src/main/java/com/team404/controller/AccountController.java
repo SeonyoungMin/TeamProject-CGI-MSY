@@ -64,19 +64,6 @@ public class AccountController {
 		return "accountList";
 	}
 
-	// 메모 수정 (구버전, 폼 submit용 — 호환 유지)
-	@PostMapping("/account/{orderNo}")
-	public String updateMemo(@PathVariable("orderNo") int orderNo, @RequestParam("memo") String memo,
-			HttpSession session) {
-
-		User loginUser = (User) session.getAttribute("loginUser");
-		if (loginUser == null) {
-			return "redirect:/login";
-		}
-		accountService.updateMemo(orderNo, memo);
-		return "redirect:/accountList";
-	}
-
 	// 메모 수정 (AJAX) — 페이지 이동 없이 저장
 	@PostMapping("/account/{orderNo}/memo")
 	@ResponseBody

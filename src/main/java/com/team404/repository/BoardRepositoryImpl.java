@@ -57,7 +57,7 @@ public class BoardRepositoryImpl implements BoardRepository {
 	public List<BoardListDto> findByType(String boardType, int startNum, int limit) {
 		String SQL = "select b.board_no, b.title, b.board_type, b.pinned, b.created_time, u.nickname as author_nickname "
 				+ "from board b " + "left join users u on u.user_no = b.author_no " + "where b.board_type = ? "
-				+ "order by b.pinned desc, b.created_time desc limit ?, ?";
+				+ "order by b.created_time desc limit ?, ?";
 		return template.query(SQL, new BoardListRowMapper(), boardType, startNum, limit);
 	}
 
@@ -67,18 +67,31 @@ public class BoardRepositoryImpl implements BoardRepository {
 		return template.queryForObject(SQL, Integer.class, boardType);
 	}
 
-	// 전체 게시글 통합 조회 (공지/문의/자유, review 제외)
-	public List<BoardListDto> findRecentAll(int startNum, int limit) {
+	// 공지사항 전용 목록 조회
+	public List<BoardListDto> findNoticeList(int startNum, int limit) {
 		String SQL = "select b.board_no, b.title, b.board_type, b.pinned, b.created_time, u.nickname as author_nickname "
-				+ "from board b " + "left join users u on u.user_no = b.author_no "
-				+ "where b.board_type in ('notice', 'inquiry', 'free') "
+				+ "from board b " + "left join users u on u.user_no = b.author_no " + "where b.board_type = 'notice' "
 				+ "order by b.pinned desc, b.created_time desc limit ?, ?";
 		return template.query(SQL, new BoardListRowMapper(), startNum, limit);
 	}
 
-	// 전체 게시글 개수 (공지/문의/자유)
+	// 공지사항 전체 개수 카운트
+	public int countNoticeAll() {
+		String SQL = "select count(*) from board where board_type = 'notice'";
+		return template.queryForObject(SQL, Integer.class);
+	}
+
+	// 목록 조회 (공지 제거)
+	public List<BoardListDto> findRecentAll(int startNum, int limit) {
+		String SQL = "select b.board_no, b.title, b.board_type, b.pinned, b.created_time, u.nickname as author_nickname "
+				+ "from board b " + "left join users u on u.user_no = b.author_no "
+				+ "where b.board_type in ('inquiry', 'free') " + "order by b.created_time desc limit ?, ?";
+		return template.query(SQL, new BoardListRowMapper(), startNum, limit);
+	}
+
+	// 개수 카운트 (공지 제거)
 	public int countRecentAll() {
-		String SQL = "select count(*) from board where board_type in ('notice', 'inquiry', 'free')";
+		String SQL = "select count(*) from board where board_type in ('inquiry', 'free')"; // 문의와 자유만 카운트
 		return template.queryForObject(SQL, Integer.class);
 	}
 

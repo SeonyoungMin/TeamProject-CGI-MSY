@@ -55,6 +55,18 @@
 			access="isAuthenticated()" />
 		<intercept-url pattern="/users/edit/**"
 			access="isAuthenticated()" />
+		<intercept-url pattern="/board/edit/**"
+			access="isAuthenticated()" />
+		<intercept-url pattern="/notice/addForm"
+			access="hasRole('ADMIN')" />
+		<intercept-url pattern="/board/write"
+			access="isAuthenticated()" />
+		<intercept-url pattern="/boardList/addForm"
+			access="isAuthenticated()" />
+		<intercept-url pattern="/freeBoard/addForm"
+			access="isAuthenticated()" />
+		<intercept-url pattern="/notice/addForm"
+			access="hasRole('ADMIN')" />
 
 
 		<!-- 그 외 전부 허용 (홈, 상품 목록·상세, 로그인·회원가입 페이지) -->
