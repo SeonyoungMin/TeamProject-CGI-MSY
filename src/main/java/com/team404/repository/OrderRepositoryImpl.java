@@ -21,7 +21,7 @@ public class OrderRepositoryImpl implements OrderRepository {
 	@Autowired
 	private JdbcTemplate template;
 
-	// orders 단일 RowMapper — 모든 조회에서 이 인스턴스 하나만 사용
+	// RowMapper
 	private RowMapper<Order> rowMapper = new RowMapper<Order>() {
 		@Override
 		public Order mapRow(ResultSet rs, int rowNum) throws SQLException {
@@ -50,10 +50,7 @@ public class OrderRepositoryImpl implements OrderRepository {
 		}
 	};
 
-	// =============================================================
 	// product 상태 변경 / 카운트
-	// =============================================================
-
 	@Override
 	public void updateProductStatus(int productNo, String status) {
 		template.update("UPDATE product SET trade_status=? WHERE product_no=?", status, productNo);
@@ -73,10 +70,6 @@ public class OrderRepositoryImpl implements OrderRepository {
 	public void increaseBuyCount(int userNo) {
 		template.update("UPDATE users SET buy_count=buy_count+1 WHERE user_no=?", userNo);
 	}
-
-	// =============================================================
-	// INSERT
-	// =============================================================
 
 	@Override
 	public void insertOrder(int productNo, int sellerNo, int buyerNo, long price) {
@@ -114,8 +107,7 @@ public class OrderRepositoryImpl implements OrderRepository {
 	@Override
 	public int insertDirectOrder(Order order) {
 		String sql = "INSERT INTO orders(product_no,buyer_no,seller_no,price,order_status,created_time,trade_type,"
-				+ "meeting_place,meeting_time,buyer_message)"
-				+ " VALUES(?,?,?,?,'예약중',NOW(),'DIRECT',?,?,?)";
+				+ "meeting_place,meeting_time,buyer_message)" + " VALUES(?,?,?,?,'예약중',NOW(),'DIRECT',?,?,?)";
 
 		KeyHolder keyHolder = new GeneratedKeyHolder();
 		template.update(conn -> {
@@ -133,7 +125,16 @@ public class OrderRepositoryImpl implements OrderRepository {
 		return keyHolder.getKey().intValue();
 	}
 
-	// 계좌이체 거래 요청 (구매자 → 판매자 승인 대기)
+	// 동일 구매자가 같은 상품에 진행 중인 요청을 갖고 있는지
+	@Override
+	public boolean existsActiveTransferRequest(int productNo, int buyerNo) {
+		String sql = "SELECT COUNT(*) FROM orders " + "WHERE product_no=? AND buyer_no=? AND trade_type='TRANSFER' "
+				+ "AND order_status IN ('요청','승인완료','입금대기')";
+		Integer count = template.queryForObject(sql, Integer.class, productNo, buyerNo);
+		return count != null && count > 0;
+	}
+
+	// 계좌이체 거래 요청 (구매자 ->판매자 승인 대기)
 	@Override
 	public int insertTransferRequest(int productNo, int sellerNo, int buyerNo, long price) {
 		String sql = "INSERT INTO orders(product_no,seller_no,buyer_no,price,order_status,created_time,trade_type)"
@@ -151,10 +152,6 @@ public class OrderRepositoryImpl implements OrderRepository {
 
 		return keyHolder.getKey().intValue();
 	}
-
-	// =============================================================
-	// UPDATE (상태 변경)
-	// =============================================================
 
 	@Override
 	public int confirmPayment(int orderNo, int sellerNo) {
@@ -184,8 +181,7 @@ public class OrderRepositoryImpl implements OrderRepository {
 
 	@Override
 	public void approveTransfer(int orderNo, int userNo) {
-		template.update(
-				"UPDATE orders SET order_status='승인완료' WHERE order_no=? AND seller_no=? AND order_status='요청'",
+		template.update("UPDATE orders SET order_status='승인완료' WHERE order_no=? AND seller_no=? AND order_status='요청'",
 				orderNo, userNo);
 	}
 
@@ -196,14 +192,25 @@ public class OrderRepositoryImpl implements OrderRepository {
 		return template.update(sql, productNo);
 	}
 
-	// =============================================================
-	// SELECT
-	// =============================================================
+	@Override
+	public int cancelOtherRequests(int productNo, int approvedOrderNo) {
+		String sql = "UPDATE orders SET order_status='취소' "
+				+ "WHERE product_no=? AND order_no<>? AND order_status='요청'";
+		return template.update(sql, productNo, approvedOrderNo);
+	}
+
+	// 본인(구매자 또는 판매자)이 진행중 거래를 취소.
+	// 완료/입금완료 상태는 차단, 0행이면 권한 없거나 이미 처리됨
+	@Override
+	public int cancelTransferOrder(int orderNo, int userNo) {
+		String sql = "UPDATE orders SET order_status='취소' " + "WHERE order_no=? AND (seller_no=? OR buyer_no=?) "
+				+ "AND trade_type='TRANSFER' " + "AND order_status IN ('요청','승인완료','입금대기')";
+		return template.update(sql, orderNo, userNo, userNo);
+	}
 
 	@Override
 	public List<Integer> findProductNosByBuyerAndSeller(int buyerNo, int sellerNo) {
-		return template.queryForList(
-				"SELECT product_no FROM orders WHERE buyer_no=? AND seller_no=?", Integer.class,
+		return template.queryForList("SELECT product_no FROM orders WHERE buyer_no=? AND seller_no=?", Integer.class,
 				buyerNo, sellerNo);
 	}
 
@@ -215,16 +222,15 @@ public class OrderRepositoryImpl implements OrderRepository {
 	@Override
 	public Order findByProductAndBuyer(int productNo, int buyerNo) {
 		List<Order> list = template.query(
-				"SELECT * FROM orders WHERE product_no=? AND buyer_no=? ORDER BY order_no DESC LIMIT 1",
-				rowMapper, productNo, buyerNo);
+				"SELECT * FROM orders WHERE product_no=? AND buyer_no=? ORDER BY order_no DESC LIMIT 1", rowMapper,
+				productNo, buyerNo);
 		return list.isEmpty() ? null : list.get(0);
 	}
 
 	@Override
 	public List<Order> findPendingTransfersBySeller(int sellerNo) {
 		String sql = "SELECT o.*, p.name AS product_name FROM orders o "
-				+ "JOIN product p ON o.product_no=p.product_no "
-				+ "WHERE o.seller_no=? AND o.order_status='입금대기' "
+				+ "JOIN product p ON o.product_no=p.product_no " + "WHERE o.seller_no=? AND o.order_status='입금대기' "
 				+ "ORDER BY o.created_time DESC";
 		return template.query(sql, (rs, rn) -> {
 			Order o = rowMapper.mapRow(rs, rn);

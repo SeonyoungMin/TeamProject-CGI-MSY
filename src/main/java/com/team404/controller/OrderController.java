@@ -315,6 +315,11 @@ public class OrderController {
 		try {
 			orderService.createTransferRequest(productNo, loginUser.getUserNo());
 		} catch (IllegalStateException e) {
+			String msg = e.getMessage();
+			if (msg != null && msg.contains("이미 진행 중")) {
+				// 동일 구매자가 같은 상품에 이미 요청을 보낸 상태 — 알림 발송 없이 안내
+				return "redirect:/product/" + productNo + "?error=already-requested";
+			}
 			return "redirect:/product/" + productNo + "?error=unavailable";
 		}
 
@@ -342,21 +347,19 @@ public class OrderController {
 
 		// 본인 상품 차단
 		if (loginUser.getUserNo() == product.getSellerNo()) {
-
 			return "redirect:/product/" + productNo + "?error=self";
 		}
 
-		// 판매중 아니면 차단
-		if (!"판매중".equals(product.getTradeStatus())) {
-
+		// 이미 거래 완료된 상품은 차단
+		if ("완료".equals(product.getTradeStatus())) {
 			return "redirect:/product/" + productNo + "?error=unavailable";
 		}
 
 		// 거래 요청 + 판매자 승인 확인
+		// (승인된 본인은 product가 '예약중'이어도 폼 진입 가능)
 		Order order = orderService.findByProductAndBuyer(productNo, loginUser.getUserNo());
 
 		if (order == null || !"승인완료".equals(order.getOrderStatus())) {
-
 			return "redirect:/product/" + productNo + "?error=not-approved";
 		}
 
@@ -405,7 +408,7 @@ public class OrderController {
 		return "orderRequestApprove";
 	}
 
-	// 판매자가 거래 요청 승인 — orders.order_status='승인완료' + 구매자에게 알림
+	// 판매자가 거래 요청 승인 — 트랜잭션으로 중복 승인 방지
 	@PostMapping("/order/transfer/{orderNo}/approve")
 	public String approveTransfer(@PathVariable("orderNo") int orderNo, HttpSession session) {
 
@@ -414,20 +417,37 @@ public class OrderController {
 			return "redirect:/login";
 		}
 
-		// 권한 검증은 SQL의 seller_no=? 조건으로 보장됨
-		orderService.approveTransfer(orderNo, loginUser.getUserNo());
+		boolean ok = orderService.approveTransfer(orderNo, loginUser.getUserNo());
+		if (!ok) {
+			// 이미 다른 거래가 진행중이거나 권한 없음/이미 처리됨
+			return "redirect:/order/pending?error=cannot-approve";
+		}
 
-		// 구매자에게 승인 알림
+		// 승인 성공 시 구매자에게 승인 알림
 		try {
 			Order order = orderService.findByOrderNo(orderNo);
 			ProductDetailDto product = productService.findProductDetail(order.getProductNo());
-			notificationService.notifyTransferApproved(order.getBuyerNo(), loginUser.getUserNo(),
-					order.getProductNo(), product.getProductName());
+			notificationService.notifyTransferApproved(order.getBuyerNo(), loginUser.getUserNo(), order.getProductNo(),
+					product.getProductName());
 		} catch (Exception e) {
 			System.out.println("거래 승인 알림 발송 실패: " + e.getMessage());
 		}
 
 		return "redirect:/order/pending?approved=" + orderNo;
+	}
+
+	// 계좌이체 거래 취소 — 판매자/구매자 본인 입금완료 이후는 차단됨
+	@PostMapping("/order/transfer/{orderNo}/cancel")
+	public String cancelTransfer(@PathVariable("orderNo") int orderNo, HttpSession session) {
+		User loginUser = (User) session.getAttribute("loginUser");
+		if (loginUser == null)
+			return "redirect:/login";
+
+		boolean ok = orderService.cancelTransferOrder(orderNo, loginUser.getUserNo());
+		if (!ok) {
+			return "redirect:/order/pending?error=cannot-cancel-transfer";
+		}
+		return "redirect:/order/pending?transferCancelled=" + orderNo;
 	}
 
 	// 계좌이체 주문 생성 (알림은 구매자가 송금 완료 버튼을 눌러야 발송)
@@ -443,7 +463,7 @@ public class OrderController {
 		return "redirect:/order/waiting/" + orderNo;
 	}
 
-	// 구매자가 송금 완료 → 판매자에게 입금 확인 요청 알림
+	// 구매자가 송금 완료 -> 판매자에게 입금 확인 요청 알림
 	@PostMapping("/order/{orderNo}/notify-deposit")
 	public String notifyDepositDone(@PathVariable("orderNo") int orderNo, HttpSession session) {
 		User loginUser = (User) session.getAttribute("loginUser");

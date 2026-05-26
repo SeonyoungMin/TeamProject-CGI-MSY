@@ -138,6 +138,14 @@
 				transfer_approved : {
 					cls : 'sold',
 					fa : 'fa-circle-check'
+				},
+				trade_cancelled : {
+					cls : 'favorite',
+					fa : 'fa-ban'
+				},
+				trade_rejected : {
+					cls : 'favorite',
+					fa : 'fa-circle-xmark'
 				}
 			};
 

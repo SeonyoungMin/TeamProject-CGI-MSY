@@ -41,8 +41,14 @@ public interface OrderService {
 	// 판매자가 승인해야 할 거래 요청 목록
 	List<Order> findTransferRequestsBySeller(int sellerNo);
 
-	//계좌조회 요청 알람 승인
-	void approveTransfer(int orderNo, int userNo);
+	// 거래 요청 승인 — 중복 승인 방지 + product '예약중' + 다른 요청 자동 거절.
+	// 이미 다른 거래가 진행 중이면 false 반환
+	boolean approveTransfer(int orderNo, int userNo);
+
+	// 계좌이체 거래 취소 (판매자/구매자 본인) — '요청'/'승인완료'/'입금대기'만 취소 가능,
+	// '입금완료'/'완료'는 차단. product '판매중' 복원 + 대기자 알림 + 관련 알림 정리.
+	// 권한 없거나 이미 처리됐으면 false
+	boolean cancelTransferOrder(int orderNo, int userNo);
 
 	Order findByProductAndBuyer(int productNo, int userNo);
 

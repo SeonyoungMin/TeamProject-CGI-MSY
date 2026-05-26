@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.team404.domain.Comment;
+import com.team404.domain.Order;
 import com.team404.domain.Product;
 import com.team404.domain.ProductDetailDto;
 import com.team404.domain.ProductListDto;
@@ -20,6 +21,7 @@ import com.team404.domain.User;
 import com.team404.service.CommentService;
 import com.team404.service.FavoriteService;
 import com.team404.service.ImageService;
+import com.team404.service.OrderService;
 import com.team404.service.ProductService;
 import com.team404.service.ReviewService;
 import com.team404.service.UserService;
@@ -50,6 +52,9 @@ public class ProductController {
 
 	@Autowired
 	private WaitlistService waitlistService;
+
+	@Autowired
+	private OrderService orderService;
 
 	// 상품 전체 목록
 	@GetMapping("/productList")
@@ -164,6 +169,14 @@ public class ProductController {
 		model.addAttribute("alreadyWaitlisted", alreadyWaitlisted);
 		model.addAttribute("waitlistCount", waitlistService.countByProduct(productNo));
 
+		// 본인이 이 상품의 활성 거래 당사자인지 (요청/승인완료/입금대기)
+		// 예약중 상태에서도 본인은 "결제 진행" 등으로 다음 단계 안내가 필요
+		Order myOrder = null;
+		if (loginUser != null) {
+			myOrder = orderService.findByProductAndBuyer(productNo, loginUser.getUserNo());
+		}
+		model.addAttribute("myOrder", myOrder);
+
 		return "productDetail";
 	}
 
@@ -201,6 +214,7 @@ public class ProductController {
 		return "redirect:/home";
 	}
 
+	
 	// 본인이거나 관리자면 true
 	private boolean canManage(User loginUser, int sellerNo) {
 		if (loginUser == null)
