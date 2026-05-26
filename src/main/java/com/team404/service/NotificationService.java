@@ -53,6 +53,8 @@ public interface NotificationService {
 	// 계좌 등록 요청 알림 (구매자 → 판매자)
 	void notifyAccountRequest(int sellerNo, int buyerNo, int productNo, String productName, String buyerNickname);
 
+	void notifyReserved(int buyerNo, int productNo, String productName);
+
 	// 대기 신청 상품이 다시 판매중으로 풀렸을 때 대기자에게
 	void notifyBackOnSale(int receiverNo, int productNo, String productName);
 

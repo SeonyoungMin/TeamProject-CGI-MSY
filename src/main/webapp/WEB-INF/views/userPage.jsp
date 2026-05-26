@@ -242,6 +242,10 @@
 								<div class="sold-overlay">
 									<span class="sold-badge">판매완료</span>
 								</div>
+							</c:if> <c:if test="${p.tradeStatus == '예약중'}">
+								<div class="sold-overlay">
+									<span class="sold-badge">예약중</span>
+								</div>
 							</c:if>
 
 							<div class="product-info">

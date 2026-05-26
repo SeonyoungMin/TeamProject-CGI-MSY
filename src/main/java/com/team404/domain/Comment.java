@@ -10,6 +10,9 @@ public class Comment {
 
 	private String nickname;
 	private String targetType; // BOARD or PRODUCT
+	
+	private int isSecret;
+	private int parentCommentNo;
 
 	public int getCommentNo() {
 		return commentNo;
@@ -65,6 +68,22 @@ public class Comment {
 
 	public void setTargetType(String targetType) {
 		this.targetType = targetType;
+	}
+
+	public int getIsSecret() {
+		return isSecret;
+	}
+
+	public void setIsSecret(int isSecret) {
+		this.isSecret = isSecret;
+	}
+
+	public int getParentCommentNo() {
+		return parentCommentNo;
+	}
+
+	public void setParentCommentNo(int parentCommentNo) {
+		this.parentCommentNo = parentCommentNo;
 	}
 
 }

@@ -236,6 +236,11 @@
 	font-size: 14px;
 	color: #888;
 }
+
+.comment-edit-form {
+	display: none;
+	margin-top: 8px;
+}
 </style>
 </head>
 <body>
@@ -374,61 +379,153 @@
 			</div>
 
 			<!-- 댓글 섹션 -->
-			<div class="card" style="margin-top: 40px;">
+			<div class="card" id="commentSection" style="margin-top: 40px;">
 				<h3 class="section-title">댓글</h3>
+
+				<%-- 댓글 목록 --%>
+				<div id="commentList">
+					<c:choose>
+						<c:when test="${empty comments}">
+							<div style="color: #999; padding: 10px 0;">아직 댓글이 없습니다.</div>
+						</c:when>
+						<c:otherwise>
+							<c:forEach var="c" items="${comments}">
+								<%-- 대댓글이면 들여쓰기 --%>
+								<div class="comment-item"
+									style="border-bottom: 1px solid #eee; padding: 10px 0;
+									${c.parentCommentNo > 0 ? 'margin-left: 30px; background: #fafafa; padding-left: 12px; border-left: 3px solid #eee;' : ''}">
+
+									<%-- 대댓글 표시 아이콘 --%>
+									<c:if test="${c.parentCommentNo > 0}">
+										<span style="color: #aaa; font-size: 13px; margin-right: 4px;">↳</span>
+									</c:if>
+
+									<span class="comment-author"
+										style="font-weight: bold; font-size: 14px;"> ${empty c.nickname ? '익명' : c.nickname}
+									</span>
+									<c:if test="${c.isSecret == 1}">
+										<span style="font-size: 11px; color: #888; margin-left: 4px;">🔒
+											비밀댓글</span>
+									</c:if>
+									<span class="comment-date"
+										style="font-size: 12px; color: #999; margin-left: 8px;">${c.createdTime}</span>
+
+									<%-- 비밀댓글: 본인/판매자/관리자만 내용 표시 --%>
+									<c:choose>
+										<c:when
+											test="${c.isSecret == 1 && loginUser.userNo != c.authorNo && loginUser.userNo != product.sellerNo && loginUser.userRole != 'ROLE_ADMIN'}">
+											<div class="comment-content"
+												style="margin: 5px 0; color: #aaa; font-style: italic;">비밀
+												댓글입니다.</div>
+										</c:when>
+										<c:otherwise>
+											<div class="comment-content" style="margin: 5px 0;">${c.content}</div>
+										</c:otherwise>
+									</c:choose>
+									<c:if test="${c.authorNo == loginUser.userNo}">
+										<div id="editForm_${c.commentNo}" class="comment-edit-form">
+											<form action="${ctx}/comment/${c.commentNo}/edit"
+												method="post">
+												<input type="hidden" name="boardNo"
+													value="${product.productNo}">
+												<div
+													style="display: flex; gap: 6px; align-items: flex-start;">
+													<textarea name="content" class="form-input"
+														style="flex: 1; height: 60px; margin: 0; font-size: 13px;"
+														required>${c.content}</textarea>
+													<button type="submit" class="btn btn-primary"
+														style="padding: 6px 12px; font-size: 13px; white-space: nowrap;">저장</button>
+													<button type="button" class="btn"
+														style="padding: 6px 12px; font-size: 13px; white-space: nowrap;"
+														onclick="toggleEditForm(${c.commentNo})">취소</button>
+												</div>
+											</form>
+										</div>
+									</c:if>
+
+									<%-- 수정/삭제/답글 버튼 --%>
+									<div style="display: flex; gap: 8px; margin-top: 4px;">
+										<%-- 수정/삭제: 본인 또는 관리자 --%>
+										<c:if
+											test="${c.authorNo == loginUser.userNo || loginUser.userRole == 'ROLE_ADMIN'}">
+											<c:if test="${c.authorNo == loginUser.userNo}">
+												<button type="button"
+													style="font-size: 12px; background: none; border: none; color: #888; cursor: pointer; padding: 0;"
+													onclick="toggleEditForm(${c.commentNo})">수정</button>
+											</c:if>
+											<form action="${ctx}/comment/${c.commentNo}/delete#commentSection"
+												method="post" style="margin: 0;">
+												<input type="hidden" name="boardNo"
+													value="${product.productNo}">
+												<button type="submit"
+													style="font-size: 12px; background: none; border: none; color: #e74c3c; cursor: pointer; padding: 0;"
+													onclick="return confirm('삭제하시겠습니까?')">삭제</button>
+											</form>
+										</c:if>
+
+										<%-- 답글 버튼: 로그인한 경우, 원댓글에만 표시 --%>
+										<c:if test="${not empty loginUser && c.parentCommentNo == 0}">
+											<button type="button"
+												style="font-size: 12px; background: none; border: none; color: #3498db; cursor: pointer; padding: 0;"
+												onclick="toggleReplyForm(${c.commentNo})">답글</button>
+										</c:if>
+									</div>
+
+									<%-- 대댓글 입력 폼 (답글 버튼 클릭 시 표시) --%>
+									<c:if test="${not empty loginUser && c.parentCommentNo == 0}">
+										<div id="replyForm_${c.commentNo}"
+											style="display: none; margin-top: 10px;">
+											<form action="${ctx}/comment/add#commentSection" method="post">
+												<input type="hidden" name="boardNo"
+													value="${product.productNo}"> <input type="hidden"
+													name="targetType" value="PRODUCT"> <input
+													type="hidden" name="parentCommentNo" value="${c.commentNo}">
+												<textarea name="content" class="form-input"
+													style="flex: 1; height: 60px; margin: 0; font-size: 13px;"
+													placeholder="답글을 입력하세요" required></textarea>
+
+												<div
+													style="display: flex; gap: 6px; align-items: flex-start; justify-content: space-between;">
+													<label
+														style="font-size: 12px; color: #555; cursor: pointer; white-space: nowrap;">
+														<input type="checkbox" name="isSecret" value="1">비밀답글
+													</label>
+													<button type="submit" class="btn btn-primary"
+														style="padding: 6px 12px; font-size: 13px; white-space: nowrap;">등록</button>
+												</div>
+											</form>
+										</div>
+									</c:if>
+								</div>
+							</c:forEach>
+						</c:otherwise>
+					</c:choose>
+				</div>
+
+				<%-- 댓글 등록 폼 --%>
 				<c:choose>
 					<c:when test="${empty loginUser}">
-						<div style="color: #888;">
+						<div style="color: #888; margin-top: 16px;">
 							<a href="${ctx}/login">댓글을 작성하려면 로그인이 필요합니다.</a>
 						</div>
 					</c:when>
 					<c:otherwise>
-						<form action="${ctx}/comment/add" method="post"
-							style="margin-bottom: 20px;">
+						<form action="${ctx}/comment/add#commentSection" method="post"
+							style="margin-top: 20px;">
 							<input type="hidden" name="boardNo" value="${product.productNo}">
-							<input type="hidden" name="targetType" value="PRODUCT">
+							<input type="hidden" name="targetType" value="PRODUCT"> <input
+								type="hidden" name="parentCommentNo" value="0">
 							<textarea class="form-input" name="content"
-								style="width: 100%; height: 80px; margin-bottom: 10px;"
+								style="width: 100%; height: 80px; margin-bottom: 8px;"
 								placeholder="댓글을 입력하세요" required></textarea>
-							<button type="submit" class="btn btn-primary">댓글 등록</button>
+							<div
+								style="display: flex; justify-content: space-between; align-items: center;">
+								<label style="font-size: 13px; color: #555; cursor: pointer;">
+									<input type="checkbox" name="isSecret" value="1"> 비밀댓글
+								</label>
+								<button type="submit" class="btn btn-primary">댓글 등록</button>
+							</div>
 						</form>
-
-						<div id="commentList">
-							<c:choose>
-								<c:when test="${empty comments}">
-									<div style="color: #999; padding: 10px 0;">아직 댓글이 없습니다.</div>
-								</c:when>
-								<c:otherwise>
-									<c:forEach var="c" items="${comments}">
-										<div class="comment-item"
-											style="border-bottom: 1px solid #eee; padding: 10px 0;">
-											<span class="comment-author">${empty c.nickname ? '익명' : c.nickname}</span>
-											<span class="comment-date"
-												style="font-size: 12px; color: #999; margin-left: 10px;">${c.createdTime}</span>
-											<div class="comment-content" style="margin: 5px 0;">${c.content}</div>
-
-											<c:if
-												test="${c.authorNo == loginUser.userNo || loginUser.userRole == 'ROLE_ADMIN'}">
-												<div style="display: flex; gap: 5px;">
-													<c:if test="${c.authorNo == loginUser.userNo}">
-														<a href="${ctx}/comment/${c.commentNo}/edit"
-															style="font-size: 12px;">수정</a>
-													</c:if>
-													<form action="${ctx}/comment/${c.commentNo}/delete"
-														method="post" style="margin: 0;">
-														<input type="hidden" name="boardNo"
-															value="${product.productNo}">
-														<button type="submit"
-															style="font-size: 12px; background: none; border: none; color: red; cursor: pointer;"
-															onclick="return confirm('삭제하시겠습니까?')">삭제</button>
-													</form>
-												</div>
-											</c:if>
-										</div>
-									</c:forEach>
-								</c:otherwise>
-							</c:choose>
-						</div>
 					</c:otherwise>
 				</c:choose>
 			</div>
@@ -473,6 +570,22 @@
 			});
 		}
 
+<<<<<<< HEAD
+		// 답글 폼 토글
+		function toggleReplyForm(commentNo) {
+			var formEl = document.getElementById('replyForm_' + commentNo);
+			if (formEl.style.display === 'none') {
+				formEl.style.display = 'block';
+				formEl.querySelector('textarea').focus();
+			} else {
+				formEl.style.display = 'none';
+			}
+		}
+		
+		function toggleEditForm(commentNo) {
+		    var formEl = document.getElementById('editForm_' + commentNo);
+		    formEl.style.display = formEl.style.display === 'none' ? 'block' : 'none';
+=======
 		function toggleWaitlist() {
 			var btn = document.getElementById('waitlistBtn');
 			if (!btn) return;
@@ -514,6 +627,7 @@
 			}).fail(function() {
 				alert('처리 중 오류가 발생했습니다.');
 			});
+>>>>>>> branch 'main' of https://github.com/SeonyoungMin/TeamProject-JAC-CGI-MSY.git
 		}
 	</script>
 </body>

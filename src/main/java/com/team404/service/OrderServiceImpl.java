@@ -6,11 +6,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.team404.domain.Order;
 import com.team404.domain.ProductDetailDto;
 import com.team404.repository.OrderRepository;
 import com.team404.repository.ProductRepository;
 import com.team404.repository.WaitlistRepository;
-import com.team404.domain.Order;
 
 @Service
 public class OrderServiceImpl implements OrderService {
@@ -169,6 +169,8 @@ public class OrderServiceImpl implements OrderService {
 	public List<Order> findMyReservedDirects(int userNo) {
 		return orderRepository.findMyReservedDirects(userNo);
 	}
+	
+
 
 	@Override
 	public int cancelAllActiveByProduct(int productNo) {

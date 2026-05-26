@@ -176,25 +176,26 @@ body {
 	border-color: #121212;
 }
 
-.sold-overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.45);
-    display: flex;
-    align-items: center;
-    justify-content: center;
+.reserved-overlay {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background: rgba(0, 0, 0, 0.45);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	border-radius: 10px 10px 0 0;
 }
 
-.sold-badge {
-    background: #fff;
-    color: #333;
-    font-size: 12px;
-    font-weight: bold;
-    padding: 4px 10px;
-    border-radius: 20px;
+.reserved-badge {
+	background: #fff;
+	color: #333;
+	font-size: 13px;
+	font-weight: bold;
+	padding: 6px 14px;
+	border-radius: 20px;
 }
 </style>
 </head>
@@ -218,6 +219,7 @@ body {
 			<c:forEach var="p" items="${list}">
 				<a href="${ctx}/product/${p.productNo}" class="product-card">
 					<div class="img-wrap">
+
 						<c:choose>
 							<c:when test="${not empty p.imgPath}">
 								<img src="${p.imgPath}">
@@ -226,12 +228,12 @@ body {
 								<div class="no-img">이미지 없음</div>
 							</c:otherwise>
 						</c:choose>
-						<!-- 판매완료 -->
-						<c:if test="${p.tradeStatus == '완료'}">
-							<div class="sold-overlay">
-								<span class="sold-badge">판매완료</span>
+						<c:if test="${p.tradeStatus == '예약중'}">
+							<div class="reserved-overlay">
+								<span class="reserved-badge">예약중</span>
 							</div>
 						</c:if>
+
 
 						<span class="view-badge"> <i class="fa-solid fa-eye"></i>
 							${p.viewCount}
@@ -244,7 +246,7 @@ body {
 
 					<div class="info">
 						<div class="name">${p.productName}</div>
-						<div class="meta">${p.category}· ${p.sellerNickname}</div>
+						<div class="meta">${p.category}·${p.sellerNickname}</div>
 						<div class="price">
 							<fmt:formatNumber value="${p.price}" />
 							원
@@ -281,28 +283,34 @@ body {
 			var iconEl = el.querySelector('.fav-icon');
 			var countEl = el.querySelector('.fav-count');
 
-			$.ajax({
-				url: '${ctx}/favorite/toggle',
-				type: 'POST',
-				data: { productNo: productNo },
-				success: function(result) {
-					if (result === 'login') {
-						alert('로그인이 필요합니다.');
-						location.href = '${ctx}/login';
-						return;
-					}
-					var count = parseInt(countEl.textContent, 10) || 0;
-					if (result === 'added') count += 1;
-					else if (result === 'removed') count = Math.max(0, count - 1);
+			$
+					.ajax({
+						url : '${ctx}/favorite/toggle',
+						type : 'POST',
+						data : {
+							productNo : productNo
+						},
+						success : function(result) {
+							if (result === 'login') {
+								alert('로그인이 필요합니다.');
+								location.href = '${ctx}/login';
+								return;
+							}
+							var count = parseInt(countEl.textContent, 10) || 0;
+							if (result === 'added')
+								count += 1;
+							else if (result === 'removed')
+								count = Math.max(0, count - 1);
 
-					countEl.textContent = count;
-					iconEl.classList.remove('fa-solid', 'fa-regular');
-					iconEl.classList.add(count > 0 ? 'fa-solid' : 'fa-regular');
-				},
-				error: function() {
-					alert('처리 중 오류가 발생했습니다.');
-				}
-			});
+							countEl.textContent = count;
+							iconEl.classList.remove('fa-solid', 'fa-regular');
+							iconEl.classList.add(count > 0 ? 'fa-solid'
+									: 'fa-regular');
+						},
+						error : function() {
+							alert('처리 중 오류가 발생했습니다.');
+						}
+					});
 		}
 	</script>
 

@@ -393,6 +393,29 @@
 		font-size: 32px;
 	}
 }
+
+/* 예약 중 상품 썸네일 표시 */
+.reserved-overlay {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background: rgba(0, 0, 0, 0.45);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	border-radius: 10px 10px 0 0;
+}
+
+.reserved-badge {
+	background: #fff;
+	color: #333;
+	font-size: 13px;
+	font-weight: bold;
+	padding: 6px 14px;
+	border-radius: 20px;
+}
 </style>
 </head>
 <body>
@@ -414,7 +437,7 @@
 		<c:choose>
 			<c:when test="${not empty loginUser}">
 				<div style="margin-bottom: 15px; font-size: 16px; color: #555;">
-					<i class="fa-solid fa-location-dot""></i>
+					<i class="fa-solid fa-location-dot"></i>
 					<c:choose>
 						<c:when test="${not empty loginUser.verifiedArea}">
                         현재 인증된 동네: <strong>${loginUser.verifiedArea}</strong>
@@ -507,6 +530,11 @@
 					<c:forEach var="p" items="${popularList}">
 						<a href="${ctx}/product/${p.productNo}" class="card">
 							<div class="thumb">
+								<c:if test="${p.tradeStatus == '예약중'}">
+									<div class="reserved-overlay">
+										<span class="reserved-badge">예약중</span>
+									</div>
+								</c:if>
 								<c:if test="${not empty p.imgPath}">
 									<img src="${p.imgPath}">
 								</c:if>
@@ -547,6 +575,11 @@
 					<c:forEach var="p" items="${productList}">
 						<a href="${ctx}/product/${p.productNo}" class="card">
 							<div class="thumb">
+								<c:if test="${p.tradeStatus == '예약중'}">
+									<div class="reserved-overlay">
+										<span class="reserved-badge">예약중</span>
+									</div>
+								</c:if>
 								<c:if test="${not empty p.imgPath}">
 									<img src="${p.imgPath}">
 								</c:if>

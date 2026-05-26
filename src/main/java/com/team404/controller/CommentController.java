@@ -47,10 +47,10 @@ public class CommentController {
 	// 댓글 등록 returnTo=board 이면 게시판으로 돌아감
 	@PostMapping("/comment/add")
 	public String add(@RequestParam("boardNo") int boardNo, @RequestParam("content") String content,
-
 			@RequestParam("targetType") String targetType,
-
-			@RequestParam(value = "returnTo", required = false) String returnTo, HttpSession session) {
+			@RequestParam(value = "returnTo", required = false) String returnTo,
+			@RequestParam(value = "isSecret", defaultValue = "0") int isSecret,
+			@RequestParam(value = "parentCommentNo", defaultValue = "0") int parentCommentNo, HttpSession session) {
 
 		User loginUser = (User) session.getAttribute("loginUser");
 		if (loginUser == null) {
@@ -62,22 +62,30 @@ public class CommentController {
 		c.setContent(content);
 		c.setAuthorNo(loginUser.getUserNo());
 		c.setTargetType(targetType);
-
+		c.setIsSecret(isSecret);
+		c.setParentCommentNo(parentCommentNo);
 		commentService.addComment(c);
 
 // 댓글 알림 (게시글, 상품게시글 작성자에게 전송)
 		try {
-			int boardAuthorNo;
-			if ("board".equals(returnTo)) { // 문의 게시판 댓글 -> board 테이블에서 작성자 조회
-				BoardDetailDto board = boardService.findBoardDetail(boardNo);
-				boardAuthorNo = board.getAuthorNo();
-				notificationService.notifyComment(loginUser.getUserNo(), boardAuthorNo, boardNo, "board",
-						loginUser.getUserNickName());
-			} else { // 상품 삭제 댓글 -> product 테이블에서 판매자 조회
-				ProductDetailDto product = productService.findProductDetail(boardNo);
-				boardAuthorNo = product.getSellerNo();
-				notificationService.notifyComment(loginUser.getUserNo(), boardAuthorNo, boardNo, "product",
-						loginUser.getUserNickName());
+			// 대댓글
+			if (parentCommentNo > 0) {
+				Comment parent = commentService.getComment(parentCommentNo);
+				if (parent != null && parent.getAuthorNo() != loginUser.getUserNo()) {
+					notificationService.notifyComment(loginUser.getUserNo(), parent.getAuthorNo(), boardNo,
+							"board".equals(returnTo) ? "board" : "product", loginUser.getUserNickName());
+				}
+			} else {
+			    int boardAuthorNo;
+			    if ("board".equals(returnTo)) {
+			        BoardDetailDto board = boardService.findBoardDetail(boardNo);
+			        boardAuthorNo = board.getAuthorNo();
+			    } else {
+			        ProductDetailDto product = productService.findProductDetail(boardNo);
+			        boardAuthorNo = product.getSellerNo();
+			    }
+			    notificationService.notifyComment(loginUser.getUserNo(), boardAuthorNo, boardNo,
+			            "board".equals(returnTo) ? "board" : "product", loginUser.getUserNickName());
 			}
 		} catch (Exception e) {
 			// 알림 실패가 댓글 등록 막지 않게 예외 삼킴

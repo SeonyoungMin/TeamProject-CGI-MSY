@@ -28,6 +28,8 @@ public class CommentRepositoryImpl implements CommentRepository {
 			c.setAuthorNo(rs.getInt("author_no"));
 			c.setCreatedTime(rs.getString("created_time"));
 			c.setNickname(rs.getString("nickname"));
+			c.setIsSecret(rs.getInt("is_secret"));
+			c.setParentCommentNo(rs.getInt("parent_comment_no"));
 			return c;
 		}
 	};
@@ -35,18 +37,18 @@ public class CommentRepositoryImpl implements CommentRepository {
 	// 게시글 용 댓글 목록 조회
 	@Override
 	public List<Comment> findByBoard(int boardNo) {
-		String sql = "SELECT c.comment_no, c.content, c.board_no, c.author_no, c.created_time, u.nickname "
+		String sql = "SELECT c.comment_no, c.content, c.board_no, c.author_no, c.created_time, u.nickname, c.is_secret, c.parent_comment_no "
 				+ "FROM comment c " + "LEFT JOIN users u ON c.author_no = u.user_no "
-				+ "WHERE c.board_no = ? AND c.target_type = 'BOARD' " + "ORDER BY c.comment_no DESC";
+				+ "WHERE c.board_no = ? AND c.target_type = 'BOARD' " + "ORDER BY CASE WHEN c.parent_comment_no = 0 OR c.parent_comment_no IS NULL THEN c.comment_no ELSE c.parent_comment_no END, c.comment_no ASC";
 
 		return jdbcTemplate.query(sql, commentRowMapper, boardNo);
 	}
 
 	// 상품용 댓글목록 조회
 	public List<Comment> findByProduct(int productNo) {
-		String sql = "SELECT c.comment_no, c.content, c.board_no, c.author_no, c.created_time, u.nickname "
+		String sql = "SELECT c.comment_no, c.content, c.board_no, c.author_no, c.created_time, u.nickname, c.is_secret, c.parent_comment_no "
 				+ "FROM comment c " + "LEFT JOIN users u ON c.author_no = u.user_no "
-				+ "WHERE c.board_no = ? AND c.target_type = 'PRODUCT' " + "ORDER BY c.comment_no DESC";
+				+ "WHERE c.board_no = ? AND c.target_type = 'PRODUCT' " + "ORDER BY CASE WHEN c.parent_comment_no = 0 OR c.parent_comment_no IS NULL THEN c.comment_no ELSE c.parent_comment_no END, c.comment_no ASC";
 
 		return jdbcTemplate.query(sql, commentRowMapper, productNo);
 	}
@@ -55,9 +57,9 @@ public class CommentRepositoryImpl implements CommentRepository {
 	@Override
 	public int insert(Comment c) {
 		System.out.println("targetType = " + c.getTargetType());
-		String sql = "INSERT INTO comment (content, board_no, author_no, target_type) " + "VALUES (?, ?, ?, ?)";
+		String sql = "INSERT INTO comment (content, board_no, author_no, target_type, is_secret, parent_comment_no) " + "VALUES (?, ?, ?, ?, ?, ?)";
 
-		return jdbcTemplate.update(sql, c.getContent(), c.getBoardNo(), c.getAuthorNo(), c.getTargetType());
+		return jdbcTemplate.update(sql, c.getContent(), c.getBoardNo(), c.getAuthorNo(), c.getTargetType(), c.getIsSecret(), c.getParentCommentNo());
 	}
 
 	// 댓글 수정
@@ -70,7 +72,7 @@ public class CommentRepositoryImpl implements CommentRepository {
 	// 댓글 한 개 조회
 	@Override
 	public Comment findByCommentNo(int commentNo) {
-		String sql = "SELECT c.comment_no, c.content, c.board_no, c.author_no, c.created_time, u.nickname "
+		String sql = "SELECT c.comment_no, c.content, c.board_no, c.author_no, c.created_time, u.nickname, is_secret, parent_comment_no "
 				+ "FROM comment c LEFT JOIN users u ON c.author_no = u.user_no " + "WHERE c.comment_no = ?";
 		List<Comment> list = jdbcTemplate.query(sql, commentRowMapper, commentNo);
 
@@ -80,6 +82,8 @@ public class CommentRepositoryImpl implements CommentRepository {
 	// 댓글 삭제
 	@Override
 	public int delete(int commentNo) {
+		String deleteSub = "delete from comment where parent_comment_no = ?";
+		jdbcTemplate.update(deleteSub, commentNo);
 		String sql = "DELETE FROM comment WHERE comment_no = ?";
 		return jdbcTemplate.update(sql, commentNo);
 	}
