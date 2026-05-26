@@ -175,6 +175,45 @@
 	background-color: #e68a00;
 }
 
+.btn-waitlist {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	padding: 10px 20px;
+	background-color: #fff;
+	color: #ff9800;
+	border: 1px solid #ff9800;
+	border-radius: 5px;
+	font-weight: bold;
+	font-size: 14px;
+	cursor: pointer;
+	box-sizing: border-box;
+}
+
+.btn-waitlist:hover {
+	background-color: #fff7eb;
+}
+
+.btn-waitlist.waiting {
+	background-color: #ff9800;
+	color: #fff;
+}
+
+.btn-waitlist.waiting:hover {
+	background-color: #e68a00;
+}
+
+.waitlist-count {
+	font-size: 12px;
+	color: #888;
+	margin-left: 6px;
+}
+
+.status-msg {
+	color: #888;
+	font-size: 14px;
+}
+
 #favBtn {
 	padding: 10px 10px;
 	border-radius: 5px;
@@ -269,15 +308,46 @@
 						<br> 상품번호 : ${product.productNo}
 
 						<div class="fav-area">
-							<c:if test="${product.sellerNo != loginUser.userNo}">
-								<a href="${ctx}/order/select?productNo=${product.productNo}"
-									class="btn-order">구매하기</a>
-							</c:if>
-							<c:if test="${product.sellerNo == loginUser.userNo}">
-								<span style="color: #e74c3c; font-size: 14px;"> 본인 상품은
-									구매할 수 없습니다.</span>
-							</c:if>
-							<c:if test="${not empty loginUser}">
+							<c:choose>
+								<%-- 본인 상품 --%>
+								<c:when test="${not empty loginUser && product.sellerNo == loginUser.userNo}">
+									<span style="color: #e74c3c; font-size: 14px;">본인 상품은 구매할 수 없습니다.</span>
+								</c:when>
+
+								<%-- 판매중: 구매하기 --%>
+								<c:when test="${product.tradeStatus == '판매중'}">
+									<a href="${ctx}/order/select?productNo=${product.productNo}"
+										class="btn-order">구매하기</a>
+								</c:when>
+
+								<%-- 예약중: 대기 신청/취소 --%>
+								<c:when test="${product.tradeStatus == '예약중'}">
+									<c:choose>
+										<c:when test="${alreadyWaitlisted}">
+											<button type="button" id="waitlistBtn" class="btn-waitlist waiting"
+												onclick="toggleWaitlist()">
+												<i class="fa-solid fa-bell"></i> 대기 신청됨
+											</button>
+										</c:when>
+										<c:otherwise>
+											<button type="button" id="waitlistBtn" class="btn-waitlist"
+												onclick="toggleWaitlist()">
+												<i class="fa-regular fa-bell"></i> 예약 대기 신청
+											</button>
+										</c:otherwise>
+									</c:choose>
+									<span class="waitlist-count" id="waitlistCountLabel">
+										대기 <span id="waitlistCount">${waitlistCount}</span>명
+									</span>
+								</c:when>
+
+								<%-- 그 외 (예: '취소' 등) --%>
+								<c:otherwise>
+									<span class="status-msg">현재 구매할 수 없는 상품입니다.</span>
+								</c:otherwise>
+							</c:choose>
+
+							<c:if test="${not empty loginUser && product.sellerNo != loginUser.userNo}">
 								<button id="favBtn" type="button" class="btn btn-line"
 									onclick="toggleFavorite()">
 									<i id="favIcon"
@@ -400,6 +470,49 @@
 			list.scrollBy({
 				left : dir * 80,
 				behavior : 'smooth'
+			});
+		}
+
+		function toggleWaitlist() {
+			var btn = document.getElementById('waitlistBtn');
+			if (!btn) return;
+			var waiting = btn.classList.contains('waiting');
+			var url = waiting ? ctx + '/waitlist/remove' : ctx + '/waitlist/add';
+
+			$.post(url, { productNo: productNo }, function(result) {
+				if (result === 'login') {
+					alert('로그인이 필요합니다.');
+					location.href = ctx + '/login';
+					return;
+				}
+				if (result === 'self') {
+					alert('본인 상품에는 대기 신청할 수 없습니다.');
+					return;
+				}
+				if (result === 'notreserved') {
+					alert('예약중 상품에만 대기 신청할 수 있습니다.');
+					location.reload();
+					return;
+				}
+				if (result === 'notfound') {
+					alert('상품을 찾을 수 없습니다.');
+					return;
+				}
+
+				var countEl = document.getElementById('waitlistCount');
+				var count = parseInt(countEl.textContent) || 0;
+
+				if (result === 'added') {
+					btn.classList.add('waiting');
+					btn.innerHTML = '<i class="fa-solid fa-bell"></i> 대기 신청됨';
+					countEl.textContent = count + 1;
+				} else if (result === 'removed') {
+					btn.classList.remove('waiting');
+					btn.innerHTML = '<i class="fa-regular fa-bell"></i> 예약 대기 신청';
+					countEl.textContent = Math.max(0, count - 1);
+				}
+			}).fail(function() {
+				alert('처리 중 오류가 발생했습니다.');
 			});
 		}
 	</script>

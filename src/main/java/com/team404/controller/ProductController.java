@@ -1,8 +1,6 @@
 package com.team404.controller;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -25,6 +23,7 @@ import com.team404.service.ImageService;
 import com.team404.service.ProductService;
 import com.team404.service.ReviewService;
 import com.team404.service.UserService;
+import com.team404.service.WaitlistService;
 
 import jakarta.servlet.http.HttpSession;
 
@@ -49,6 +48,9 @@ public class ProductController {
 	@Autowired
 	private UserService userService;
 
+	@Autowired
+	private WaitlistService waitlistService;
+
 	// 상품 전체 목록
 	@GetMapping("/productList")
 	public String list(@RequestParam(value = "pageNum", defaultValue = "1") int pageNum, HttpSession session, // 세션 추가
@@ -71,23 +73,6 @@ public class ProductController {
 
 		return "productList";
 	}
-
-	// 공통 로직 분리 아무데서도 호출 안되는 코드라 주석처리
-//	private Map<String, Object> getProductData(int pageNum, int limit, int loginUserNo) {
-//		int start = (pageNum - 1) * limit;
-//
-//		List<ProductListDto> list = productService.findAll(start, limit, loginUserNo);
-//		int total = productService.countAll();
-//
-//		int totalPages = (int) Math.ceil((double) total / limit);
-//
-//		Map<String, Object> map = new HashMap<>();
-//		map.put("list", list);
-//		map.put("currentPage", pageNum);
-//		map.put("totalPages", totalPages);
-//
-//		return map;
-//	}
 
 	// 검색어로 상품 찾기
 	@GetMapping("/product/search")
@@ -171,6 +156,14 @@ public class ProductController {
 		ReviewDto review = reviewService.findReviewByProduct(productNo);
 		model.addAttribute("review", review);
 
+		// 대기 신청 정보 (예약중 상품 UI에 사용)
+		boolean alreadyWaitlisted = false;
+		if (loginUser != null) {
+			alreadyWaitlisted = waitlistService.exists(productNo, loginUser.getUserNo());
+		}
+		model.addAttribute("alreadyWaitlisted", alreadyWaitlisted);
+		model.addAttribute("waitlistCount", waitlistService.countByProduct(productNo));
+
 		return "productDetail";
 	}
 
@@ -235,6 +228,7 @@ public class ProductController {
 	public String edit(@PathVariable("productNo") int productNo, @RequestParam("productName") String name,
 			@RequestParam("category") String category, @RequestParam("price") long price,
 			@RequestParam(value = "description", required = false) String description,
+			@RequestParam(value = "tradeStatus", required = false) String tradeStatus,
 			@RequestParam(value = "imgFiles", required = false) List<MultipartFile> imgFiles, HttpSession session) {
 
 		User loginUser = (User) session.getAttribute("loginUser");
@@ -253,9 +247,16 @@ public class ProductController {
 		product.setCategory(category);
 		product.setPrice(price);
 		product.setDescription(description);
+		product.setTradeStatus(tradeStatus);
 
 		// 서비스 내부의 본인 검증을 통과시키기 위해 원래 판매자 번호를 넘겨줌
 		productService.updateProduct(product, imgFiles, origin.getSellerNo());
+
+		// '예약중' → '판매중' 전환 시 대기자에게 알림 발송 + 대기 목록 비우기
+		if ("예약중".equals(origin.getTradeStatus()) && "판매중".equals(tradeStatus)) {
+			waitlistService.notifyBackOnSaleAndClear(productNo);
+		}
+
 		return "redirect:/product/" + productNo;
 	}
 

@@ -120,11 +120,17 @@ public class ProductRepositoryImpl implements ProductRepository {
 		return template.queryForObject(selectSQL, Integer.class);
 	}
 
-	// 상품 수정
+	// 상품 수정 — trade_status도 함께 변경 (null이면 기존 값 유지)
 	public void updateProduct(Product product) {
-		String SQL = "update product set name=?, category=?, price=?, description=? where product_no=?";
-		template.update(SQL, product.getProductName(), product.getCategory(), product.getPrice(),
-				product.getDescription(), product.getProductNo());
+		if (product.getTradeStatus() != null && !product.getTradeStatus().isEmpty()) {
+			String SQL = "update product set name=?, category=?, price=?, description=?, trade_status=? where product_no=?";
+			template.update(SQL, product.getProductName(), product.getCategory(), product.getPrice(),
+					product.getDescription(), product.getTradeStatus(), product.getProductNo());
+		} else {
+			String SQL = "update product set name=?, category=?, price=?, description=? where product_no=?";
+			template.update(SQL, product.getProductName(), product.getCategory(), product.getPrice(),
+					product.getDescription(), product.getProductNo());
+		}
 	}
 
 	// 상품 삭제

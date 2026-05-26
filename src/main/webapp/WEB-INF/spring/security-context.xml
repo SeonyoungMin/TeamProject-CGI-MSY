@@ -47,6 +47,8 @@
 			access="isAuthenticated()" />
 		<intercept-url pattern="/notification/**"
 			access="isAuthenticated()" />
+		<intercept-url pattern="/waitlist/**"
+			access="isAuthenticated()" />
 
 		<!-- 관리자만 접근 가능 — hasRole('ADMIN') 은 자동으로 ROLE_ 접두어 붙음 -->
 		<intercept-url pattern="/users/search/allUsers"

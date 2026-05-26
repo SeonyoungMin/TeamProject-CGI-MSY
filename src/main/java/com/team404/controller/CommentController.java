@@ -44,7 +44,7 @@ public class CommentController {
 		return commentService.getComments(boardNo);
 	}
 
-	// 댓글 등록 (일반 폼 submit). returnTo=board 이면 게시판으로 돌아감
+	// 댓글 등록 returnTo=board 이면 게시판으로 돌아감
 	@PostMapping("/comment/add")
 	public String add(@RequestParam("boardNo") int boardNo, @RequestParam("content") String content,
 

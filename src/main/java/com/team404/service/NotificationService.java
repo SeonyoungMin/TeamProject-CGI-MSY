@@ -52,4 +52,13 @@ public interface NotificationService {
 
 	// 계좌 등록 요청 알림 (구매자 → 판매자)
 	void notifyAccountRequest(int sellerNo, int buyerNo, int productNo, String productName, String buyerNickname);
+
+	// 대기 신청 상품이 다시 판매중으로 풀렸을 때 대기자에게
+	void notifyBackOnSale(int receiverNo, int productNo, String productName);
+
+	// 계좌 조회 요청 알람 (구매자 → 판매자)
+	void notifyTransferRequest(int sellerNo, int buyerNo, int productNo, String productName, String buyerNickName);
+
+	// 거래 요청 승인 알림 (판매자 → 구매자)
+	void notifyTransferApproved(int buyerNo, int sellerNo, int productNo, String productName);
 }

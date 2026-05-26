@@ -120,10 +120,8 @@ public class OrderController {
 	// 직거래 약속 제출 → 동네인증은 이미 통과한 상태. 예약 생성 후 예약 완료 페이지로
 	@PostMapping("/order/direct/submit")
 	public String directSubmit(@RequestParam("productNo") int productNo,
-			@RequestParam("meetingPlace") String meetingPlace,
-			@RequestParam("meetingTime") String meetingTime,
-			@RequestParam(value = "buyerMessage", required = false) String buyerMessage,
-			HttpSession session) {
+			@RequestParam("meetingPlace") String meetingPlace, @RequestParam("meetingTime") String meetingTime,
+			@RequestParam(value = "buyerMessage", required = false) String buyerMessage, HttpSession session) {
 
 		User loginUser = (User) session.getAttribute("loginUser");
 		if (loginUser == null)
@@ -178,6 +176,20 @@ public class OrderController {
 		model.addAttribute("product", product);
 		model.addAttribute("seller", seller);
 		return "orderReserved";
+	}
+
+	// 판매자가 직거래 약속 취소 - 상품을 판매중으로 복원하고 대기자에게 알림
+	@PostMapping("/order/direct/{orderNo}/cancel")
+	public String sellerCancelDirect(@PathVariable("orderNo") int orderNo, HttpSession session) {
+		User loginUser = (User) session.getAttribute("loginUser");
+		if (loginUser == null)
+			return "redirect:/login";
+
+		boolean ok = orderService.cancelDirectOrder(orderNo, loginUser.getUserNo());
+		if (!ok) {
+			return "redirect:/order/pending?error=cannot-cancel";
+		}
+		return "redirect:/order/pending?cancelled=" + orderNo;
 	}
 
 	// 판매자가 직거래 거래완료 버튼 클릭
@@ -240,7 +252,7 @@ public class OrderController {
 		}
 
 		if ("TRANSFER".equals(type)) {
-			return "redirect:/order/transfer/form?productNo=" + productNo;
+			return "redirect:/order/transfer/request/" + productNo;
 		}
 
 		return "redirect:/";
@@ -266,27 +278,156 @@ public class OrderController {
 		return "redirect:/product/" + productNo + "?accountRequest=sent";
 	}
 
-	// 계좌이체 폼 화면
-	@GetMapping("/order/transfer/form")
-	public String transferForm(@RequestParam("productNo") int productNo, Model model, HttpSession session) {
+	// 계좌이체 거래 요청 페이지
+	@GetMapping("/order/transfer/request/{productNo}")
+	public String transferRequestPage(@PathVariable("productNo") int productNo, Model model, HttpSession session) {
+
+		User loginUser = (User) session.getAttribute("loginUser");
+
+		if (loginUser == null)
+			return "redirect:/login";
+
+		ProductDetailDto product = productService.findProductDetail(productNo);
+
+		if (loginUser.getUserNo() == product.getSellerNo()) {
+			return "redirect:/product/" + productNo + "?error=self";
+		}
+
+		if (!"판매중".equals(product.getTradeStatus())) {
+			return "redirect:/product/" + productNo + "?error=unavailable";
+		}
+
+		model.addAttribute("product", product);
+
+		return "tradeRequest";
+	}
+
+	// 거래 요청 보내기 — orders insert(status='요청') + 판매자에게 알림
+	@PostMapping("/order/transfer/request")
+	public String sendTransferRequest(@RequestParam("productNo") int productNo, HttpSession session) {
+
 		User loginUser = (User) session.getAttribute("loginUser");
 		if (loginUser == null)
 			return "redirect:/login";
 
 		ProductDetailDto product = productService.findProductDetail(productNo);
+
+		try {
+			orderService.createTransferRequest(productNo, loginUser.getUserNo());
+		} catch (IllegalStateException e) {
+			return "redirect:/product/" + productNo + "?error=unavailable";
+		}
+
+		try {
+			notificationService.notifyTransferRequest(product.getSellerNo(), loginUser.getUserNo(), productNo,
+					product.getProductName(), loginUser.getUserNickName());
+		} catch (Exception e) {
+			System.out.println("거래 요청 알림 실패 : " + e.getMessage());
+		}
+
+		return "redirect:/product/" + productNo + "?transferRequested=1";
+	}
+
+	// 계좌이체 폼 화면
+	@GetMapping("/order/transfer/form")
+	public String transferForm(@RequestParam("productNo") int productNo, Model model, HttpSession session) {
+
+		User loginUser = (User) session.getAttribute("loginUser");
+
+		if (loginUser == null) {
+			return "redirect:/login";
+		}
+
+		ProductDetailDto product = productService.findProductDetail(productNo);
+
+		// 본인 상품 차단
 		if (loginUser.getUserNo() == product.getSellerNo()) {
+
 			return "redirect:/product/" + productNo + "?error=self";
 		}
+
+		// 판매중 아니면 차단
 		if (!"판매중".equals(product.getTradeStatus())) {
+
 			return "redirect:/product/" + productNo + "?error=unavailable";
+		}
+
+		// 거래 요청 + 판매자 승인 확인
+		Order order = orderService.findByProductAndBuyer(productNo, loginUser.getUserNo());
+
+		if (order == null || !"승인완료".equals(order.getOrderStatus())) {
+
+			return "redirect:/product/" + productNo + "?error=not-approved";
 		}
 
 		User seller = userService.getUserByNo(product.getSellerNo());
 
 		model.addAttribute("product", product);
+
 		model.addAttribute("seller", seller);
+
 		model.addAttribute("loginUser", loginUser);
+
 		return "orderTransfer";
+	}
+
+	@PostMapping("/order/transfer/request-submit")
+	public String transferRequestSubmit(@RequestParam("productNo") int productNo, HttpSession session) {
+
+		User loginUser = (User) session.getAttribute("loginUser");
+		if (loginUser == null)
+			return "redirect:/login";
+
+		ProductDetailDto product = productService.findProductDetail(productNo);
+
+		notificationService.notifyTransferRequest(product.getSellerNo(), loginUser.getUserNo(), productNo,
+				product.getProductName(), loginUser.getUserNickName());
+
+		return "redirect:/product/" + productNo + "?request=sent";
+	}
+
+	@GetMapping("/order/pending-request/{productNo}")
+	public String pendingRequest(@PathVariable int productNo, Model model, HttpSession session) {
+
+		User loginUser = (User) session.getAttribute("loginUser");
+
+		if (loginUser == null)
+			return "redirect:/login";
+
+		ProductDetailDto product = productService.findProductDetail(productNo);
+
+		if (product.getSellerNo() != loginUser.getUserNo()) {
+			return "redirect:/home";
+		}
+
+		model.addAttribute("product", product);
+
+		return "orderRequestApprove";
+	}
+
+	// 판매자가 거래 요청 승인 — orders.order_status='승인완료' + 구매자에게 알림
+	@PostMapping("/order/transfer/{orderNo}/approve")
+	public String approveTransfer(@PathVariable("orderNo") int orderNo, HttpSession session) {
+
+		User loginUser = (User) session.getAttribute("loginUser");
+		if (loginUser == null) {
+			return "redirect:/login";
+		}
+
+		// 권한 검증은 SQL의 seller_no=? 조건으로 보장됨
+		orderService.approveTransfer(orderNo, loginUser.getUserNo());
+
+		// 구매자에게 승인 알림
+		try {
+			Order order = orderService.findByOrderNo(orderNo);
+			ProductDetailDto product = productService.findProductDetail(order.getProductNo());
+			notificationService.notifyTransferApproved(order.getBuyerNo(), loginUser.getUserNo(),
+					order.getProductNo(), product.getProductName());
+		} catch (Exception e) {
+			System.out.println("거래 승인 알림 발송 실패: " + e.getMessage());
+		}
+
+		return "redirect:/order/pending?approved=" + orderNo;
 	}
 
 	// 계좌이체 주문 생성 (알림은 구매자가 송금 완료 버튼을 눌러야 발송)
@@ -382,15 +523,18 @@ public class OrderController {
 		return "redirect:/order/pending?confirmed=" + orderNo;
 	}
 
-	// 판매자 - 입금 확인 대기 + 직거래 예약 목록
+	// 판매자 - 거래 요청 대기 + 입금 확인 대기 + 직거래 예약 목록
 	@GetMapping("/order/pending")
 	public String pendingOrders(HttpSession session, Model model) {
 		User loginUser = (User) session.getAttribute("loginUser");
 		if (loginUser == null)
 			return "redirect:/login";
 
+		List<Order> transferRequests = orderService.findTransferRequestsBySeller(loginUser.getUserNo());
 		List<Order> pendingTransfers = orderService.findPendingTransfersBySeller(loginUser.getUserNo());
 		List<Order> reservedDirects = orderService.findReservedDirectsBySeller(loginUser.getUserNo());
+
+		model.addAttribute("transferRequests", transferRequests);
 		model.addAttribute("pendingTransfers", pendingTransfers);
 		model.addAttribute("reservedDirects", reservedDirects);
 

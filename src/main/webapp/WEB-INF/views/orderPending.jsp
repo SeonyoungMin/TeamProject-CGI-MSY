@@ -113,6 +113,28 @@
 .confirm-btn:hover {
 	background: #333;
 }
+
+.action-group {
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+	flex-shrink: 0;
+}
+
+.cancel-btn {
+	padding: 10px 18px;
+	background: #fff;
+	color: #e74c3c;
+	border: 1px solid #e74c3c;
+	border-radius: 8px;
+	font-weight: bold;
+	cursor: pointer;
+	font-size: 13px;
+}
+
+.cancel-btn:hover {
+	background: #fdecea;
+}
 </style>
 </head>
 <body>
@@ -125,16 +147,56 @@
 		<p class="page-desc">계좌이체 입금 확인 또는 직거래 약속 완료를 처리해주세요.</p>
 
 		<c:if test="${param.confirmed != null}">
-			<div class="banner banner-success">✓ 거래가 완료되었습니다.</div>
+			<div class="banner banner-success"> 거래가 완료되었습니다.</div>
 		</c:if>
 		<c:if test="${param.completed != null}">
-			<div class="banner banner-success">✓ 직거래가 완료되었습니다.</div>
+			<div class="banner banner-success"> 직거래가 완료되었습니다.</div>
+		</c:if>
+		<c:if test="${param.cancelled != null}">
+			<div class="banner banner-success"> 예약이 취소되었습니다. 대기자에게 알림이 발송됐어요.</div>
 		</c:if>
 		<c:if test="${param.error == 'cannot-confirm'}">
-			<div class="banner banner-error">✗ 이미 처리된 주문이거나 권한이 없어요.</div>
+			<div class="banner banner-error"> 이미 처리된 주문이거나 권한이 없어요.</div>
+		</c:if>
+		<c:if test="${param.error == 'cannot-cancel'}">
+			<div class="banner banner-error"> 취소할 수 없는 주문이거나 권한이 없어요.</div>
+		</c:if>
+		<c:if test="${param.approved != null}">
+			<div class="banner banner-success"> 거래 요청을 승인했습니다. 구매자에게 알림이 발송됐어요.</div>
 		</c:if>
 
-		<h3 style="font-size: 16px; margin: 18px 0 10px;">계좌이체 입금 대기</h3>
+		<h3 style="font-size: 16px; margin: 18px 0 10px;">계좌이체 거래 요청</h3>
+		<c:choose>
+			<c:when test="${empty transferRequests}">
+				<div class="empty-state" style="padding: 30px 20px;">새로운 거래 요청이 없습니다.</div>
+			</c:when>
+			<c:otherwise>
+				<c:forEach var="o" items="${transferRequests}">
+					<div class="pending-card">
+						<div class="pending-info">
+							<div>
+								<span class="pending-badge" style="background: #ede9fe; color: #5b21b6;">거래 요청</span>
+								<span style="font-size: 12px; color: #999;">#${o.orderNo}</span>
+							</div>
+							<div class="product-name">${o.productName}</div>
+							<div class="meta-row">
+								금액 <strong><fmt:formatNumber value="${o.price}" />원</strong>
+							</div>
+							<div class="meta-row" style="color: #999;">
+								<fmt:formatDate value="${o.createdTime}" pattern="yyyy-MM-dd HH:mm" /> 요청
+							</div>
+						</div>
+						<form action="${ctx}/order/transfer/${o.orderNo}/approve" method="post" style="margin: 0;">
+							<button type="submit" class="confirm-btn"
+								onclick="return confirm('거래 요청을 승인하시겠어요?\n구매자에게 입금 폼 접근 권한이 부여됩니다.');">
+								승인</button>
+						</form>
+					</div>
+				</c:forEach>
+			</c:otherwise>
+		</c:choose>
+
+		<h3 style="font-size: 16px; margin: 24px 0 10px;">계좌이체 입금 대기</h3>
 		<c:choose>
 			<c:when test="${empty pendingTransfers}">
 				<div class="empty-state" style="padding: 30px 20px;">입금 대기 중인 거래가 없습니다.</div>
@@ -205,11 +267,18 @@
 								<fmt:formatDate value="${o.createdTime}" pattern="yyyy-MM-dd HH:mm" /> 예약
 							</div>
 						</div>
-						<form action="${ctx}/order/direct/${o.orderNo}/complete" method="post" style="margin: 0;">
-							<button type="submit" class="confirm-btn"
-								onclick="return confirm('거래를 완료 처리하시겠어요?\n구매자에게 완료 알림이 발송됩니다.');">
-								거래 완료</button>
-						</form>
+						<div class="action-group">
+							<form action="${ctx}/order/direct/${o.orderNo}/complete" method="post" style="margin: 0;">
+								<button type="submit" class="confirm-btn"
+									onclick="return confirm('거래를 완료 처리하시겠어요?\n구매자에게 완료 알림이 발송됩니다.');">
+									거래 완료</button>
+							</form>
+							<form action="${ctx}/order/direct/${o.orderNo}/cancel" method="post" style="margin: 0;">
+								<button type="submit" class="cancel-btn"
+									onclick="return confirm('예약을 취소하시겠어요?\n상품이 다시 판매중으로 바뀌고, 대기 신청한 사용자 전원에게 알림이 발송됩니다.');">
+									예약 취소</button>
+							</form>
+						</div>
 					</div>
 				</c:forEach>
 			</c:otherwise>

@@ -75,12 +75,36 @@
 					</div>
 				</c:if>
 			</div>
-			<div style="margin-top: 20px; display: flex; gap: 10px; flex-wrap: wrap;">
+			<div
+				style="margin-top: 20px; display: flex; gap: 10px; flex-wrap: wrap;">
 				<a href="${ctx}/users/edit/${user.userNo}" class="btn btn-primary">내
-					정보 수정</a>
-				<a href="${ctx}/mypage/account" class="btn btn-primary">계좌 정보
-					${empty user.userAccountNumber ? '등록' : '수정'}</a>
-				<a href="${ctx}/order/pending" class="btn btn-primary">거래 관리</a>
+					정보 수정</a> <a href="${ctx}/mypage/account" class="btn btn-primary">계좌
+					정보 ${empty user.userAccountNumber ? '등록' : '수정'}</a> <a
+					href="${ctx}/order/pending" class="btn btn-primary">거래 관리</a>
+
+				<c:if test="${not empty transferRequests}">
+					<div style="margin-top: 24px;">
+						<h3 class="section-title">계좌 거래 요청</h3>
+
+						<c:forEach var="r" items="${transferRequests}">
+							<div class="card"
+								style="display: flex; justify-content: space-between; align-items: center;">
+
+								<div>
+									<div style="font-weight: bold;">${r.productName}</div>
+									<div style="font-size: 13px; color: #888;">요청자 :
+										${r.buyerNickname}</div>
+								</div>
+
+								<form action="${ctx}/order/transfer/approve" method="post"
+									style="margin: 0;">
+									<input type="hidden" name="orderNo" value="${r.orderNo}">
+									<button class="btn btn-primary">승인</button>
+								</form>
+							</div>
+						</c:forEach>
+					</div>
+				</c:if>
 
 				<c:url value="/users/delete/${user.userNo}" var="deleteUrl" />
 
@@ -94,29 +118,32 @@
 		<!-- 내 직거래 (예약중) 미니 섹션 -->
 		<c:if test="${not empty myReservedDirects}">
 			<div style="margin-top: 24px;">
-				<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+				<div
+					style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
 					<h3 style="margin: 0; font-size: 15px; font-weight: 600;">
-						내 직거래
-						<span style="color:#0c447c; background:#e0f2fe; font-size:11px; padding:2px 8px; border-radius:10px; margin-left:6px; font-weight:bold;">
-							${fn:length(myReservedDirects)}건 예약중
-						</span>
+						내 직거래 <span
+							style="color: #0c447c; background: #e0f2fe; font-size: 11px; padding: 2px 8px; border-radius: 10px; margin-left: 6px; font-weight: bold;">
+							${fn:length(myReservedDirects)}건 예약중 </span>
 					</h3>
-					<a href="${ctx}/order/pending" style="font-size: 12px; color: #666;">판매자 관리 &gt;</a>
+					<a href="${ctx}/order/pending"
+						style="font-size: 12px; color: #666;">판매자 관리 &gt;</a>
 				</div>
 				<div style="display: flex; flex-direction: column; gap: 8px;">
 					<c:forEach var="d" items="${myReservedDirects}">
-						<c:set var="role" value="${d.buyerNo == user.userNo ? '구매' : '판매'}" />
-						<c:set var="link" value="${d.buyerNo == user.userNo ? ctx.concat('/order/direct/reserved/').concat(d.orderNo) : ctx.concat('/order/pending')}" />
+						<c:set var="role"
+							value="${d.buyerNo == user.userNo ? '구매' : '판매'}" />
+						<c:set var="link"
+							value="${d.buyerNo == user.userNo ? ctx.concat('/order/direct/reserved/').concat(d.orderNo) : ctx.concat('/order/pending')}" />
 						<a href="${link}"
 							style="display: flex; align-items: center; gap: 10px; padding: 10px 14px; background: #fff; border: 1px solid #eee; border-radius: 10px; text-decoration: none; color: inherit;">
-							<span style="font-size: 11px; padding: 2px 7px; border-radius: 4px;
+							<span
+							style="font-size: 11px; padding: 2px 7px; border-radius: 4px;
 								${role == '구매' ? 'background:#fef3c7; color:#92400e;' : 'background:#dcfce7; color:#166534;'}">
-								${role}
-							</span>
+								${role} </span>
 							<div style="flex: 1; min-width: 0; overflow: hidden;">
-								<div style="font-size: 13px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-									${d.productName}
-								</div>
+								<div
+									style="font-size: 13px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+									${d.productName}</div>
 								<div style="font-size: 11px; color: #888;">
 									<c:if test="${not empty d.meetingTime}">
 										<fmt:formatDate value="${d.meetingTime}" pattern="MM/dd HH:mm" />
@@ -125,8 +152,7 @@
 										· ${d.meetingPlace}
 									</c:if>
 								</div>
-							</div>
-							<span style="color: #aaa; font-size: 12px;">›</span>
+							</div> <span style="color: #aaa; font-size: 12px;">›</span>
 						</a>
 					</c:forEach>
 				</div>

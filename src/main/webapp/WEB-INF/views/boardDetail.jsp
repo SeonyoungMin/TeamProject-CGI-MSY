@@ -217,6 +217,7 @@ body {
 						method="post">
 						<input type="hidden" name="boardNo" value="${board.boardNo}">
 						<input type="hidden" name="targetType" value="BOARD"> <input
+							type="hidden" name="returnTo" value="board"> <input
 							type="text" name="content" placeholder="댓글을 입력하세요" required>
 
 						<button type="submit">등록</button>

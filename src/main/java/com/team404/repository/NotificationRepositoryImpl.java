@@ -40,7 +40,6 @@ public class NotificationRepositoryImpl implements NotificationRepository {
 	}
 	
 	
-
 	// 읽지 않은 알림 개수 (헤더 뱃지용)
 	public int countUnread(int receiverNo) {
 		String SQL = "select count(*) from notification "

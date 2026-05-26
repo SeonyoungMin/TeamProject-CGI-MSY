@@ -177,4 +177,40 @@ public class NotificationServiceImpl implements NotificationService {
 		n.setLinkUrl(CTX + "/mypage/account");
 		notificationRepsotory.insert(n);
 	}
+
+	@Override
+	public void notifyBackOnSale(int receiverNo, int productNo, String productName) {
+		Notification n = new Notification();
+		n.setReceiverNo(receiverNo);
+		n.setSenderNo(0);
+		n.setNotiType("waitlist");
+		n.setMessage("대기 신청하신 '" + productName + "' 상품이 다시 판매중입니다. 지금 구매해 보세요!");
+		n.setLinkUrl(CTX + "/product/" + productNo);
+		notificationRepsotory.insert(n);
+	}
+
+	@Override
+	public void notifyTransferRequest(int sellerNo, int buyerNo, int productNo, String productName,
+			String buyerNickName) {
+
+		Notification n = new Notification();
+		n.setReceiverNo(sellerNo);
+		n.setSenderNo(buyerNo);
+		n.setNotiType("transfer_request");
+		n.setMessage(buyerNickName + "님이 '" + productName + "' 상품의 거래를 요청했습니다.");
+		n.setLinkUrl(CTX + "/order/pending");
+		notificationRepsotory.insert(n);
+	}
+
+	@Override
+	public void notifyTransferApproved(int buyerNo, int sellerNo, int productNo, String productName) {
+
+		Notification n = new Notification();
+		n.setReceiverNo(buyerNo);
+		n.setSenderNo(sellerNo);
+		n.setNotiType("transfer_approved");
+		n.setMessage("'" + productName + "' 상품의 거래 요청이 승인되었습니다. 입금 정보를 입력해 주세요.");
+		n.setLinkUrl(CTX + "/order/transfer/form?productNo=" + productNo);
+		notificationRepsotory.insert(n);
+	}
 }

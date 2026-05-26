@@ -259,7 +259,8 @@ h2 {
 						style="flex: 1; margin: 0;">
 						<input type="hidden" name="productNo" value="${product.productNo}">
 						<button type="submit" class="btn-submit" style="width: 100%;"
-							onclick="return confirm('판매자에게 계좌 등록 요청을 보낼까요?');">계좌 등록 요청 보내기</button>
+							onclick="return confirm('판매자에게 계좌 등록 요청을 보낼까요?');">계좌 등록
+							요청 보내기</button>
 					</form>
 					<button type="button" class="btn-cancel" style="flex: 1;"
 						onclick="history.back()">돌아가기</button>
@@ -305,14 +306,15 @@ h2 {
 									value="${loginUser.userAddress}" required readonly>
 							</div>
 							<div class="field-row">
-								<span class="field-label">상세주소 <span style="color:#999; font-weight:normal; font-size:12px;">(선택)</span></span>
+								<span class="field-label">상세주소 <span
+									style="color: #999; font-weight: normal; font-size: 12px;">(선택)</span></span>
 								<input class="field-input" type="text" name="addressDetail"
 									placeholder="동/호수 (선택)">
 							</div>
 							<div class="field-row">
 								<span class="field-label">요청사항</span> <select
-									class="field-input" name="deliveryRequest" id="deliveryRequestSel"
-									onchange="toggleDeliveryEtc()">
+									class="field-input" name="deliveryRequest"
+									id="deliveryRequestSel" onchange="toggleDeliveryEtc()">
 									<option value="문 앞에 놓아주세요">문 앞에 놓아주세요</option>
 									<option value="배송 전 연락 바랍니다">배송 전 연락 바랍니다</option>
 									<option value="경비실에 맡겨주세요">경비실에 맡겨주세요</option>
@@ -320,9 +322,9 @@ h2 {
 									<option value="기타">기타 (직접 입력)</option>
 								</select>
 							</div>
-							<div class="field-row" id="deliveryEtcRow" style="display:none;">
-								<span class="field-label">기타 요청</span>
-								<input class="field-input" type="text" id="deliveryRequestEtc"
+							<div class="field-row" id="deliveryEtcRow" style="display: none;">
+								<span class="field-label">기타 요청</span> <input
+									class="field-input" type="text" id="deliveryRequestEtc"
 									placeholder="요청사항을 직접 입력해 주세요" maxlength="100">
 							</div>
 						</div>
@@ -340,53 +342,66 @@ h2 {
 								<div style="font-size: 13px; color: #666; margin-top: 2px;">
 									예금주: ${seller.userAccountHolder}</div>
 							</div>
-							<button type="button" class="copy-btn" onclick="copyAccount()">복사</button>
-						</div>
-						<div class="card">
-							<div class="field-row">
-								<span class="field-label">입금자명</span> <input class="field-input"
-									type="text" name="depositorName" placeholder="실제 입금하시는 분의 이름"
-									required>
+							<div style="display: flex; flex-direction: column; gap: 8px;">
+								<button type="button" class="copy-btn" onclick="copyAccount()">계좌
+									복사</button>
+
+								<a
+									href="https://www.police.go.kr/www/security/cyber/cyber04.jsp"
+									target="_blank" class="copy-btn"
+									style="text-decoration: none; text-align: center;"> 사기계좌 조회
+								</a>
+							</div>
+							<div class="card">
+								<div class="field-row">
+									<span class="field-label">입금자명</span> <input
+										class="field-input" type="text" name="depositorName"
+										placeholder="실제 입금하시는 분의 이름" required>
+								</div>
 							</div>
 						</div>
-					</div>
 
-					<div class="section">
-						<div class="section-title">결제 요약</div>
-						<div class="card">
-							<div class="summary-row">
-								<span style="color: #666;">상품 금액</span> <span><fmt:formatNumber
-										value="${product.price}" />원</span>
-							</div>
-							<div class="summary-total">
-								<span>총 결제 금액</span> <span><fmt:formatNumber
-										value="${product.price}" />원</span>
+						<div class="section">
+							<div class="section-title">결제 요약</div>
+							<div class="card">
+								<div class="summary-row">
+									<span style="color: #666;">상품 금액</span> <span><fmt:formatNumber
+											value="${product.price}" />원</span>
+								</div>
+								<div class="summary-total">
+									<span>총 결제 금액</span> <span><fmt:formatNumber
+											value="${product.price}" />원</span>
+								</div>
 							</div>
 						</div>
-					</div>
 
-					<div class="notice-box">
-						<strong>안전거래 안내</strong><br> 입금 전 판매자 신원과 계좌 정보를 한 번 더 확인하세요.
-						입금 후에는 채팅으로 송금 확인을 요청해주세요.
-					</div>
+						<div class="notice-box">
+							<strong>안전거래 안내</strong><br> 입금 전 판매자 신원과 계좌 정보를 한 번 더
+							확인하세요.
+						</div>
 
-					<div class="section">
-						<label style="display: block; padding: 6px 0; cursor: pointer;">
-							<input type="checkbox" id="agree1"> 개인정보 제3자(판매자) 제공에
-							동의합니다 (필수)
-						</label> <label style="display: block; padding: 6px 0; cursor: pointer;">
-							<input type="checkbox" id="agree2"> 환불 정책을 확인했으며 동의합니다
-							(필수)
-						</label>
-					</div>
+						<div class="section">
 
-					<div class="btn-group">
-						<button type="button" class="btn-cancel" onclick="history.back()">취소</button>
-						<button type="submit" class="btn-submit" id="submitBtn">
-							<fmt:formatNumber value="${product.price}" />
-							원 결제하기
-						</button>
-					</div>
+							<label
+								style="display: block; padding: 8px 0; cursor: pointer; line-height: 1.6;">
+								<input type="checkbox" id="agree1"> 판매자 계좌가 <b>사기계좌
+									여부 조회 완료</b>된 계좌인지 직접 확인했으며, 입금 판단에 대한 책임은 구매자 본인에게 있음을 확인합니다. (필수)
+							</label> <label
+								style="display: block; padding: 8px 0; cursor: pointer; line-height: 1.6;">
+								<input type="checkbox" id="agree2"> 사기계좌로 확인될 경우 다른 피해
+								예방을 위해 <b>경찰청 또는 사이버범죄 신고센터에 신고</b>외에 자사 사이트에서도 사용자 신고를 적극적으로 하는
+								데 동의합니다. (필수)
+							</label>
+
+						</div>
+
+						<div class="btn-group">
+							<button type="button" class="btn-cancel" onclick="history.back()">취소</button>
+							<button type="submit" class="btn-submit" id="submitBtn">
+								<fmt:formatNumber value="${product.price}" />
+								원 결제하기
+							</button>
+						</div>
 				</form>
 
 			</c:otherwise>
@@ -427,10 +442,12 @@ h2 {
 			var sel = document.getElementById('deliveryRequestSel');
 			var row = document.getElementById('deliveryEtcRow');
 			var etc = document.getElementById('deliveryRequestEtc');
-			if (!sel || !row) return;
+			if (!sel || !row)
+				return;
 			if (sel.value === '기타') {
 				row.style.display = '';
-				if (etc) etc.focus();
+				if (etc)
+					etc.focus();
 			} else {
 				row.style.display = 'none';
 			}
@@ -453,7 +470,8 @@ h2 {
 					if (!val) {
 						alert('기타 요청사항을 입력해주세요.');
 						e.preventDefault();
-						if (etc) etc.focus();
+						if (etc)
+							etc.focus();
 						return;
 					}
 					var opt = document.createElement('option');
