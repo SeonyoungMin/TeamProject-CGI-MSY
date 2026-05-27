@@ -63,4 +63,14 @@ public interface NotificationService {
 
 	// 거래 요청 승인 알림 (판매자 → 구매자)
 	void notifyTransferApproved(int buyerNo, int sellerNo, int productNo, String productName);
+
+	// 직거래 약속 취소 알림 (판매자 → 구매자)
+	void notifyDirectCancelled(int buyerNo, int productNo, String productName);
+
+	// 계좌이체 거래 요청 거절 알림 (판매자 → 구매자, 요청 단계에서 취소된 경우)
+	void notifyTransferRejected(int buyerNo, int productNo, String productName);
+
+	// 계좌이체 거래 취소 알림 (승인완료/입금대기 단계에서 취소된 경우)
+	// cancelledBySeller=true 면 receiver=구매자, false 면 receiver=판매자
+	void notifyTransferCancelled(int receiverNo, int productNo, String productName, boolean cancelledBySeller);
 }

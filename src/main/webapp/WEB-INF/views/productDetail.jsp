@@ -315,8 +315,10 @@
 						<div class="fav-area">
 							<c:choose>
 								<%-- 본인 상품 --%>
-								<c:when test="${not empty loginUser && product.sellerNo == loginUser.userNo}">
-									<span style="color: #e74c3c; font-size: 14px;">본인 상품은 구매할 수 없습니다.</span>
+								<c:when
+									test="${not empty loginUser && product.sellerNo == loginUser.userNo}">
+									<span style="color: #e74c3c; font-size: 14px;">본인 상품은
+										구매할 수 없습니다.</span>
 								</c:when>
 
 								<%-- 판매중: 구매하기 --%>
@@ -325,12 +327,33 @@
 										class="btn-order">구매하기</a>
 								</c:when>
 
-								<%-- 예약중: 대기 신청/취소 --%>
+								<%-- 본인이 승인받은 거래 → 결제 진행 (예약중 분기보다 먼저!) --%>
+								<c:when
+									test="${not empty myOrder && myOrder.orderStatus == '승인완료'}">
+									<a
+										href="${ctx}/order/transfer/form?productNo=${product.productNo}"
+										class="btn-order">결제 진행</a>
+								</c:when>
+
+								<%-- 본인이 입금 대기 중 → 입금 안내로 --%>
+								<c:when
+									test="${not empty myOrder && myOrder.orderStatus == '입금대기'}">
+									<a href="${ctx}/order/waiting/${myOrder.orderNo}"
+										class="btn-order">입금 안내 보기</a>
+								</c:when>
+
+								<%-- 본인이 거래 요청 보낸 상태 → 승인 대기 안내 --%>
+								<c:when
+									test="${not empty myOrder && myOrder.orderStatus == '요청'}">
+									<span class="status-msg">판매자 승인 대기 중입니다.</span>
+								</c:when>
+
+								<%-- 예약중: 대기 신청/취소 (다른 사용자에게만) --%>
 								<c:when test="${product.tradeStatus == '예약중'}">
 									<c:choose>
 										<c:when test="${alreadyWaitlisted}">
-											<button type="button" id="waitlistBtn" class="btn-waitlist waiting"
-												onclick="toggleWaitlist()">
+											<button type="button" id="waitlistBtn"
+												class="btn-waitlist waiting" onclick="toggleWaitlist()">
 												<i class="fa-solid fa-bell"></i> 대기 신청됨
 											</button>
 										</c:when>
@@ -341,8 +364,8 @@
 											</button>
 										</c:otherwise>
 									</c:choose>
-									<span class="waitlist-count" id="waitlistCountLabel">
-										대기 <span id="waitlistCount">${waitlistCount}</span>명
+									<span class="waitlist-count" id="waitlistCountLabel"> 대기
+										<span id="waitlistCount">${waitlistCount}</span>명
 									</span>
 								</c:when>
 
@@ -352,7 +375,8 @@
 								</c:otherwise>
 							</c:choose>
 
-							<c:if test="${not empty loginUser && product.sellerNo != loginUser.userNo}">
+							<c:if
+								test="${not empty loginUser && product.sellerNo != loginUser.userNo}">
 								<button id="favBtn" type="button" class="btn btn-line"
 									onclick="toggleFavorite()">
 									<i id="favIcon"
@@ -537,7 +561,10 @@
 	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 	<script>
 		var ctx = "${ctx}";
-		var productNo = ${product.productNo};
+		var productNo = $
+		{
+			product.productNo
+		};
 
 		function changeImage(src) {
 			document.getElementById("mainImage").src = src;
@@ -570,64 +597,62 @@
 			});
 		}
 
-<<<<<<< HEAD
-		// 답글 폼 토글
 		function toggleReplyForm(commentNo) {
-			var formEl = document.getElementById('replyForm_' + commentNo);
-			if (formEl.style.display === 'none') {
-				formEl.style.display = 'block';
-				formEl.querySelector('textarea').focus();
-			} else {
-				formEl.style.display = 'none';
-			}
+		    var formEl = document.getElementById('replyForm_' + commentNo);
+		    if (formEl.style.display === 'none') {
+		        formEl.style.display = 'block';
+		        formEl.querySelector('textarea').focus();
+		    } else {
+		        formEl.style.display = 'none';
+		    }
 		}
-		
+
 		function toggleEditForm(commentNo) {
 		    var formEl = document.getElementById('editForm_' + commentNo);
 		    formEl.style.display = formEl.style.display === 'none' ? 'block' : 'none';
-=======
+		}
+
 		function toggleWaitlist() {
-			var btn = document.getElementById('waitlistBtn');
-			if (!btn) return;
-			var waiting = btn.classList.contains('waiting');
-			var url = waiting ? ctx + '/waitlist/remove' : ctx + '/waitlist/add';
+		    var btn = document.getElementById('waitlistBtn');
+		    if (!btn) return;
+		    var waiting = btn.classList.contains('waiting');
+		    var url = waiting ? ctx + '/waitlist/remove' : ctx + '/waitlist/add';
 
-			$.post(url, { productNo: productNo }, function(result) {
-				if (result === 'login') {
-					alert('로그인이 필요합니다.');
-					location.href = ctx + '/login';
-					return;
-				}
-				if (result === 'self') {
-					alert('본인 상품에는 대기 신청할 수 없습니다.');
-					return;
-				}
-				if (result === 'notreserved') {
-					alert('예약중 상품에만 대기 신청할 수 있습니다.');
-					location.reload();
-					return;
-				}
-				if (result === 'notfound') {
-					alert('상품을 찾을 수 없습니다.');
-					return;
-				}
+		    $.post(url, { productNo : productNo }, function(result) {
+		        if (result === 'login') {
+		            alert('로그인이 필요합니다.');
+		            location.href = ctx + '/login';
+		            return;
+		        }
+		        if (result === 'self') {
+		            alert('본인 상품에는 대기 신청할 수 없습니다.');
+		            return;
+		        }
+		        if (result === 'notreserved') {
+		            alert('예약중 상품에만 대기 신청할 수 있습니다.');
+		            location.reload();
+		            return;
+		        }
+		        if (result === 'notfound') {
+		            alert('상품을 찾을 수 없습니다.');
+		            return;
+		        }
 
-				var countEl = document.getElementById('waitlistCount');
-				var count = parseInt(countEl.textContent) || 0;
+		        var countEl = document.getElementById('waitlistCount');
+		        var count = parseInt(countEl.textContent) || 0;
 
-				if (result === 'added') {
-					btn.classList.add('waiting');
-					btn.innerHTML = '<i class="fa-solid fa-bell"></i> 대기 신청됨';
-					countEl.textContent = count + 1;
-				} else if (result === 'removed') {
-					btn.classList.remove('waiting');
-					btn.innerHTML = '<i class="fa-regular fa-bell"></i> 예약 대기 신청';
-					countEl.textContent = Math.max(0, count - 1);
-				}
-			}).fail(function() {
-				alert('처리 중 오류가 발생했습니다.');
-			});
->>>>>>> branch 'main' of https://github.com/SeonyoungMin/TeamProject-JAC-CGI-MSY.git
+		        if (result === 'added') {
+		            btn.classList.add('waiting');
+		            btn.innerHTML = '<i class="fa-solid fa-bell"></i> 대기 신청됨';
+		            countEl.textContent = count + 1;
+		        } else if (result === 'removed') {
+		            btn.classList.remove('waiting');
+		            btn.innerHTML = '<i class="fa-regular fa-bell"></i> 예약 대기 신청';
+		            countEl.textContent = Math.max(0, count - 1);
+		        }
+		    }).fail(function() {
+		        alert('처리 중 오류가 발생했습니다.');
+		    });
 		}
 	</script>
 </body>

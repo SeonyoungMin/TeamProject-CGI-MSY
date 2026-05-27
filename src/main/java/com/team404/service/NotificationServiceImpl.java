@@ -215,6 +215,40 @@ public class NotificationServiceImpl implements NotificationService {
 	}
 
 	@Override
+	public void notifyDirectCancelled(int buyerNo, int productNo, String productName) {
+		Notification n = new Notification();
+		n.setReceiverNo(buyerNo);
+		n.setSenderNo(0);
+		n.setNotiType("trade_cancelled");
+		n.setMessage("'" + productName + "' 상품의 직거래 약속이 취소되었습니다.");
+		n.setLinkUrl(CTX + "/product/" + productNo);
+		notificationRepsotory.insert(n);
+	}
+
+	@Override
+	public void notifyTransferRejected(int buyerNo, int productNo, String productName) {
+		Notification n = new Notification();
+		n.setReceiverNo(buyerNo);
+		n.setSenderNo(0);
+		n.setNotiType("trade_rejected");
+		n.setMessage("'" + productName + "' 상품의 거래 요청이 거절되었습니다.");
+		n.setLinkUrl(CTX + "/product/" + productNo);
+		notificationRepsotory.insert(n);
+	}
+
+	@Override
+	public void notifyTransferCancelled(int receiverNo, int productNo, String productName, boolean cancelledBySeller) {
+		String who = cancelledBySeller ? "판매자" : "구매자";
+		Notification n = new Notification();
+		n.setReceiverNo(receiverNo);
+		n.setSenderNo(0);
+		n.setNotiType("trade_cancelled");
+		n.setMessage(who + "가 '" + productName + "' 상품의 거래를 취소했습니다.");
+		n.setLinkUrl(CTX + "/product/" + productNo);
+		notificationRepsotory.insert(n);
+	}
+
+	@Override
 	public void notifyTransferApproved(int buyerNo, int sellerNo, int productNo, String productName) {
 
 		Notification n = new Notification();

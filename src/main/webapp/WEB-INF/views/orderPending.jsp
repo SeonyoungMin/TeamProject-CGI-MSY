@@ -164,6 +164,15 @@
 		<c:if test="${param.approved != null}">
 			<div class="banner banner-success"> 거래 요청을 승인했습니다. 구매자에게 알림이 발송됐어요.</div>
 		</c:if>
+		<c:if test="${param.transferCancelled != null}">
+			<div class="banner banner-success"> 거래가 취소되었습니다. 관련 알림도 정리됐어요.</div>
+		</c:if>
+		<c:if test="${param.error == 'cannot-approve'}">
+			<div class="banner banner-error"> 이미 다른 거래가 진행 중이거나 권한이 없습니다.</div>
+		</c:if>
+		<c:if test="${param.error == 'cannot-cancel-transfer'}">
+			<div class="banner banner-error"> 입금이 완료된 거래는 취소할 수 없습니다.</div>
+		</c:if>
 
 		<h3 style="font-size: 16px; margin: 18px 0 10px;">계좌이체 거래 요청</h3>
 		<c:choose>
@@ -186,11 +195,18 @@
 								<fmt:formatDate value="${o.createdTime}" pattern="yyyy-MM-dd HH:mm" /> 요청
 							</div>
 						</div>
-						<form action="${ctx}/order/transfer/${o.orderNo}/approve" method="post" style="margin: 0;">
-							<button type="submit" class="confirm-btn"
-								onclick="return confirm('거래 요청을 승인하시겠어요?\n구매자에게 입금 폼 접근 권한이 부여됩니다.');">
-								승인</button>
-						</form>
+						<div class="action-group">
+							<form action="${ctx}/order/transfer/${o.orderNo}/approve" method="post" style="margin: 0;">
+								<button type="submit" class="confirm-btn"
+									onclick="return confirm('거래 요청을 승인하시겠어요?\n구매자에게 입금 폼 접근 권한이 부여됩니다.');">
+									승인</button>
+							</form>
+							<form action="${ctx}/order/transfer/${o.orderNo}/cancel" method="post" style="margin: 0;">
+								<button type="submit" class="cancel-btn"
+									onclick="return confirm('이 거래 요청을 거절하시겠어요?');">
+									거절</button>
+							</form>
+						</div>
 					</div>
 				</c:forEach>
 			</c:otherwise>
@@ -222,12 +238,20 @@
 								주문
 							</div>
 						</div>
-						<form action="${ctx}/order/${o.orderNo}/confirm-payment"
-							method="post" style="margin: 0;">
-							<button type="submit" class="confirm-btn"
-								onclick="return confirm('정말 입금이 확인됐나요?\n확인하면 거래가 완료 처리됩니다.');">
-								입금 확인</button>
-						</form>
+						<div class="action-group">
+							<form action="${ctx}/order/${o.orderNo}/confirm-payment"
+								method="post" style="margin: 0;">
+								<button type="submit" class="confirm-btn"
+									onclick="return confirm('정말 입금이 확인됐나요?\n확인하면 거래가 완료 처리됩니다.');">
+									입금 확인</button>
+							</form>
+							<form action="${ctx}/order/transfer/${o.orderNo}/cancel"
+								method="post" style="margin: 0;">
+								<button type="submit" class="cancel-btn"
+									onclick="return confirm('이 거래를 취소하시겠어요?\n상품이 다시 판매중으로 바뀌고 관련 알림이 정리됩니다.');">
+									거래 취소</button>
+							</form>
+						</div>
 					</div>
 				</c:forEach>
 			</c:otherwise>
