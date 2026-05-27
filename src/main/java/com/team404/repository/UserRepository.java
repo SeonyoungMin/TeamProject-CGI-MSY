@@ -64,7 +64,16 @@ public interface UserRepository {
 	
 	//구글, 카카오 로그인
 	User findByEmail(String email);
-	
+
 	void insertOAuthUser(User user);
 
+	// 계좌 정보 등록/수정
+	void updateAccount(int userNo, String bankName, String accountNumber, String accountHolder);
+
+	// 유저 신고 누적 점수
+	void updateRiskScore(int userNo, double score);
+	
+	// 신고 내역 알림 대상 (관리자)
+	List<User> findAdmins();
+	
 }

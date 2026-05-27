@@ -12,46 +12,48 @@
 <style>
 body {
 	margin: 0;
-	font-family: Arial, sans-serif;
+	font-family: 'Malgun Gothic', sans-serif;
 	background: #f8f9fa;
 }
 
 .container {
-	max-width: 1400px;
+	max-width: 1300px;
 	margin: 40px auto;
-	padding: 30px;
-	background: white;
-	border-radius: 12px;
+	padding: 0 20px;
 }
 
 .top-bar {
 	display: flex;
 	justify-content: space-between;
 	align-items: center;
-	margin-bottom: 30px;
+	margin-bottom: 24px;
 }
 
 .write-btn {
 	padding: 10px 20px;
-	background: black;
-	color: white;
+	background: #121212;
+	color: #fff !important;
 	text-decoration: none;
 	border-radius: 8px;
+	font-size: 14px;
 }
 
+/* 상품 그리드 */
 .product-grid {
 	display: grid;
 	grid-template-columns: repeat(5, 1fr);
-	gap: 20px;
+	gap: 15px;
 }
 
 .product-card {
-	border: 1px solid #eee;
-	border-radius: 10px;
-	overflow: hidden;
-	background: white;
+	display: block;
 	text-decoration: none;
-	color: black;
+	color: inherit;
+	border: 1px solid #eee;
+	border-radius: 8px;
+	overflow: hidden;
+	position: relative;
+	background: #fff;
 	transition: .2s;
 }
 
@@ -60,43 +62,99 @@ body {
 	box-shadow: 0 4px 12px rgba(0, 0, 0, .08);
 }
 
-.product-card img {
+/* 썸네일 */
+.img-wrap {
+	height: 180px;
+	background: #f0f0f0;
+	position: relative;
+	overflow: hidden;
+}
+
+.img-wrap img {
 	width: 100%;
-	height: 160px;
+	height: 100%;
 	object-fit: cover;
 }
 
 .no-img {
-	height: 160px;
+	width: 100%;
+	height: 100%;
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	background: #f3f3f3;
 	color: #aaa;
+	background: #f0f0f0;
+	font-size: 13px;
 }
 
+/* 조회수 뱃지 */
+.view-badge {
+	position: absolute;
+	bottom: 8px;
+	left: 8px;
+	background: rgba(0, 0, 0, 0.55);
+	color: #fff;
+	font-size: 11px;
+	padding: 2px 6px;
+	border-radius: 10px;
+}
+
+/* 찜 버튼 */
+.fav-btn {
+	position: absolute;
+	bottom: 8px;
+	right: 8px;
+	display: inline-flex;
+	align-items: center;
+	gap: 4px;
+	padding: 3px 8px;
+	background: rgba(255, 255, 255, 0.88);
+	border-radius: 14px;
+	cursor: pointer;
+	user-select: none;
+}
+
+.fav-btn:hover {
+	background: #fff;
+}
+
+.fav-icon {
+	color: #ff4d4d;
+	font-size: 13px;
+}
+
+.fav-count {
+	font-size: 12px;
+	font-weight: bold;
+	color: #111;
+}
+
+/* 텍스트 */
 .info {
-	padding: 14px;
+	padding: 10px 12px 12px;
 }
 
 .name {
-	font-weight: bold;
-	margin-bottom: 8px;
+	font-size: 14px;
+	font-weight: 600;
 	white-space: nowrap;
 	overflow: hidden;
 	text-overflow: ellipsis;
+	margin-bottom: 4px;
 }
 
 .meta {
-	color: #777;
-	font-size: 13px;
-	margin-bottom: 6px;
+	font-size: 12px;
+	color: #888;
+	margin-bottom: 4px;
 }
 
 .price {
 	font-weight: bold;
+	font-size: 15px;
 }
 
+/* 페이지네이션 */
 .pagination {
 	text-align: center;
 	margin-top: 30px;
@@ -113,51 +171,32 @@ body {
 }
 
 .pagination strong {
-	background: black;
-	color: white;
-}
-
-.view-badge {
-	position: absolute;
-	bottom: 8px;
-	left: 8px;
-	background: rgba(0, 0, 0, 0.55);
+	background: #121212;
 	color: #fff;
-	font-size: 12px;
-	padding: 2px 6px;
-	border-radius: 10px;
+	border-color: #121212;
 }
 
-.fav-btn {
+.reserved-overlay {
 	position: absolute;
-	bottom: 8px;
-	right: 8px;
-	display: inline-flex;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background: rgba(0, 0, 0, 0.45);
+	display: flex;
 	align-items: center;
-	gap: 4px;
-	padding: 3px 8px;
-	background: rgba(255, 255, 255, 0.85);
-	border-radius: 14px;
-	cursor: pointer;
-	user-select: none;
+	justify-content: center;
+	border-radius: 10px 10px 0 0;
 }
 
-.fav-btn:hover {
+.reserved-badge {
 	background: #fff;
-}
-
-.fav-btn .fav-icon {
-	color: #ff4d4d;
-	font-size: 10px;
-}
-
-.fav-btn .fav-count {
-	font-size: 12px;
+	color: #333;
+	font-size: 13px;
 	font-weight: bold;
-	color: #111;
+	padding: 6px 14px;
+	border-radius: 20px;
 }
-
-
 </style>
 </head>
 <body>
@@ -167,35 +206,40 @@ body {
 	<div class="container">
 
 		<div class="top-bar">
-			<h2>상품 목록</h2>
-			<a href="${ctx}/product/new" class="write-btn" style="color: #fff;">글쓰기</a>
+			<h2 style="margin: 0;">상품 목록</h2>
+			<a href="${ctx}/product/new" class="write-btn">글쓰기</a>
 		</div>
 
 		<c:if test="${empty list}">
-			<p style="text-align: center; color: #888;">등록된 상품이 없습니다.</p>
+			<p style="text-align: center; color: #888; padding: 60px 0;">등록된
+				상품이 없습니다.</p>
 		</c:if>
 
 		<div class="product-grid">
 			<c:forEach var="p" items="${list}">
 				<a href="${ctx}/product/${p.productNo}" class="product-card">
-					<div style="position: relative;">
+					<div class="img-wrap">
+
 						<c:choose>
 							<c:when test="${not empty p.imgPath}">
-								<img src="${p.imgPath}"
-									style="width: 100%; height: 160px; object-fit: cover;">
+								<img src="${p.imgPath}">
 							</c:when>
-
 							<c:otherwise>
 								<div class="no-img">이미지 없음</div>
 							</c:otherwise>
 						</c:choose>
+						<c:if test="${p.tradeStatus == '예약중'}">
+							<div class="reserved-overlay">
+								<span class="reserved-badge">예약중</span>
+							</div>
+						</c:if>
+
 
 						<span class="view-badge"> <i class="fa-solid fa-eye"></i>
 							${p.viewCount}
-						</span>
-						<span class="fav-btn" data-product-no="${p.productNo}"
+						</span> <span class="fav-btn" data-product-no="${p.productNo}"
 							onclick="toggleFavorite(event, this)"> <i
-							class="fav-icon ${p.favoriteCount > 0 ? 'fa-solid' : 'fa-regular'} fa-heart"></i>
+							class="fav-icon ${p.isFavorite > 0 ? 'fa-solid' : 'fa-regular'} fa-heart"></i>
 							<span class="fav-count">${p.favoriteCount}</span>
 						</span>
 					</div>
@@ -220,7 +264,7 @@ body {
 							<strong>${i}</strong>
 						</c:when>
 						<c:otherwise>
-							<a href="${ctx}/productList?pageNum=${i}"> ${i} </a>
+							<a href="${ctx}/productList?pageNum=${i}">${i}</a>
 						</c:otherwise>
 					</c:choose>
 				</c:forEach>
@@ -228,8 +272,9 @@ body {
 		</c:if>
 
 	</div>
+
 	<script>
-		// 찜 토글 (AJAX)
+		// 찜 토글 (jQuery AJAX)
 		function toggleFavorite(event, el) {
 			event.preventDefault();
 			event.stopPropagation();
@@ -238,34 +283,38 @@ body {
 			var iconEl = el.querySelector('.fav-icon');
 			var countEl = el.querySelector('.fav-count');
 
-			var form = new URLSearchParams();
-			form.append('productNo', productNo);
+			$
+					.ajax({
+						url : '${ctx}/favorite/toggle',
+						type : 'POST',
+						data : {
+							productNo : productNo
+						},
+						success : function(result) {
+							if (result === 'login') {
+								alert('로그인이 필요합니다.');
+								location.href = '${ctx}/login';
+								return;
+							}
+							var count = parseInt(countEl.textContent, 10) || 0;
+							if (result === 'added')
+								count += 1;
+							else if (result === 'removed')
+								count = Math.max(0, count - 1);
 
-			fetch('${ctx}/favorite/toggle', {
-				method: 'POST',
-				headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-				body: form.toString()
-			}).then(function(res) {
-				return res.text();
-			}).then(function(result) {
-				if (result === 'login') {
-					alert('로그인이 필요합니다.');
-					location.href = '${ctx}/login';
-					return;
-				}
-				var count = parseInt(countEl.textContent, 10) || 0;
-				if (result === 'added') count += 1;
-				else if (result === 'removed') count = Math.max(0, count - 1);
-
-				countEl.textContent = count;
-				iconEl.classList.remove('fa-solid', 'fa-regular');
-				iconEl.classList.add(count > 0 ? 'fa-solid' : 'fa-regular');
-			}).catch(function() {
-				alert('처리 중 오류가 발생했습니다.');
-			});
+							countEl.textContent = count;
+							iconEl.classList.remove('fa-solid', 'fa-regular');
+							iconEl.classList.add(count > 0 ? 'fa-solid'
+									: 'fa-regular');
+						},
+						error : function() {
+							alert('처리 중 오류가 발생했습니다.');
+						}
+					});
 		}
 	</script>
 
 	<%@ include file="/WEB-INF/views/footer.jsp"%>
+
 </body>
 </html>

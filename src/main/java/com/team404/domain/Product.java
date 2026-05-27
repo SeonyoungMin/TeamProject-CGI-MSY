@@ -59,12 +59,12 @@ public class Product {
 		this.description = description;
 	}
 
-	public String getTrade_status() {
+	public String getTradeStatus() {
 		return tradeStatus;
 	}
 
-	public void setTrade_status(String trade_status) {
-		this.tradeStatus = trade_status;
+	public void setTradeStatus(String tradeStatus) {
+		this.tradeStatus = tradeStatus;
 	}
 
 	public Timestamp getCreatedTime() {

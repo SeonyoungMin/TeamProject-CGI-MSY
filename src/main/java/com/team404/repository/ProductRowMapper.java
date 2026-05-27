@@ -16,7 +16,7 @@ public class ProductRowMapper implements RowMapper<Product> {
 		product.setCategory(rs.getNString("category"));
 		product.setPrice(rs.getLong("price"));
 		product.setDescription(rs.getNString("description"));
-		product.setTrade_status(rs.getNString("trade_status"));
+		product.setTradeStatus(rs.getNString("trade_status"));
 		product.setCreatedTime(rs.getTimestamp("created_time"));
 		return product;
 	}

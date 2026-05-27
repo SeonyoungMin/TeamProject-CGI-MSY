@@ -14,10 +14,11 @@ public class ProductListDto {
 	private long price;
 	private String tradeStatus;
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
-    private Timestamp createdTime;
+	private Timestamp createdTime;
 	private int viewCount;
 
 	private int favoriteCount;
+	private int isFavorite;
 
 	// orders 테이블 데이터 (orders.product_no = product.product_no)
 	private int sellerNo;
@@ -81,7 +82,6 @@ public class ProductListDto {
 		this.createdTime = createdTime;
 	}
 
-
 	public int getViewCount() {
 		return viewCount;
 	}
@@ -128,6 +128,14 @@ public class ProductListDto {
 
 	public void setFavoriteCount(int favoriteCount) {
 		this.favoriteCount = favoriteCount;
+	}
+
+	public int getIsFavorite() {
+		return isFavorite;
+	}
+
+	public void setIsFavorite(int isFavorite) {
+		this.isFavorite = isFavorite;
 	}
 
 }

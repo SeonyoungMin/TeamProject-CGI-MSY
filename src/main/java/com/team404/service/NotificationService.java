@@ -43,4 +43,37 @@ public interface NotificationService {
 
 	// 읽은 알림 전체 삭제
 	public void deleteRead(int receiverNo);
+
+	// 입금 알람
+	void notifyDepositPending(int sellerNo, int buyerNo, int productNo, String productName, String buyerNickname);
+
+	// 직거래 예약 알림 (구매자가 약속 잡음 → 판매자에게)
+	void notifyDirectReserved(int sellerNo, int buyerNo, int productNo, String productName, String buyerNickname);
+
+	// 계좌 등록 요청 알림 (구매자 → 판매자)
+	void notifyAccountRequest(int sellerNo, int buyerNo, int productNo, String productName, String buyerNickname);
+
+	void notifyReserved(int buyerNo, int productNo, String productName);
+
+	// 대기 신청 상품이 다시 판매중으로 풀렸을 때 대기자에게
+	void notifyBackOnSale(int receiverNo, int productNo, String productName);
+
+	// 계좌 조회 요청 알람 (구매자 → 판매자)
+	void notifyTransferRequest(int sellerNo, int buyerNo, int productNo, String productName, String buyerNickName);
+
+	// 거래 요청 승인 알림 (판매자 → 구매자)
+	void notifyTransferApproved(int buyerNo, int sellerNo, int productNo, String productName);
+
+	// 직거래 약속 취소 알림 (판매자 → 구매자)
+	void notifyDirectCancelled(int buyerNo, int productNo, String productName);
+
+	// 계좌이체 거래 요청 거절 알림 (판매자 → 구매자, 요청 단계에서 취소된 경우)
+	void notifyTransferRejected(int buyerNo, int productNo, String productName);
+
+	// 계좌이체 거래 취소 알림 (승인완료/입금대기 단계에서 취소된 경우)
+	// cancelledBySeller=true 면 receiver=구매자, false 면 receiver=판매자
+	void notifyTransferCancelled(int receiverNo, int productNo, String productName, boolean cancelledBySeller);
+	
+	// 신고 접수 관리자 알림
+	void notifyReport(int reporterNo, String targetType, String targetName);
 }

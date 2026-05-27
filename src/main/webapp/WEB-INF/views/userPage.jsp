@@ -11,7 +11,7 @@
 <style>
 /* 기본 레이아웃 */
 .app-container {
-	max-width: 700px;
+	max-width: 1100px;
 	margin: 0 auto;
 	padding: 20px;
 	font-family: 'Pretendard', sans-serif;
@@ -58,18 +58,20 @@
 /* 상품 그리드 */
 .product-grid {
 	display: grid;
-	grid-template-columns: repeat(2, 1fr);
-	gap: 20px;
+	grid-template-columns: repeat(4, 1fr);
+	gap: 14px;
 }
 
 .product-card {
+	position: relative;
 	text-decoration: none;
 	color: inherit;
 	border: 1px solid #f0f0f0;
-	border-radius: 12px;
+	border-radius: 10px;
 	overflow: hidden;
 	transition: 0.2s;
 	background: #fff;
+	text-decoration: none;
 }
 
 .product-card:hover {
@@ -79,18 +81,18 @@
 
 .product-card img {
 	width: 100%;
-	height: 180px;
+	height: 140px;
 	object-fit: cover;
 	background: #fafafa;
 }
 
 .product-info {
-	padding: 15px;
+	padding: 10px 12px;
 }
 
 .product-name {
-	font-size: 15px;
-	margin-bottom: 8px;
+	font-size: 13px;
+	margin-bottom: 6px;
 	white-space: nowrap;
 	overflow: hidden;
 	text-overflow: ellipsis;
@@ -99,7 +101,7 @@
 
 .product-price {
 	font-weight: bold;
-	font-size: 16px;
+	font-size: 14px;
 	color: #111;
 }
 
@@ -152,12 +154,44 @@
 	border-radius: 50%;
 	background: #ddd;
 }
+
+/* 판매 유저 페이지에서 판매 완료 된 상품 구분 */
+.sold-overlay {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 140px;
+	background: rgba(0, 0, 0, 0.45);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	border-radius: 10px 10px 0 0;
+}
+
+.sold-badge {
+	background: #fff;
+	color: #333;
+	font-size: 13px;
+	font-weight: bold;
+	padding: 6px 14px;
+	border-radius: 20px;
+}
 </style>
 </head>
+
+<%@ include file="/WEB-INF/views/reportModal.jsp"%>
 <body>
 	<%@ include file="/WEB-INF/views/header.jsp"%>
 
 	<div class="app-container">
+		<c:if test="${not empty loginUser && loginUser.userNo != user.userNo}">
+			<div style="text-align: right; margin-top: 10px;">
+				<button type="button" class="btn btn-danger"
+					onclick="openReportModal('user', ${user.userNo})">신고</button>
+			</div>
+		</c:if>
+
 		<div class="profile-section">
 			<div style="margin-bottom: 20px;">
 				<c:choose>
@@ -177,7 +211,8 @@
 
 				<c:if test="${sessionScope.loginUser.userRole == 'ROLE_ADMIN'}">
 					<div style="margin-top: 12px; display: flex; gap: 8px;">
-						<a href="${ctx}/users/edit/${user.userNo}" class="btn">회원 정보 수정</a>
+						<a href="${ctx}/users/edit/${user.userNo}" class="btn">회원 정보
+							수정</a>
 						<form action="${ctx}/users/delete/${user.userNo}" method="post"
 							style="display: inline; margin: 0;"
 							onsubmit="return confirm('정말 이 회원을 삭제하시겠습니까?');">
@@ -189,8 +224,8 @@
 			</div>
 		</div>
 
-		<div class="section-header">
-			<span class="section-title">판매 상품 <span class="item-count">(${myProducts.size()})</span></span>
+		<div id="productList" class="section-header">
+			<span class="section-title">판매 상품 <span class="item-count">(${totalMyProducts})</span></span>
 		</div>
 
 		<c:choose>
@@ -209,10 +244,19 @@
 								</c:when>
 								<c:otherwise>
 									<div
-										style="width: 100%; height: 180px; background: #f5f5f5; display: flex; align-items: center; justify-content: center; color: #ccc;">이미지
+										style="width: 100%; height: 140px; background: #f5f5f5; display: flex; align-items: center; justify-content: center; color: #ccc;">이미지
 										없음</div>
 								</c:otherwise>
-							</c:choose>
+							</c:choose> <c:if test="${p.tradeStatus == '완료'}">
+								<div class="sold-overlay">
+									<span class="sold-badge">판매완료</span>
+								</div>
+							</c:if> <c:if test="${p.tradeStatus == '예약중'}">
+								<div class="sold-overlay">
+									<span class="sold-badge">예약중</span>
+								</div>
+							</c:if>
+
 							<div class="product-info">
 								<div class="product-name">${p.productName}</div>
 								<div class="product-price">
@@ -223,45 +267,85 @@
 						</a>
 					</c:forEach>
 				</div>
+
+				<c:if test="${totalProductPages > 1}">
+					<div class="pagination"
+						style="text-align: center; margin-top: 20px; display: flex; justify-content: center; gap: 8px;">
+						<c:forEach var="i" begin="1" end="${totalProductPages}">
+							<a
+								href="${ctx}/users/search/${user.userNo}?productPage=${i}&page=${currentPage}#productList"
+								style="padding: 5px 12px; border: 1px solid #ddd; text-decoration: none; color: #333; border-radius: 4px;
+								${i == currentProductPage ? 'background-color: #121212; color: #fff; border-color: #121212;' : 'background-color: #fff;'}">
+								${i} </a>
+						</c:forEach>
+					</div>
+				</c:if>
 			</c:otherwise>
 		</c:choose>
 
 		<div class="review-container"
 			style="margin-top: 50px; border-top: 1px solid #eee; padding-top: 30px;">
-
 			<div class="section-header" style="margin-bottom: 20px;">
 				<span class="section-title"
 					style="font-size: 18px; font-weight: bold;"> 거래 후기 <span
 					class="item-count" style="font-size: 13px; color: #999;">(${reviews.size()})</span>
 				</span>
 			</div>
+			<c:choose>
+				<c:when test="${not hasBought || allReviewed}">
+					<!-- 				<div
+						style="text-align: center; padding: 20px; color: #888; border: 1px solid #eee; border-radius: 8px;">
+						이 판매자의 상품을 구매한 경우에만 후기를 작성할 수 있습니다.</div> -->
+				</c:when>
+				<c:when test="${alreadyReviewed}">
+					<div class="card"
+						style="padding: 20px; background: #fff5f0; border-radius: 8px; border: 1px solid #ffd9c0; margin-bottom: 30px; text-align: center;">
+						<h4 style="margin: 0; font-size: 16px; color: #ff8a3d;">이미
+							후기를 쓴 상품입니다.</h4>
+						<p style="margin-top: 8px; color: #888; font-size: 13px;">한
+							상품에는 한 번만 후기를 작성할 수 있습니다.</p>
+						<a href="#reviewList"
+							style="display: inline-block; margin-top: 12px; background: #ff8a3d; color: #fff; padding: 8px 18px; border-radius: 6px; text-decoration: none; font-weight: bold; font-size: 13px;">
+							내 후기 보러가기</a>
+					</div>
+				</c:when>
+				<c:otherwise>
+					<div class="card"
+						style="padding: 20px; background: #f9f9f9; border-radius: 8px; border: 1px solid #eee; margin-bottom: 30px;">
+						<h4 style="margin-top: 0; margin-bottom: 15px; font-size: 16px;">이
+							판매자에게 후기 남기기</h4>
+						<form action="${ctx}/review/add" method="post">
+							<input type="hidden" name="${_csrf.parameterName}"
+								value="${_csrf.token}"> <input type="hidden"
+								name="sellerNo" value="${user.userNo}">
 
-			<div class="card"
-				style="padding: 20px; background: #f9f9f9; border-radius: 8px; border: 1px solid #eee; margin-bottom: 30px;">
-				<h4 style="margin-top: 0; margin-bottom: 15px; font-size: 16px;">이
-					판매자에게 후기 남기기</h4>
-				<form action="${ctx}/review/add" method="post">
-					<input type="hidden" name="sellerNo" value="${user.userNo}">
-					<div style="margin-bottom: 15px;">
-						<label
-							style="font-size: 13px; color: #666; display: block; margin-bottom: 5px;">상품
-							번호</label> <input type="number" name="productNo"
-							value="${not empty myProducts ? myProducts[0].productNo : ''}"
-							style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;"
-							required>
+							<c:if test="${not empty selectedProductNo}">
+								<p style="color: #ff8a3d; font-weight: bold;">[선택된 상품 번호:
+									${selectedProductNo}]에 대한 후기를 작성 중입니다.</p>
+							</c:if>
+							<div style="margin-bottom: 15px;">
+								<label
+									style="font-size: 13px; color: #666; display: block; margin-bottom: 5px;">상품
+									번호</label> <input type="number" name="productNo"
+									value="${not empty selectedProductNo ? selectedProductNo : (not empty myProducts ? myProducts[0].productNo : '')}"
+									style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;"
+									required>
+							</div>
+							<div style="margin-bottom: 10px;">
+
+								<textarea name="content" rows="4"
+									style="width: 100%; border: 1px solid #ddd; border-radius: 4px; padding: 12px; box-sizing: border-box; resize: none;"
+									placeholder="거래 후기를 입력하세요" required>${prevContent}</textarea>
+							</div>
+							<div style="text-align: right;">
+								<button type="submit" class="btn btn-primary"
+									style="background: #121212; color: #fff; border: none; padding: 10px 25px; border-radius: 4px; cursor: pointer;">
+									후기 등록</button>
+							</div>
+						</form>
 					</div>
-					<div style="margin-bottom: 10px;">
-						<textarea name="content" rows="4"
-							style="width: 100%; border: 1px solid #ddd; border-radius: 4px; padding: 12px; box-sizing: border-box; resize: none;"
-							placeholder="거래 후기를 입력하세요" required></textarea>
-					</div>
-					<div style="text-align: right;">
-						<button type="submit" class="btn btn-primary"
-							style="background: #121212; color: #fff; border: none; padding: 10px 25px; border-radius: 4px; cursor: pointer;">
-							후기 등록</button>
-					</div>
-				</form>
-			</div>
+				</c:otherwise>
+			</c:choose>
 
 			<hr style="margin: 40px 0; border: 0; border-top: 1px solid #eee;">
 
@@ -284,8 +368,35 @@
 								</div>
 								<div style="font-size: 14px; color: #444; line-height: 1.6;">${r.content}</div>
 								<div
-									style="font-size: 12px; color: #aaa; margin-top: 8px; text-align: right;">
-									작성자: ${r.sellerNickname}</div>
+									style="display: flex; justify-content: space-between; align-items: center; margin-top: 8px;">
+									<div style="font-size: 12px; color: #aaa;">작성자:
+										${r.sellerNickname}</div>
+
+									<c:if
+										test="${not empty loginUser && r.authorNo == loginUser.userNo}">
+										<div style="display: flex; gap: 6px;">
+											<%-- 수정 버튼: 후기 삭제 후 기존 내용 채운 폼 열기 --%>
+											<form action="${ctx}/review/${r.boardNo}/edit" method="post"
+												style="margin: 0;">
+												<input type="hidden" name="sellerNo" value="${user.userNo}">
+												<input type="hidden" name="productNo" value="${r.productNo}">
+												<input type="hidden" name="content" value="${r.content}">
+												<button type="submit" class="btn"
+													style="font-size: 12px; padding: 4px 10px;"
+													onclick="return confirm('후기를 수정하시겠습니까?')">수정</button>
+											</form>
+											<form action="${ctx}/review/${r.boardNo}/delete"
+												method="post" style="margin: 0;">
+												<input type="hidden" name="sellerNo" value="${user.userNo}">
+												<input type="hidden" name="productNo" value="${r.productNo}">
+												<input type="hidden" name="content" value="${r.content}">
+												<button type="submit" class="btn btn-danger"
+													style="font-size: 12px; padding: 4px 10px;"
+													onclick="return confirm('후기를 삭제하시겠습니까?')">삭제</button>
+											</form>
+										</div>
+									</c:if>
+								</div>
 							</div>
 						</c:forEach>
 					</c:otherwise>
@@ -295,7 +406,7 @@
 			<div class="pagination"
 				style="text-align: center; margin-top: 20px; display: flex; justify-content: center; gap: 8px;">
 				<c:forEach var="i" begin="1" end="${totalPages}">
-					<a href="${ctx}/users/search/${user.userNo}?page=${i}"
+					<a href="${ctx}/users/search/${user.userNo}?page=${i}#reviewList"
 						style="padding: 5px 12px; border: 1px solid #ddd; text-decoration: none; color: #333; border-radius: 4px; 
                   ${i == currentPage ? 'background-color: #121212; color: #fff; border-color: #121212;' : 'background-color: #fff;'}">
 						${i} </a>
@@ -305,5 +416,6 @@
 	</div>
 
 	<%@ include file="/WEB-INF/views/footer.jsp"%>
+	<%@ include file="/WEB-INF/views/reportModal.jsp"%>
 </body>
 </html>

@@ -114,7 +114,8 @@ button:hover {
 			<div class="form-card">
 
 				<div class="form-group">
-					<label>게시판 구분</label> <select name="boardType" required>
+					<label>게시판 구분</label> <select name="boardType" id="boardTypeSelect"
+						required>
 
 						<c:if test="${isAdmin}">
 							<option value="notice"
@@ -145,8 +146,10 @@ button:hover {
 					<textarea name="content" rows="8" required>${board.content}</textarea>
 				</div>
 
+
 				<c:if test="${isAdmin}">
-					<div class="form-group">
+					<div class="form-group" id="pinnedGroup"
+						style="${board.boardType == 'notice' ? '' : 'display:none;'}">
 						<label> <input type="checkbox" name="pinned" value="true"
 							${board.pinned ? 'checked' : ''}> 상단 고정
 						</label>
@@ -165,6 +168,29 @@ button:hover {
 		</form>
 
 	</div>
+
+	<c:if test="${isAdmin}">
+		<script>
+			(function() {
+				var sel = document.getElementById('boardTypeSelect');
+				var grp = document.getElementById('pinnedGroup');
+				if (!sel || !grp)
+					return;
+				function sync() {
+					if (sel.value === 'notice') {
+						grp.style.display = '';
+					} else {
+						grp.style.display = 'none';
+						var cb = grp.querySelector('input[name="pinned"]');
+						if (cb)
+							cb.checked = false;
+					}
+				}
+				sel.addEventListener('change', sync);
+				sync();
+			})();
+		</script>
+	</c:if>
 
 	<%@ include file="/WEB-INF/views/footer.jsp"%>
 

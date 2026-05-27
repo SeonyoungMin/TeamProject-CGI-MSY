@@ -9,7 +9,6 @@
 <c:set var="type" value="${empty boardType ? 'all' : boardType}" />
 <c:set var="listUrl" value="${empty listUrl ? '/board/all' : listUrl}" />
 <c:set var="writeUrl"
-
 	value="${type == 'notice' ? '/notice/addForm' : (type == 'free' ? '/freeBoard/addForm' : (type == 'inquiry' ? '/boardList/addForm' : '/board/write'))}" />
 <!DOCTYPE html>
 <html>
@@ -56,7 +55,7 @@
 	border-bottom: 1px solid #f0f0f0;
 	font-size: 14px;
 }
- 
+
 .board-item .title {
 	flex: 1;
 	color: #222;
@@ -85,9 +84,20 @@
 	font-weight: 600;
 }
 
-.tag-notice { background: #fdecec; color: #c0392b; }
-.tag-inquiry { background: #eef3fb; color: #2c6ab1; }
-.tag-free { background: #f1f5ee; color: #5a7a3a; }
+.tag-notice {
+	background: #fdecec;
+	color: #c0392b;
+}
+
+.tag-inquiry {
+	background: #eef3fb;
+	color: #2c6ab1;
+}
+
+.tag-free {
+	background: #f1f5ee;
+	color: #5a7a3a;
+}
 
 .pin {
 	color: #c0392b;
@@ -129,40 +139,45 @@
 
 		<!-- 카테고리 탭 -->
 		<nav class="board-tabs">
-			<a href="${ctx}/board/all" class="${type == 'all' ? 'active' : ''}">전체</a>
-			<a href="${ctx}/notice" class="${type == 'notice' ? 'active' : ''}">공지</a>
-			<a href="${ctx}/boardList" class="${type == 'inquiry' ? 'active' : ''}">문의</a>
-			<a href="${ctx}/freeBoard" class="${type == 'free' ? 'active' : ''}">자유</a>
+			<c:choose>
+
+				<c:when test="${type == 'notice'}">
+					<a href="${ctx}/notice" class="active">공지사항</a>
+				</c:when>
+
+				<c:otherwise>
+					<a href="${ctx}/boardList"
+						class="${type == 'inquiry' ? 'active' : ''}">문의</a>
+					<a href="${ctx}/freeBoard"
+						class="${type == 'free' ? 'active' : ''}">자유</a>
+				</c:otherwise>
+			</c:choose>
 		</nav>
 
 		<c:choose>
 			<c:when test="${empty list}">
-				<p style="color: #888; text-align: center; padding: 40px 0;">등록된 글이 없습니다.</p>
+				<p style="color: #888; text-align: center; padding: 40px 0;">등록된
+					글이 없습니다.</p>
 			</c:when>
 			<c:otherwise>
 				<c:forEach var="b" items="${list}">
 					<div class="board-item">
-						<a href="${ctx}/boardList/${b.boardNo}" class="title">
-							<c:if test="${b.pinned}">
-								<i class="pin fa-solid fa-thumbtack"></i>
-							</c:if>
-							<c:if test="${type == 'all'}">
-								<c:choose>
-									<c:when test="${b.boardType == 'notice'}">
-										<span class="tag tag-notice">공지</span>
-									</c:when>
-									<c:when test="${b.boardType == 'free'}">
-										<span class="tag tag-free">자유</span>
-									</c:when>
-									<c:otherwise>
-										<span class="tag tag-inquiry">문의</span>
-									</c:otherwise>
-								</c:choose>
-							</c:if>
-							${b.title}
-						</a>
-						<span class="meta">${b.authorNickname}</span>
-						<span class="meta">
+						<a href="${ctx}/boardList/${b.boardNo}" class="title"> <c:if
+								test="${b.pinned && b.boardType == 'notice'}">
+								<i class="pin fa-solid fa-thumbtack"
+									style="color: #c0392b; margin-right: 4px;"></i>
+							</c:if> <c:choose>
+								<c:when test="${b.boardType == 'notice'}">
+									<span class="tag tag-notice">공지</span>
+								</c:when>
+								<c:when test="${b.boardType == 'free'}">
+									<span class="tag tag-free">자유</span>
+								</c:when>
+								<c:otherwise>
+									<span class="tag tag-inquiry">문의</span>
+								</c:otherwise>
+							</c:choose> ${b.title}
+						</a><span class="meta">${b.authorNickname}</span> <span class="meta">
 							<fmt:formatDate value="${b.createdTime}" pattern="MM.dd" />
 						</span>
 					</div>

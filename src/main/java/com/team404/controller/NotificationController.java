@@ -24,6 +24,15 @@ public class NotificationController {
 	@Autowired
 	private NotificationService notificationService;
 
+	@GetMapping("/notification/click")
+	public String click(@RequestParam("no") int notificationNo, @RequestParam("link") String link) {
+		notificationService.readAndGetLink(notificationNo);
+		if (link != null && !link.isEmpty()) {
+			return "redirect:" + link;
+		}
+		return "redirect:/notification";
+	}
+
 	// 알림 목록 페이지
 
 	@GetMapping("/notification")
@@ -43,7 +52,7 @@ public class NotificationController {
 
 	@GetMapping("/notification/unread-count")
 	@ResponseBody
-	public Map<String, Integer> unreadCunt(HttpSession session) {
+	public Map<String, Integer> unreadCount(HttpSession session) {
 		Map<String, Integer> result = new HashMap<>();
 		User loginUser = (User) session.getAttribute("loginUser");
 		if (loginUser == null) {
@@ -90,7 +99,7 @@ public class NotificationController {
 		return "redirect:/notification";
 	}
 
-	// 드롭다운 읾음 처리
+	// 드롭다운 읽음 처리
 	@PostMapping("/notification/read")
 	@ResponseBody
 	public Map<String, String> readAjax(@RequestParam("no") int notificationNo, HttpSession session) {
@@ -127,7 +136,7 @@ public class NotificationController {
 		return "redirect:/notification";
 	}
 
-	// 읽우 알림 전체 삭제
+	// 읽은 알림 전체 삭제
 	@PostMapping("/notification/delete-read")
 	public String deleteRead(HttpSession session) {
 

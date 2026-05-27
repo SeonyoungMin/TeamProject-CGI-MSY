@@ -18,6 +18,7 @@ public class ReviewRowMapper implements RowMapper<ReviewDto> {
 		reviewDto.setCreatedTime(rs.getTimestamp("created_time"));
 		reviewDto.setSellerNickname(rs.getString("sellerNickname"));
 		reviewDto.setProductName(rs.getString("productName"));
+		reviewDto.setAuthorNo(rs.getInt("author_no"));
 		
 		return reviewDto;
 	}

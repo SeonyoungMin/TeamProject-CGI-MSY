@@ -3,6 +3,8 @@ package com.team404.domain;
 public class Rangking {
 	private int memberNo;
 	private String nickname;
+
+	private long totalAmount;
 	private long tradeCount;
 
 	public int getMemberNo() {
@@ -21,11 +23,21 @@ public class Rangking {
 		this.nickname = nickname;
 	}
 
-	public long gettradeCount() {
+	public long getTotalAmount() {
+		return totalAmount;
+	}
+
+	public void setTotalAmount(long totalAmount) {
+		this.totalAmount = totalAmount;
+	}
+
+
+	public long getTradeCount() {
 		return tradeCount;
 	}
 
-	public void settradeCount(long tradeCount) {
+	public void setTradeCount(long tradeCount) {
 		this.tradeCount = tradeCount;
+
 	}
 }

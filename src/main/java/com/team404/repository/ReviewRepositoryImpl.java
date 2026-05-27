@@ -32,7 +32,7 @@ public class ReviewRepositoryImpl implements ReviewRepository {
 
 	// 마이페이지 후기 조회
 	public List<ReviewDto> findReviewsByUser(int userNo) {
-		String SQL = "SELECT b.board_no, b.content, b.product_no, b.created_time, "
+		String SQL = "SELECT b.board_no, b.content, b.product_no, b.created_time, b.author_no, "
 				+ "u.nickname as sellerNickname, p.name as productName " + "FROM board b "
 				+ "JOIN product p ON p.product_no = b.product_no " + "JOIN users u ON u.user_no = b.author_no "
 				+ "WHERE p.seller_no = ? AND b.board_type = 'review' " + "ORDER BY b.created_time DESC";
@@ -58,6 +58,14 @@ public class ReviewRepositoryImpl implements ReviewRepository {
 		String SQL = "select author_no from board where board_no = ?";
 		List<Integer> result = template.query(SQL, (rs, rowNum) -> rs.getInt("author_no"), boardNo);
 		return result.isEmpty() ? 0 : result.get(0);
+	}
+
+	// 같은 유저가 같은 상품에 이미 후기를 썼는지 검사
+	public boolean existsReview(int productNo, int authorNo) {
+		String SQL = "select count(*) from board "
+				+ "where product_no = ? and author_no = ? and board_type = 'review'";
+		Integer count = template.queryForObject(SQL, Integer.class, productNo, authorNo);
+		return count != null && count > 0;
 	}
 
 }

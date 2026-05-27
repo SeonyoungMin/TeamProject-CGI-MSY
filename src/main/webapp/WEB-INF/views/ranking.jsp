@@ -2,6 +2,7 @@
 <%@ taglib prefix="c" uri="jakarta.tags.core"%>
 <%@ taglib prefix="fmt" uri="jakarta.tags.fmt"%>
 
+
 <div class="page">
 	<%@ include file="/WEB-INF/views/header.jsp"%>
 

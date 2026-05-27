@@ -13,28 +13,28 @@ public class ReviewDto {
 	private int boardNo;
 	private int productNo;
 	private String productName;
-	
-	
+	private int authorNo;
+
 	public String getSellerNickname() {
 		return sellerNickname;
 	}
-	
+
 	public void setSellerNickname(String sellerNickname) {
 		this.sellerNickname = sellerNickname;
 	}
-	
+
 	public Timestamp getCreatedTime() {
 		return createdTime;
 	}
-	
+
 	public void setCreatedTime(Timestamp createdTime) {
 		this.createdTime = createdTime;
 	}
-	
+
 	public String getContent() {
 		return content;
 	}
-	
+
 	public void setContent(String content) {
 		this.content = content;
 	}
@@ -62,8 +62,13 @@ public class ReviewDto {
 	public void setProductName(String productName) {
 		this.productName = productName;
 	}
-	
-	
-	
-	
+
+	public int getAuthorNo() {
+		return authorNo;
+	}
+
+	public void setAuthorNo(int authorNo) {
+		this.authorNo = authorNo;
+	}
+
 }

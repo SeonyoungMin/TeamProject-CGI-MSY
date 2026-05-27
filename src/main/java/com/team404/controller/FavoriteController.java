@@ -32,25 +32,44 @@ public class FavoriteController {
 	@Autowired
 	private NotificationService notificationService;
 
-	// 내 찜 목록 페이지
+	// 내 찜 목록 페이지 (페이지당 8개)
 	@GetMapping("/favorite")
-	public String favoritePage(HttpSession session, Model model) {
+	public String favoritePage(@RequestParam(value = "page", defaultValue = "1") int page,
+			HttpSession session, Model model) {
 		User loginUser = (User) session.getAttribute("loginUser");
 		if (loginUser == null) {
 			return "redirect:/login";
 		}
 
-		// 찜한 상품 번호들을 가져와서, 각각 상세 정보까지 채워서 화면으로 전달
 		List<Integer> productNos = favoriteService.findBoardNosByUser(loginUser.getUserNo());
+
+		int pageSize = 8;
+		int total = productNos.size();
+		int totalPages = (total + pageSize - 1) / pageSize;
+		if (page < 1) {
+			page = 1;
+		}
+		if (totalPages > 0 && page > totalPages) {
+			page = totalPages;
+		}
+		int start = (page - 1) * pageSize;
+		int end = Math.min(start + pageSize, total);
+
 		List<ProductDetailDto> products = new ArrayList<>();
-		for (Integer pNo : productNos) {
-			try {
-				products.add(productService.findProductDetail(pNo));
-			} catch (Exception e) {
-				// 이미 삭제된 상품은 건너뜀
+		if (start < total) {
+			for (Integer pNo : productNos.subList(start, end)) {
+				try {
+					products.add(productService.findProductDetail(pNo));
+				} catch (Exception e) {
+					// 이미 삭제된 상품은 건너뜀
+				}
 			}
 		}
+
 		model.addAttribute("products", products);
+		model.addAttribute("totalFavorites", total);
+		model.addAttribute("currentPage", page);
+		model.addAttribute("totalPages", totalPages);
 		return "favorite";
 	}
 

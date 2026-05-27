@@ -1,8 +1,6 @@
 package com.team404.controller;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -14,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.team404.domain.Comment;
+import com.team404.domain.Order;
 import com.team404.domain.Product;
 import com.team404.domain.ProductDetailDto;
 import com.team404.domain.ProductListDto;
@@ -22,8 +21,11 @@ import com.team404.domain.User;
 import com.team404.service.CommentService;
 import com.team404.service.FavoriteService;
 import com.team404.service.ImageService;
+import com.team404.service.OrderService;
 import com.team404.service.ProductService;
 import com.team404.service.ReviewService;
+import com.team404.service.UserService;
+import com.team404.service.WaitlistService;
 
 import jakarta.servlet.http.HttpSession;
 
@@ -32,7 +34,7 @@ public class ProductController {
 
 	@Autowired
 	private ProductService productService;
-	
+
 	@Autowired
 	private ReviewService reviewService;
 
@@ -45,35 +47,37 @@ public class ProductController {
 	@Autowired
 	private CommentService commentService;
 
+	@Autowired
+	private UserService userService;
+
+	@Autowired
+	private WaitlistService waitlistService;
+
+	@Autowired
+	private OrderService orderService;
+
 	// 상품 전체 목록
 	@GetMapping("/productList")
-	public String list(Model model) {
-		List<ProductListDto> list = productService.findAll(0, 100);
-		model.addAttribute("list", list);
-		return "productList";
-	}
+	public String list(@RequestParam(value = "pageNum", defaultValue = "1") int pageNum, HttpSession session, // 세션 추가
+			Model model) {
 
-	// =========================
-	// ⭐ 공통 로직 분리
-	// =========================
-	private Map<String, Object> getProductData(int pageNum, int limit) {
+		User loginUser = (User) session.getAttribute("loginUser");
+		int loginUserNo = (loginUser != null) ? loginUser.getUserNo() : 0; // 로그인 안했으면 0
 
+		int limit = 15;
 		int start = (pageNum - 1) * limit;
 
-		List<ProductListDto> list = productService.findAll(start, limit);
+		List<ProductListDto> list = productService.findAll(start, limit, loginUserNo);
 		int total = productService.countAll();
 
-		int totalPages = (int) Math.ceil((double) total / limit);
+		int totalPages = (total % limit == 0) ? (total / limit) : (total / limit) + 1;
 
-		Map<String, Object> map = new HashMap<>();
-		map.put("list", list);
-		map.put("currentPage", pageNum);
-		map.put("totalPages", totalPages);
+		model.addAttribute("list", list);
+		model.addAttribute("currentPage", pageNum);
+		model.addAttribute("totalPages", totalPages);
 
-		return map;
+		return "productList";
 	}
-
-	// 상품 조건 조회
 
 	// 검색어로 상품 찾기
 	@GetMapping("/product/search")
@@ -93,16 +97,15 @@ public class ProductController {
 
 	// 내가 등록한 상품 (로그인 필요, 페이징)
 	@GetMapping("/product/mylist")
-	public String myList(@RequestParam(value = "pageNum", defaultValue = "1") int pageNum,
-			Model model, HttpSession session) {
+	public String myList(@RequestParam(value = "pageNum", defaultValue = "1") int pageNum, Model model,
+			HttpSession session) {
 		User loginUser = (User) session.getAttribute("loginUser");
 		if (loginUser == null) {
 			return "redirect:/login";
 		}
 		int limit = 10;
 		int startNum = limit * (pageNum - 1);
-		model.addAttribute("list",
-				productService.findBySeller(loginUser.getUserNo(), startNum, limit));
+		model.addAttribute("list", productService.findBySeller(loginUser.getUserNo(), startNum, limit));
 		int total = productService.countBySeller(loginUser.getUserNo());
 		int totalPages = (total % limit) == 0 ? total / limit : (total / limit) + 1;
 		model.addAttribute("totalPages", totalPages);
@@ -116,8 +119,21 @@ public class ProductController {
 		ProductDetailDto product = productService.findProductDetail(productNo);
 
 		if (product != null && ("완료".equals(product.getTradeStatus()))) {
+			User loginUserForReview = (User) session.getAttribute("loginUser");
+			boolean alreadyReviewed = false;
+			if (loginUserForReview != null) {
+				alreadyReviewed = reviewService.existsReview(productNo, loginUserForReview.getUserNo());
+			}
 			model.addAttribute("product", product);
+			model.addAttribute("loginUser", loginUserForReview);
+			model.addAttribute("alreadyReviewed", alreadyReviewed);
 			return "orderComplete";
+		}
+
+		// 판매자 정보
+		if (product != null) {
+			User seller = userService.getUserByNo(product.getSellerNo());
+			model.addAttribute("seller", seller);
 		}
 
 		User loginUser = (User) session.getAttribute("loginUser");
@@ -128,21 +144,39 @@ public class ProductController {
 		}
 
 		boolean favorite = false;
+		int favoriteCount = 0;
 		if (loginUser != null) {
 			favorite = favoriteService.exists(loginUser.getUserNo(), productNo);
 		}
-
-		List<Comment> comments = commentService.getComments(productNo);
+		favoriteCount = favoriteService.countByBoard(productNo);
+		List<Comment> comments = commentService.getProductComments(productNo);
 
 		model.addAttribute("product", product);
 		model.addAttribute("loginUser", loginUser);
 		model.addAttribute("favorite", favorite);
+		model.addAttribute("favoriteCount", favoriteCount);
 		model.addAttribute("comments", comments);
-		
-		//후기 추가
+
+		// 후기 추가
 		ReviewDto review = reviewService.findReviewByProduct(productNo);
-		model.addAttribute("review",review);
-		
+		model.addAttribute("review", review);
+
+		// 대기 신청 정보 (예약중 상품 UI에 사용)
+		boolean alreadyWaitlisted = false;
+		if (loginUser != null) {
+			alreadyWaitlisted = waitlistService.exists(productNo, loginUser.getUserNo());
+		}
+		model.addAttribute("alreadyWaitlisted", alreadyWaitlisted);
+		model.addAttribute("waitlistCount", waitlistService.countByProduct(productNo));
+
+		// 본인이 이 상품의 활성 거래 당사자인지 (요청/승인완료/입금대기)
+		// 예약중 상태에서도 본인은 "결제 진행" 등으로 다음 단계 안내가 필요
+		Order myOrder = null;
+		if (loginUser != null) {
+			myOrder = orderService.findByProductAndBuyer(productNo, loginUser.getUserNo());
+		}
+		model.addAttribute("myOrder", myOrder);
+
 		return "productDetail";
 	}
 
@@ -180,6 +214,7 @@ public class ProductController {
 		return "redirect:/home";
 	}
 
+	
 	// 본인이거나 관리자면 true
 	private boolean canManage(User loginUser, int sellerNo) {
 		if (loginUser == null)
@@ -207,6 +242,7 @@ public class ProductController {
 	public String edit(@PathVariable("productNo") int productNo, @RequestParam("productName") String name,
 			@RequestParam("category") String category, @RequestParam("price") long price,
 			@RequestParam(value = "description", required = false) String description,
+			@RequestParam(value = "tradeStatus", required = false) String tradeStatus,
 			@RequestParam(value = "imgFiles", required = false) List<MultipartFile> imgFiles, HttpSession session) {
 
 		User loginUser = (User) session.getAttribute("loginUser");
@@ -225,9 +261,16 @@ public class ProductController {
 		product.setCategory(category);
 		product.setPrice(price);
 		product.setDescription(description);
+		product.setTradeStatus(tradeStatus);
 
 		// 서비스 내부의 본인 검증을 통과시키기 위해 원래 판매자 번호를 넘겨줌
 		productService.updateProduct(product, imgFiles, origin.getSellerNo());
+
+		// '예약중' → '판매중' 전환 시 대기자에게 알림 발송 + 대기 목록 비우기
+		if ("예약중".equals(origin.getTradeStatus()) && "판매중".equals(tradeStatus)) {
+			waitlistService.notifyBackOnSaleAndClear(productNo);
+		}
+
 		return "redirect:/product/" + productNo;
 	}
 
@@ -258,19 +301,18 @@ public class ProductController {
 			return "redirect:/login";
 		}
 		ProductDetailDto origin = productService.findProductDetail(productNo);
-		
-		System.out.println("loginUser.getUserNo(): " + loginUser.getUserNo());
-		System.out.println("origin.getSellerNo(): " + origin.getSellerNo());
+
 		if (!canManage(loginUser, origin.getSellerNo())) {
 			return "redirect:/product/" + productNo;
 		}
 		imageService.setThumbnail(imageNo, "product", productNo);
 		return "redirect:/product/" + productNo + "/edit";
 	}
-	
-	//이미지 추가 후 redirect
+
+	// 이미지 추가 후 redirect
 	@PostMapping("/product/{productNo}/addImage")
-	public String addImage(@PathVariable("productNo") int productNo, @RequestParam(value = "imgFiles", required = false) List<MultipartFile> imgFiles) {
+	public String addImage(@PathVariable("productNo") int productNo,
+			@RequestParam(value = "imgFiles", required = false) List<MultipartFile> imgFiles) {
 		if (imgFiles != null && !imgFiles.isEmpty()) {
 			imageService.upload(imgFiles, "product", productNo);
 		}

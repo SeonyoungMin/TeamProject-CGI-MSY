@@ -9,7 +9,7 @@ import com.team404.domain.ProductDetailDto;
 
 public class ProductDetailRowMapper implements RowMapper<ProductDetailDto> {
 	public ProductDetailDto mapRow(ResultSet rs, int rowNum) throws SQLException {
-		
+
 		ProductDetailDto productDetailDto = new ProductDetailDto();
 		productDetailDto.setProductNo(rs.getInt("product_no"));
 		productDetailDto.setProductName(rs.getString("name"));
@@ -20,11 +20,12 @@ public class ProductDetailRowMapper implements RowMapper<ProductDetailDto> {
 		productDetailDto.setViewCount(rs.getInt("view_count"));
 		productDetailDto.setCreatedTime(rs.getTimestamp("created_time"));
 		productDetailDto.setSellerNo(rs.getInt("seller_no"));
-		productDetailDto.setSellerNickname(rs.getString("sellerNickname"));
+		productDetailDto.setBuyerNo(rs.getInt("buyer_no"));
+		productDetailDto.setSellerNickname(rs.getString("seller_nickname"));
 		productDetailDto.setImgName(rs.getString("img_name"));
 		productDetailDto.setImgPath(rs.getString("img_path"));
 		productDetailDto.setViewCount(rs.getInt("view_count"));
-		
+
 		return productDetailDto;
 	}
 

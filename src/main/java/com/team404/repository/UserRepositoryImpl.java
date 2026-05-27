@@ -19,10 +19,6 @@ public class UserRepositoryImpl implements UserRepository {
 	@Autowired
 	JdbcTemplate template;
 
-	void setJdbcTemplate(DataSource dataSource) {
-		template = new JdbcTemplate(dataSource);
-	}
-
 	@Override
 	public int countAll() {
 		String SQL = "SELECT COUNT(*) FROM users";
@@ -186,23 +182,35 @@ public class UserRepositoryImpl implements UserRepository {
 		return template.query(SQL, new UserRowMapper(), minCount, maxCount);
 	}
 
-	@Override
-	public void setNewUser(User newUser) {
-		String SQL = "INSERT INTO users(id, pw, name, nickname, age, address, phone) VALUES(?,?,?,?,?,?,?)";
-		template.update(SQL, newUser.getUserId(), newUser.getUserPw(), newUser.getUserName(), newUser.getUserNickName(),
-				newUser.getUserAge(), newUser.getUserAddress(), newUser.getUserPhone());
+	// 동네 인증까지
+		@Override
+		public void setNewUser(User newUser) {
 
-		Integer lastId = template.queryForObject("SELECT LAST_INSERT_ID()", Integer.class);
-		if (lastId != null) {
-			newUser.setUserNo(lastId);
+			String SQL = "INSERT INTO users(" + "id, pw, name, nickname, age, address, phone, "
+					+ "latitude, longitude, verified_area, verified_at" + ") VALUES(?,?,?,?,?,?,?,?,?,?,?)";
+
+			template.update(SQL, newUser.getUserId(), newUser.getUserPw(), newUser.getUserName(), newUser.getUserNickName(),
+					newUser.getUserAge(), newUser.getUserAddress(), newUser.getUserPhone(), newUser.getLatitude(),
+					newUser.getLongitude(), newUser.getVerifiedArea(), newUser.getVerifiedAt());
+
+			Integer lastId = template.queryForObject("SELECT LAST_INSERT_ID()", Integer.class);
+
+			if (lastId != null) {
+				newUser.setUserNo(lastId);
+			}
 		}
-	}
 
+
+	// 동네 인증포함
 	@Override
 	public void setEditUser(User editUser) {
-		String SQL = "UPDATE users SET id = ?, pw = ?, name = ?, nickname = ?, age = ?, address = ?, phone = ? WHERE user_no = ?";
+
+		String SQL = "UPDATE users SET " + "id=?, pw=?, name=?, nickname=?, age=?, address=?, phone=?, "
+				+ "latitude=?, longitude=?, verified_area=?, verified_at=? " + "WHERE user_no=?";
+
 		template.update(SQL, editUser.getUserId(), editUser.getUserPw(), editUser.getUserName(),
 				editUser.getUserNickName(), editUser.getUserAge(), editUser.getUserAddress(), editUser.getUserPhone(),
+				editUser.getLatitude(), editUser.getLongitude(), editUser.getVerifiedArea(), editUser.getVerifiedAt(),
 				editUser.getUserNo());
 	}
 
@@ -230,5 +238,23 @@ public class UserRepositoryImpl implements UserRepository {
 		if (lastId != null) {
 			user.setUserNo(lastId);
 		}
+	}
+
+	@Override
+	public void updateAccount(int userNo, String bankName, String accountNumber, String accountHolder) {
+		String SQL = "UPDATE users SET bank_name = ?, account_number = ?, account_holder = ? WHERE user_no = ?";
+		template.update(SQL, bankName, accountNumber, accountHolder, userNo);
+	}
+	
+	@Override
+	public void updateRiskScore(int userNo, double score) {
+	    String sql = "UPDATE users SET risk_score = risk_score + ? WHERE user_no = ?";
+	    template.update(sql, score, userNo);
+	}
+	
+	@Override
+	public List<User> findAdmins() {
+		String SQL = "select * from users where role = 'ROLE_ADMIN'";
+		return template.query(SQL, new UserRowMapper());
 	}
 }

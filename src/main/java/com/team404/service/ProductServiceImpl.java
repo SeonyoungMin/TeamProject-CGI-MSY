@@ -27,8 +27,8 @@ public class ProductServiceImpl implements ProductService {
 
 	// 상품 목록 조회 (+페이징), 찜갯수 카운트
 	@Override
-	public List<ProductListDto> findAll(int offset, int limit) {
-		List<ProductListDto> list = productRepository.findAll(offset, limit);
+	public List<ProductListDto> findAll(int offset, int limit, int loginUserNo) {
+		List<ProductListDto> list = productRepository.findAll(offset, limit, loginUserNo);
 
 		for (ProductListDto dto : list) {
 			int count = favoriteService.countByBoard(dto.getProductNo());
@@ -71,7 +71,7 @@ public class ProductServiceImpl implements ProductService {
 
 	// 내 판매 목록 (전체)
 	@Override
-	public List<ProductListDto> findBySeller(int sellerNo) {
+	public List<ProductListDto> findBySeller(int sellerNo, int loginUserNo) {
 		return productRepository.findBySeller(sellerNo);
 	}
 
@@ -152,10 +152,25 @@ public class ProductServiceImpl implements ProductService {
 		productRepository.increaseViewCount(productNo);
 	}
 
-
 	// 인기 상품 (조회수 desc, 거래완료 제외)
 	@Override
-	public List<ProductListDto> findTopByViewCount(int limit, String category) {
-		return productRepository.findTopByViewCount(limit, category);
+	public List<ProductListDto> findTopByFavoriteCount(int limit, String category, int loginUserNo) {
+		return productRepository.findTopByFavoriteCount(limit, category, loginUserNo);
+	}
+
+	// 구매내역
+	@Override
+	public List<ProductListDto> findBoughtListByBuyerNo(int buyerNo) {
+		return productRepository.findBoughtListByBuyerNo(buyerNo);
+	}
+
+	@Override
+	public List<ProductListDto> findBoughtListByBuyerNo(int buyerNo, int startNum, int limit) {
+		return productRepository.findBoughtListByBuyerNo(buyerNo, startNum, limit);
+	}
+
+	@Override
+	public int countBoughtByBuyerNo(int buyerNo) {
+		return productRepository.countBoughtByBuyerNo(buyerNo);
 	}
 }

@@ -1,5 +1,6 @@
 package com.team404.domain;
 
+import java.sql.Timestamp;
 import java.time.LocalDateTime;
 
 import org.springframework.web.multipart.MultipartFile;
@@ -22,7 +23,16 @@ public class User {
 	private LocalDateTime userCreatedTime;
 	private int userBuyCount;
 	private int userSellCount;
-	
+
+	private Double latitude;
+	private Double longitude;
+	private String verifiedArea;
+	private Timestamp verifiedAt;
+
+	private String userBankName;
+	private String userAccountNumber;
+	private String userAccountHolder;
+
 	public User() {
 	}
 
@@ -89,7 +99,7 @@ public class User {
 	public void setUserPhone(String userPhone) {
 		this.userPhone = userPhone;
 	}
-	
+
 	public String getUserGrade() {
 		return userGrade;
 	}
@@ -137,7 +147,7 @@ public class User {
 	public void setUserCreatedTime(LocalDateTime userCreatedTime) {
 		this.userCreatedTime = userCreatedTime;
 	}
-	
+
 	public int getUserBuyCount() {
 		return userBuyCount;
 	}
@@ -153,5 +163,61 @@ public class User {
 	public void setUserSellCount(int userSellCount) {
 		this.userSellCount = userSellCount;
 	}
-	
+
+	public Double getLatitude() {
+		return latitude;
+	}
+
+	public void setLatitude(Double latitude) {
+		this.latitude = latitude;
+	}
+
+	public Double getLongitude() {
+		return longitude;
+	}
+
+	public void setLongitude(Double longitude) {
+		this.longitude = longitude;
+	}
+
+	public String getVerifiedArea() {
+		return verifiedArea;
+	}
+
+	public void setVerifiedArea(String verifiedArea) {
+		this.verifiedArea = verifiedArea;
+	}
+
+	public Timestamp getVerifiedAt() {
+		return verifiedAt;
+	}
+
+	public void setVerifiedAt(Timestamp verifiedAt) {
+		this.verifiedAt = verifiedAt;
+	}
+
+	public String getUserBankName() {
+		return userBankName;
+	}
+
+	public void setUserBankName(String userBankName) {
+		this.userBankName = userBankName;
+	}
+
+	public String getUserAccountNumber() {
+		return userAccountNumber;
+	}
+
+	public void setUserAccountNumber(String userAccountNumber) {
+		this.userAccountNumber = userAccountNumber;
+	}
+
+	public String getUserAccountHolder() {
+		return userAccountHolder;
+	}
+
+	public void setUserAccountHolder(String userAccountHolder) {
+		this.userAccountHolder = userAccountHolder;
+	}
+
 }

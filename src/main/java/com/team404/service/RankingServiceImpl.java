@@ -1,6 +1,5 @@
 package com.team404.service;
 
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -49,7 +48,7 @@ public class RankingServiceImpl implements RankingService {
 			int no = r.getMemberNo(); // 회원번호 꺼내기
 			if (map.containsKey(no)) { // 지도에 이미 이 회원이 있다면
 				Rangking e = map.get(no); // 지도에서 꺼내서
-				e.settradeCount(e.gettradeCount() + 1); // 건수만 1 더하기
+				e.setTradeCount(e.getTradeCount() + 1); // 건수만 1 더하기
 			} else { // 처음 보는 회원이면
 				map.put(no, r); // 지도에 새로 등록
 			}
@@ -60,12 +59,13 @@ public class RankingServiceImpl implements RankingService {
 		long maxCount = -1; // 최고 점수 비교용
 
 		for (Rangking r : map.values()) { // 지도 다 뒤져서
-			if (r.gettradeCount() > maxCount) { // 더 높은 건수 발견하면
-				maxCount = r.gettradeCount(); // 점수 갈아치움
+			if (r.getTradeCount() > maxCount) { // 더 높은 건수 발견하면
+				maxCount = r.getTradeCount(); // 점수 갈아치움
 				king = r; // 왕 바꾸기
 			}
 		}
 
 		return king; // 최종왕 선정
+
 	}
 }

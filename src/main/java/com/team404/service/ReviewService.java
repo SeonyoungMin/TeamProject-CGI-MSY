@@ -11,5 +11,6 @@ public interface ReviewService {
 	public List<ReviewDto> findReviewsByUser(int userNo);
 	public void updateReview(int boardNo, String content, int loginMemberNo);
 	public void deleteReview(int boardNo, int loginMemberNo);
+	public boolean existsReview(int productNo, int authorNo);
 
 }

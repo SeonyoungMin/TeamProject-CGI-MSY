@@ -28,7 +28,7 @@ public class RankingRepositoryImpl implements RankingRepository {
 			Rangking r = new Rangking(); // 랭킹 객체 만들고
 			r.setMemberNo(rs.getInt("memberNo")); // 멤버번호 넣고
 			r.setNickname(rs.getString("nickname")); // 닉네임 넣고
-			r.settradeCount(1L); // 거래건수 한건으로 설정해서
+			r.setTradeCount(1L); // 거래건수 한건으로 설정해서
 			return r; // 리스트에 담기
 		});
 	}
@@ -48,7 +48,7 @@ public class RankingRepositoryImpl implements RankingRepository {
 			Rangking r = new Rangking();
 			r.setMemberNo(rs.getInt("memberNo"));
 			r.setNickname(rs.getString("nickname"));
-			r.settradeCount(rs.getLong("cnt"));
+			r.setTradeCount(rs.getLong("cnt"));
 			return r;
 		}, limit);
 	}
@@ -70,7 +70,7 @@ public class RankingRepositoryImpl implements RankingRepository {
 			Rangking r = new Rangking();
 			r.setMemberNo(rs.getInt("memberNo"));
 			r.setNickname(rs.getString("nickname"));
-			r.settradeCount(rs.getLong("cnt"));
+			r.setTradeCount(rs.getLong("cnt"));
 			return r;
 		}, limit);
 	}
@@ -89,8 +89,9 @@ public class RankingRepositoryImpl implements RankingRepository {
 			Rangking r = new Rangking(); // 랭킹 객체 만들고
 			r.setMemberNo(rs.getInt("memberNo")); // 멤버번호 넣고
 			r.setNickname(rs.getString("nickname")); // 닉네임 넣고
-			r.settradeCount(1L); // 거래건수 한건으로 설정해서
+			r.setTradeCount(1L); // 거래건수 한건으로 설정해서
 			return r; // 리스트에 담기
 		});
+
 	}
 }

@@ -26,6 +26,19 @@ public class UserRowMapper implements RowMapper<User> {
 		user.setUserCreatedTime(rs.getTimestamp("created_time").toLocalDateTime());
 		user.setUserSellCount(rs.getInt("sell_count"));
 		user.setUserBuyCount(rs.getInt("buy_count"));
+
+		user.setLatitude(rs.getDouble("latitude"));
+		user.setLongitude(rs.getDouble("longitude"));
+		user.setVerifiedArea(rs.getString("verified_area"));
+		user.setVerifiedAt(rs.getTimestamp("verified_at"));
+
+		try {
+			user.setUserBankName(rs.getString("bank_name"));
+			user.setUserAccountNumber(rs.getString("account_number"));
+			user.setUserAccountHolder(rs.getString("account_holder"));
+		} catch (SQLException ignore) {
+			// 계좌 컬럼이 아직 추가되지 않은 환경에서도 안 깨지도록
+		}
 		return user;
 	}
 }

@@ -15,4 +15,5 @@ public interface RankingRepository {
 
 	// 이달의 소비왕 상위 N명
 	List<Rangking> getTopBuyers(int limit);
+
 }

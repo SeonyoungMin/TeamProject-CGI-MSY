@@ -32,26 +32,27 @@ public class BoardController {
 
 	@Autowired
 	private CommentService commentService;
-	
-	@Autowired
-	private NotificationService notificationService; 
 
-	// 전체 게시글 목록 (공지/문의/자유)
+	@Autowired
+	private NotificationService notificationService;
+
+	// 전체 게시글 목록 (문의 + 자유, 공지 제외)
 	@GetMapping("/board/all")
 	public String getAllBoardList(@RequestParam(value = "pageNum", defaultValue = "1") int pageNum,
-			@RequestParam(value = "limit", defaultValue = "10") int limit, HttpSession session, Model model) {
-		int startNum = limit * (pageNum - 1);
+			@RequestParam(value = "limit", defaultValue = "10") int limit, Model model) {
+
+		int startNum = (pageNum - 1) * limit;
 		List<BoardListDto> list = boardService.findRecentAll(startNum, limit);
-		int totalNum = boardService.countRecentAll();
-		int totalPages = (totalNum + limit - 1) / limit;
+		int totalCount = boardService.countRecentAll();
+		int totalPages = (int) Math.ceil((double) totalCount / limit);
 
 		model.addAttribute("list", list);
-		model.addAttribute("totalPages", totalPages);
 		model.addAttribute("currentPage", pageNum);
+		model.addAttribute("totalPages", totalPages);
 		model.addAttribute("boardType", "all");
-		model.addAttribute("boardTitle", "전체 게시글");
+		model.addAttribute("boardTitle", "전체 게시판");
 		model.addAttribute("listUrl", "/board/all");
-		model.addAttribute("canWrite", session.getAttribute("loginUser") != null);
+
 		return "boardList";
 	}
 
@@ -145,19 +146,19 @@ public class BoardController {
 		if ("notice".equals(type) && !isAdmin) {
 			return "redirect:/notice";
 		}
-		// 관리자만 핀 고정 가능
-		if (!isAdmin) {
+		// 핀 고정은 공지사항(관리자)만 가능 → 문의/자유는 항상 false
+		if (!"notice".equals(type) || !isAdmin) {
 			board.setPinned(false);
 		}
 		board.setAuthorNo(loginUser.getUserNo());
 		int newBoardNo = boardService.registerBoard(board, loginUser.getUserNo());
-		
-		//공지사항 등록 시 전체 유저에게 알림
+
+		// 공지사항 등록 시 전체 유저에게 알림
 		if ("notice".equals(type)) {
 			try {
 				notificationService.notifyNotice(newBoardNo, board.getTitle());
 			} catch (Exception e) {
-				
+
 			}
 		}
 		return "redirect:" + listUrlByType(type);
@@ -167,9 +168,8 @@ public class BoardController {
 	private void setBoardListModel(String type, String pageTitle, String listUrl, int pageNum, int limit, Model model) {
 		int startNum = limit * (pageNum - 1);
 
-
-		List<BoardListDto> list = boardService.findAllByType(type, startNum, limit);
-		int totalNum = boardService.countAllByType(type);
+		List<BoardListDto> list = boardService.getBoardListByType(type, startNum, limit);
+		int totalNum = boardService.getBoardCountByType(type);
 
 		int totalPages = (totalNum % limit) == 0 ? totalNum / limit : (totalNum / limit) + 1;
 
@@ -196,15 +196,15 @@ public class BoardController {
 	public String getBoard(@PathVariable("boardNo") int boardNo, Model model, HttpSession session) {
 		BoardDetailDto dto = boardService.findBoardDetail(boardNo);
 		model.addAttribute("board", dto);
-		
-		//댓글 목록
+
+		// 댓글 목록
 		List<Comment> comments = commentService.getComments(boardNo);
 		model.addAttribute("comments", comments);
-		
-		//로그인 유저 확인
+
+		// 로그인 유저 확인
 		User loginUser = (User) session.getAttribute("loginUser");
 		model.addAttribute("loginUser", loginUser);
-		
+
 		return "boardDetail";
 	}
 
@@ -235,7 +235,7 @@ public class BoardController {
 			return "redirect:/login";
 		}
 		board.setAuthorNo(loginUser.getUserNo());
-		boardService.registerBoard(board, loginUser.getUserNo());
+		int newBoardNo = boardService.registerBoard(board, loginUser.getUserNo());
 
 		return "redirect:/boardList";
 	}
@@ -249,7 +249,12 @@ public class BoardController {
 		}
 		BoardDetailDto board = boardService.findBoardDetail(boardNo);
 		boolean isAdmin = "ROLE_ADMIN".equals(loginUser.getUserRole());
-		if (board.getAuthorNo() != loginUser.getUserNo() && !isAdmin) {
+		// 공지사항은 관리자만 수정 가능
+		if ("notice".equals(board.getBoardType())) {
+			if (!isAdmin) {
+				return "redirect:/boardList/" + boardNo;
+			}
+		} else if (board.getAuthorNo() != loginUser.getUserNo() && !isAdmin) {
 			return "redirect:/boardList/" + boardNo;
 		}
 		model.addAttribute("board", board);
@@ -266,15 +271,32 @@ public class BoardController {
 		if (loginUser == null) {
 			return "redirect:/login";
 		}
+		boolean isAdmin = "ROLE_ADMIN".equals(loginUser.getUserRole());
 		BoardDetailDto existing = boardService.findBoardDetail(boardNo);
-		if (!"ROLE_ADMIN".equals(loginUser.getUserRole())) {
+
+		// 공지사항은 관리자만 수정 가능
+		if ("notice".equals(existing.getBoardType()) && !isAdmin) {
+			return "redirect:/boardList/" + boardNo;
+		}
+
+		// 비관리자는 타입을 공지로 바꾸지 못함
+		String finalType = (boardType != null) ? boardType : existing.getBoardType();
+		if ("notice".equals(finalType) && !isAdmin) {
+			finalType = existing.getBoardType();
+		}
+		board.setBoardType(finalType);
+
+		// 핀 고정은 공지사항(관리자)만 가능. 그 외에는 기존 값 유지(문의/자유는 항상 false)
+		if ("notice".equals(finalType) && isAdmin) {
+			// form에서 받은 board.pinned 그대로 사용
+		} else if ("notice".equals(finalType)) {
 			board.setPinned(existing.isPinned());
+		} else {
+			board.setPinned(false);
 		}
-		if (boardType != null) {
-			board.setBoardType(boardType);
-		}
+
 		board.setBoardNo(boardNo);
-		boardService.updateBoard(board, loginUser.getUserNo());
+		boardService.updateBoard(board, loginUser.getUserNo(), isAdmin);
 
 		return "redirect:/boardList/" + boardNo;
 	}
@@ -286,8 +308,14 @@ public class BoardController {
 		if (loginUser == null) {
 			return "redirect:/login";
 		}
-		String type = boardService.findBoardDetail(boardNo).getBoardType();
-		boardService.deleteBoard(boardNo, loginUser.getUserNo());
+		boolean isAdmin = "ROLE_ADMIN".equals(loginUser.getUserRole());
+		BoardDetailDto existing = boardService.findBoardDetail(boardNo);
+		// 공지사항은 관리자만 삭제 가능
+		if ("notice".equals(existing.getBoardType()) && !isAdmin) {
+			return "redirect:/boardList/" + boardNo;
+		}
+		String type = existing.getBoardType();
+		boardService.deleteBoard(boardNo, loginUser.getUserNo(), isAdmin);
 		return "redirect:" + listUrlByType(type);
 	}
 

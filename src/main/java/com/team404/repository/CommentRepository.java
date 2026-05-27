@@ -5,8 +5,11 @@ import com.team404.domain.Comment;
 
 public interface CommentRepository {
 
-	// 댓글 목록
+	// 보드용 목록 조회
 	List<Comment> findByBoard(int boardNo);
+
+	// 게시글용 목록 조회
+	List<Comment> findByProduct(int productNo);
 
 	// 댓글 작성
 	int insert(Comment comment);

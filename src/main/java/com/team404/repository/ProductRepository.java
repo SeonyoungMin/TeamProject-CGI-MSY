@@ -6,54 +6,62 @@ import com.team404.domain.Product;
 import com.team404.domain.ProductDetailDto;
 import com.team404.domain.ProductListDto;
 
-// 이미지 관련 메서드(insertImage, findImagesByProduct) 및 ProductImage import 제거
-// ->이미지 처리는 ImageRepository 단독 책임
 public interface ProductRepository {
 
 	// 상품 목록 조회 (+페이징)
-	List<ProductListDto> findAll(int startNum, int limit);
+	List<ProductListDto> findAll(int startNum, int limit, int loginUserNo);
 
-	public int countAll();
-	// 전체 데이터 개수 반환
+	// 전체 데이터 개수
+	int countAll();
 
-	// 상품 상세 조회 (productNo 기준)
-	public ProductDetailDto findProductDetail(int productNo); 
+	// 상품 상세 조회
+	ProductDetailDto findProductDetail(int productNo);
 
-	// 상품 조건 조회(키워드 검색)
-	public List<ProductListDto> findByKeyword(String keyword);
+	// 키워드 검색
+	List<ProductListDto> findByKeyword(String keyword);
 
-	// 카테고리별 조회
-	public List<ProductListDto> findByCategory(String category);
+	// 카테고리 조회
+	List<ProductListDto> findByCategory(String category);
 
 	// 내 판매 목록 조회 (전체)
-	public List<ProductListDto> findBySeller(int sellerNo);
+	List<ProductListDto> findBySeller(int sellerNo);
 
 	// 내 판매 목록 조회 (페이징)
-	public List<ProductListDto> findBySeller(int sellerNo, int startNum, int limit);
+	List<ProductListDto> findBySeller(int sellerNo, int startNum, int limit);
 
-	public int countBySeller(int sellerNo);
+	// 판매글 개수
+	int countBySeller(int sellerNo);
 
 	// 상품 등록
-	public int insertProduct(Product productNo);
+	int insertProduct(Product product);
 
 	// 상품 수정
-	public void updateProduct(Product productNo);
+	void updateProduct(Product product);
 
 	// 상품 삭제
-	public void deleteProduct(int productNo);
+	void deleteProduct(int productNo);
 
 	// 거래 상태 변경
-	public void updateTradeStatus(int productNo, String tradeStatus);
+	void updateTradeStatus(int productNo, String tradeStatus);
 
-	// 본인 확인용 (유저가 본인이 등록한 글만 수정/삭제 할 수 있도록 하는 기능)
-	public int findSellerNo(int productNo);
+	// 판매자 번호 조회
+	int findSellerNo(int productNo);
 
-	// 상품 등록 orders 추가
-	public void insertOrder(int productNo, int sellerNo, int buyerNo);
+	// 주문 생성
+	void insertOrder(int productNo, int sellerNo, int buyerNo);
 
-	// 상품 조회수 +1
-	public void increaseViewCount(int productNo);
+	// 조회수 증가
+	void increaseViewCount(int productNo);
 
-	// 인기 상품 (조회수 desc, 거래완료 제외, 카테고리 옵션)
-	public List<ProductListDto> findTopByViewCount(int limit, String category);
+	// 인기 상품
+	List<ProductListDto> findTopByFavoriteCount(int limit, String category, int loginUserNo);
+
+	// 구매내역 (전체)
+	List<ProductListDto> findBoughtListByBuyerNo(int buyerNo);
+
+	// 구매내역 (페이징)
+	List<ProductListDto> findBoughtListByBuyerNo(int buyerNo, int startNum, int limit);
+
+	// 구매내역 총 개수
+	int countBoughtByBuyerNo(int buyerNo);
 }

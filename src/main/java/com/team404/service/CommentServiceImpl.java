@@ -16,6 +16,11 @@ public class CommentServiceImpl implements CommentService {
 
 	// 댓글 조회
 	@Override
+	public List<Comment> getProductComments(int productNo) {
+		return repository.findByProduct(productNo);
+	}
+
+	@Override
 	public List<Comment> getComments(int boardNo) {
 		return repository.findByBoard(boardNo);
 	}
