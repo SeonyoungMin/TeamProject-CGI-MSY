@@ -150,7 +150,7 @@ public class OrderController {
 			ProductDetailDto product = productService.findProductDetail(productNo);
 			notificationService.notifyDirectReserved(order.getSellerNo(), loginUser.getUserNo(), productNo,
 					product.getProductName(), loginUser.getUserNickName());
-			notificationService.notifyDirectReserved(order.getSellerNo(), orderNo, productNo, meetingTime, buyerMessage);
+			notificationService.notifyReserved(loginUser.getUserNo(), productNo, product.getProductName());
 		} catch (Exception e) {
 			System.out.println("직거래 예약 알림 발송 실패: " + e.getMessage());
 		}

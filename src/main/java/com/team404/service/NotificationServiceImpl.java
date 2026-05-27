@@ -222,7 +222,7 @@ public class NotificationServiceImpl implements NotificationService {
 		n.setNotiType("trade_cancelled");
 		n.setMessage("'" + productName + "' 상품의 직거래 약속이 취소되었습니다.");
 		n.setLinkUrl(CTX + "/product/" + productNo);
-		notificationRepsotory.insert(n);
+		notificationRepository.insert(n);
 	}
 
 	@Override
@@ -233,7 +233,7 @@ public class NotificationServiceImpl implements NotificationService {
 		n.setNotiType("trade_rejected");
 		n.setMessage("'" + productName + "' 상품의 거래 요청이 거절되었습니다.");
 		n.setLinkUrl(CTX + "/product/" + productNo);
-		notificationRepsotory.insert(n);
+		notificationRepository.insert(n);
 	}
 
 	@Override
@@ -245,7 +245,7 @@ public class NotificationServiceImpl implements NotificationService {
 		n.setNotiType("trade_cancelled");
 		n.setMessage(who + "가 '" + productName + "' 상품의 거래를 취소했습니다.");
 		n.setLinkUrl(CTX + "/product/" + productNo);
-		notificationRepsotory.insert(n);
+		notificationRepository.insert(n);
 	}
 
 	@Override

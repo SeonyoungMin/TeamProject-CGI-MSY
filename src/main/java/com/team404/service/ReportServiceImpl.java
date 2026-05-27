@@ -1,5 +1,7 @@
 package com.team404.service;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -12,55 +14,58 @@ import com.team404.repository.ReportRepository;
 @Service
 public class ReportServiceImpl implements ReportService {
 
-	@Autowired
-	private ReportRepository reportRepository;
+    @Autowired
+    private ReportRepository reportRepository;
 
-	@Autowired
-	private FraudAccountRepository fraudRepository;
+    @Autowired
+    private FraudAccountRepository fraudRepository;
 
-	@Autowired
-	private UserService userService;
+    @Autowired
+    private UserService userService;
 
-	@Override
-	public void report(Report report) {
+    @Override
+    public void submitReport(Report report) {
+        double score = 0;
+        if ("SCAM_ACCOUNT".equals(report.getReasonType())) score += 0.8;
+        if ("FRAUD".equals(report.getReasonType())) score += 0.6;
 
-		double score = 0;
+        report.setAiScore(score);
+        if (score >= 0.8)      report.setAiResult("HIGH_RISK");
+        else if (score >= 0.5) report.setAiResult("SUSPICIOUS");
+        else                   report.setAiResult("CLEAN");
 
-		if ("SCAM_ACCOUNT".equals(report.getReasonType())) {
-			score += 0.8;
-		}
+        report.setStatus("대기");
+        reportRepository.insert(report);
 
-		if ("FRAUD".equals(report.getReasonType())) {
-			score += 0.6;
-		}
+        if ("ACCOUNT".equals(report.getTargetType()) && score >= 0.8) {
+            User seller = userService.getUserByNo(report.getTargetNo());
+            FraudAccount fraud = new FraudAccount();
+            fraud.setSellerNo(seller.getUserNo());
+            fraud.setAccountNumber(seller.getUserAccountNumber());
+            fraud.setBankName(seller.getUserBankName());
+            fraud.setStatus("SUSPECTED");
+            fraud.setLocked(true);
+            fraudRepository.save(fraud);
+        }
+    }
 
-		report.setAiScore(score);
+    @Override
+    public List<Report> getAllReports() {
+        return reportRepository.findAll();
+    }
 
-		if (score >= 0.8) {
-			report.setAiResult("HIGH_RISK");
-		} else if (score >= 0.5) {
-			report.setAiResult("SUSPICIOUS");
-		} else {
-			report.setAiResult("CLEAN");
-		}
+    @Override
+    public List<Report> getReportsByType(String targetType) {
+        return reportRepository.findByTargetType(targetType);
+    }
 
-		report.setStatus("PENDING");
+    @Override
+    public void processReport(int reportNo) {
+        reportRepository.updateStatus(reportNo, "처리완료");
+    }
 
-		reportRepository.save(report);
-
-		if ("ACCOUNT".equals(report.getTargetType()) && score >= 0.8) {
-
-			User seller = userService.getUserByNo(report.getTargetNo());
-
-			FraudAccount fraud = new FraudAccount();
-
-			fraud.setSellerNo(seller.getUserNo());
-			fraud.setAccountNumber(seller.getUserAccountNumber());
-			fraud.setBankName(seller.getUserBankName());
-			fraud.setStatus("SUSPECTED");
-			fraud.setLocked(true);
-
-			fraudRepository.save(fraud);
-		}
-	}
+    @Override
+    public boolean isDuplicate(int reporterNo, String targetType, int targetNo) {
+        return reportRepository.existsReport(reporterNo, targetType, targetNo);
+    }
 }

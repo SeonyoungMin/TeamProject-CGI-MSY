@@ -179,10 +179,19 @@
 }
 </style>
 </head>
+
+<%@ include file="/WEB-INF/views/reportModal.jsp"%>
 <body>
 	<%@ include file="/WEB-INF/views/header.jsp"%>
 
 	<div class="app-container">
+		<c:if test="${not empty loginUser && loginUser.userNo != user.userNo}">
+			<div style="text-align: right; margin-top: 10px;">
+				<button type="button" class="btn btn-danger"
+					onclick="openReportModal('user', ${user.userNo})">신고</button>
+			</div>
+		</c:if>
+
 		<div class="profile-section">
 			<div style="margin-bottom: 20px;">
 				<c:choose>
@@ -365,7 +374,6 @@
 
 									<c:if
 										test="${not empty loginUser && r.authorNo == loginUser.userNo}">
-										<p>loginUser: ${loginUser.userNo}</p>
 										<div style="display: flex; gap: 6px;">
 											<%-- 수정 버튼: 후기 삭제 후 기존 내용 채운 폼 열기 --%>
 											<form action="${ctx}/review/${r.boardNo}/edit" method="post"

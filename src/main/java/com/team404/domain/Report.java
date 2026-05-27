@@ -19,6 +19,9 @@ public class Report {
 	private String status;
 
 	private LocalDateTime createdTime;
+	
+    private String reporterNickname;
+    private String targetName; // 신고 대상 이름 (상품명, 닉네임 등)
 
 	public int getReportNo() {
 		return reportNo;
@@ -99,4 +102,21 @@ public class Report {
 	public void setCreatedTime(LocalDateTime createdTime) {
 		this.createdTime = createdTime;
 	}
+
+	public String getReporterNickname() {
+		return reporterNickname;
+	}
+
+	public void setReporterNickname(String reporterNickname) {
+		this.reporterNickname = reporterNickname;
+	}
+
+	public String getTargetName() {
+		return targetName;
+	}
+
+	public void setTargetName(String targetName) {
+		this.targetName = targetName;
+	}
+	
 }
