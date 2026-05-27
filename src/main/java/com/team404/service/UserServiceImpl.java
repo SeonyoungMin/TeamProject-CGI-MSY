@@ -211,5 +211,15 @@ public class UserServiceImpl implements UserService {
 	public void updateAccount(int userNo, String bankName, String accountNumber, String accountHolder) {
 		userRepository.updateAccount(userNo, bankName, accountNumber, accountHolder);
 	}
+	
+	@Override
+	public void updateRiskScore(int userNo, double score) {
+	    userRepository.updateRiskScore(userNo, score);
+	}
+	
+	@Override
+	public List<User> findAdmins() {
+		return userRepository.findAdmins();
+	}
 
 }

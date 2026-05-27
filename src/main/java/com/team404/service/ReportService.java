@@ -16,4 +16,5 @@ public interface ReportService {
 
 	boolean isDuplicate(int reporterNo, String targetType, int targetNo);
 
+	List<Report> getReportsByStatus(String status);
 }

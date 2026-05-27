@@ -15,6 +15,7 @@ body {
 	font-family: Arial, sans-serif;
 	background: #f6f7f9;
 }
+
 .container {
 	max-width: 900px;
 	margin: 40px auto;
@@ -22,11 +23,13 @@ body {
 	padding: 30px;
 	border-radius: 12px;
 }
+
 .post-title {
 	font-size: 24px;
 	font-weight: bold;
 	margin-bottom: 10px;
 }
+
 .post-meta {
 	color: #888;
 	font-size: 13px;
@@ -34,6 +37,7 @@ body {
 	display: flex;
 	justify-content: space-between;
 }
+
 .post-content {
 	line-height: 1.7;
 	white-space: pre-wrap;
@@ -41,23 +45,120 @@ body {
 	border-top: 1px solid #eee;
 	border-bottom: 1px solid #eee;
 }
-.comment-section { margin-top: 40px; }
-.comment-title { font-size: 18px; font-weight: bold; margin-bottom: 15px; }
-.comment-form { display: flex; gap: 10px; margin-bottom: 20px; align-items: center; }
-.comment-form input[type="text"] { flex: 1; padding: 10px; border: 1px solid #ddd; border-radius: 8px; }
-.comment-form button[type="submit"] { padding: 10px 16px; border: none; background: #000; color: #fff; border-radius: 8px; cursor: pointer; white-space: nowrap; }
-.comment-item { padding: 12px 0; border-bottom: 1px solid #eee; }
-.reply-item { margin-left: 30px; padding-left: 12px; border-left: 3px solid #eee; background: #fafafa; }
-.comment-top { display: flex; justify-content: space-between; font-size: 12px; color: #777; margin-bottom: 5px; }
-.comment-author { font-weight: bold; color: #333; }
-.comment-content { font-size: 14px; color: #222; }
-.comment-actions { margin-top: 6px; font-size: 12px; display: flex; gap: 10px; align-items: center; }
-.comment-actions form { margin: 0; }
-.comment-actions button { background: none; border: none; color: red; cursor: pointer; font-size: 12px; padding: 0; }
-.reply-btn { background: none; border: none; color: #3498db; cursor: pointer; font-size: 12px; padding: 0; }
-.edit-btn { background: none; border: none; color: #888; cursor: pointer; font-size: 12px; padding: 0; }
-.reply-form, .comment-edit-form { display: none; margin-top: 10px; }
-.empty { color: #999; padding: 20px 0; text-align: center; }
+
+.comment-section {
+	margin-top: 40px;
+}
+
+.comment-title {
+	font-size: 18px;
+	font-weight: bold;
+	margin-bottom: 15px;
+}
+
+.comment-form {
+	display: flex;
+	gap: 10px;
+	margin-bottom: 20px;
+	align-items: center;
+}
+
+.comment-form input[type="text"] {
+	flex: 1;
+	padding: 10px;
+	border: 1px solid #ddd;
+	border-radius: 8px;
+}
+
+.comment-form button[type="submit"] {
+	padding: 10px 16px;
+	border: none;
+	background: #000;
+	color: #fff;
+	border-radius: 8px;
+	cursor: pointer;
+	white-space: nowrap;
+}
+
+.comment-item {
+	padding: 12px 0;
+	border-bottom: 1px solid #eee;
+}
+
+.reply-item {
+	margin-left: 30px;
+	padding-left: 12px;
+	border-left: 3px solid #eee;
+	background: #fafafa;
+}
+
+.comment-top {
+	display: flex;
+	justify-content: space-between;
+	font-size: 12px;
+	color: #777;
+	margin-bottom: 5px;
+}
+
+.comment-author {
+	font-weight: bold;
+	color: #333;
+}
+
+.comment-content {
+	font-size: 14px;
+	color: #222;
+}
+
+.comment-actions {
+	margin-top: 6px;
+	font-size: 12px;
+	display: flex;
+	gap: 10px;
+	align-items: center;
+}
+
+.comment-actions form {
+	margin: 0;
+}
+
+.comment-actions button {
+	background: none;
+	border: none;
+	color: red;
+	cursor: pointer;
+	font-size: 12px;
+	padding: 0;
+}
+
+.reply-btn {
+	background: none;
+	border: none;
+	color: #3498db;
+	cursor: pointer;
+	font-size: 12px;
+	padding: 0;
+}
+
+.edit-btn {
+	background: none;
+	border: none;
+	color: #888;
+	cursor: pointer;
+	font-size: 12px;
+	padding: 0;
+}
+
+.reply-form, .comment-edit-form {
+	display: none;
+	margin-top: 10px;
+}
+
+.empty {
+	color: #999;
+	padding: 20px 0;
+	text-align: center;
+}
 </style>
 </head>
 
@@ -65,21 +166,33 @@ body {
 	<%@ include file="/WEB-INF/views/header.jsp"%>
 
 	<div class="container">
-		<a href="${ctx}/home">< 메인으로 </a> <br><br>
-
+		<div style="display: flex; justify-content: space-between;">
+			<a href="${ctx}/home">< 메인으로 </a>
+			<%-- 신고 버튼 (본인 게시글 제외) --%>
+			<c:if
+				test="${not empty loginUser && loginUser.userNo != board.authorNo}">
+				<button type="button" class="btn btn-danger"
+					onclick="openReportModal('board', ${board.boardNo})">신고</button>
+			</c:if>
+		</div>
 		<%-- 공지 관련 권한 변수 --%>
-		<c:set var="isAdmin" value="${loginUser != null && loginUser.userRole == 'ROLE_ADMIN'}" />
-		<c:set var="isAuthor" value="${loginUser != null && loginUser.userNo == board.authorNo}" />
+		<c:set var="isAdmin"
+			value="${loginUser != null && loginUser.userRole == 'ROLE_ADMIN'}" />
+		<c:set var="isAuthor"
+			value="${loginUser != null && loginUser.userNo == board.authorNo}" />
 		<c:set var="isNotice" value="${board.boardType == 'notice'}" />
 		<c:set var="canEdit" value="${isNotice ? isAdmin : isAuthor}" />
-		<c:set var="canDelete" value="${isNotice ? isAdmin : (isAuthor || isAdmin)}" />
+		<c:set var="canDelete"
+			value="${isNotice ? isAdmin : (isAuthor || isAdmin)}" />
 
 		<div class="post-title">
 			<c:if test="${isNotice && board.pinned}">
-				<i class="fa-solid fa-thumbtack" style="color: #c0392b; margin-right: 6px;"></i>
+				<i class="fa-solid fa-thumbtack"
+					style="color: #c0392b; margin-right: 6px;"></i>
 			</c:if>
 			<c:if test="${isNotice}">
-				<span style="background: #fdecec; color: #c0392b; font-size: 12px; padding: 2px 6px; border-radius: 3px; margin-right: 6px; font-weight: 600; vertical-align: middle;">공지</span>
+				<span
+					style="background: #fdecec; color: #c0392b; font-size: 12px; padding: 2px 6px; border-radius: 3px; margin-right: 6px; font-weight: 600; vertical-align: middle;">공지</span>
 			</c:if>
 			${board.title}
 		</div>
@@ -96,7 +209,8 @@ body {
 					<a href="${ctx}/boardList/${board.boardNo}/edit" class="btn">수정</a>
 				</c:if>
 				<c:if test="${canDelete}">
-					<form action="${ctx}/boardList/${board.boardNo}" method="post" style="display: inline;">
+					<form action="${ctx}/boardList/${board.boardNo}" method="post"
+						style="display: inline;">
 						<input type="hidden" name="_method" value="DELETE">
 						<button type="submit" onclick="return confirm('삭제하시겠습니까?')">삭제</button>
 					</form>
@@ -117,13 +231,14 @@ body {
 				<c:otherwise>
 					<form action="${ctx}/comment/add#commentSection" method="post">
 						<input type="hidden" name="boardNo" value="${board.boardNo}">
-						<input type="hidden" name="targetType" value="BOARD">
-						<input type="hidden" name="returnTo" value="board">
-						<input type="hidden" name="parentCommentNo" value="0">
-						<input type="text" name="content"
+						<input type="hidden" name="targetType" value="BOARD"> <input
+							type="hidden" name="returnTo" value="board"> <input
+							type="hidden" name="parentCommentNo" value="0"> <input
+							type="text" name="content"
 							style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; margin-bottom: 8px;"
 							placeholder="댓글을 입력하세요" required>
-						<div style="display: flex; justify-content: space-between; align-items: center;">
+						<div
+							style="display: flex; justify-content: space-between; align-items: center;">
 							<label style="font-size: 13px; color: #555; cursor: pointer;">
 								<input type="checkbox" name="isSecret" value="1"> 비밀댓글
 							</label>
@@ -141,7 +256,8 @@ body {
 				</c:when>
 				<c:otherwise>
 					<c:forEach var="c" items="${comments}">
-						<div class="comment-item ${c.parentCommentNo > 0 ? 'reply-item' : ''}">
+						<div
+							class="comment-item ${c.parentCommentNo > 0 ? 'reply-item' : ''}">
 
 							<div class="comment-top">
 								<div class="comment-author">
@@ -153,15 +269,18 @@ body {
 										<c:otherwise>${c.nickname}</c:otherwise>
 									</c:choose>
 									<c:if test="${c.isSecret == 1}">
-										<span style="font-size: 11px; color: #888; margin-left: 4px;">🔒 비밀댓글</span>
+										<span style="font-size: 11px; color: #888; margin-left: 4px;">🔒
+											비밀댓글</span>
 									</c:if>
 								</div>
 								<div>${c.createdTime}</div>
 							</div>
 
 							<c:choose>
-								<c:when test="${c.isSecret == 1 && loginUser.userNo != c.authorNo && loginUser.userNo != board.authorNo && loginUser.userRole != 'ROLE_ADMIN'}">
-									<div class="comment-content" style="color: #aaa; font-style: italic;">비밀 댓글입니다.</div>
+								<c:when
+									test="${c.isSecret == 1 && loginUser.userNo != c.authorNo && loginUser.userNo != board.authorNo && loginUser.userRole != 'ROLE_ADMIN'}">
+									<div class="comment-content"
+										style="color: #aaa; font-style: italic;">비밀 댓글입니다.</div>
 								</c:when>
 								<c:otherwise>
 									<div class="comment-content">${c.content}</div>
@@ -170,13 +289,16 @@ body {
 
 							<c:if test="${c.authorNo == loginUser.userNo}">
 								<div id="editForm_${c.commentNo}" class="comment-edit-form">
-									<form action="${ctx}/comment/${c.commentNo}/edit#commentSection" method="post">
+									<form
+										action="${ctx}/comment/${c.commentNo}/edit#commentSection"
+										method="post">
 										<input type="hidden" name="boardNo" value="${board.boardNo}">
-										<input type="hidden" name="returnTo" value="board">
-										<input type="text" name="content" value="${c.content}"
+										<input type="hidden" name="returnTo" value="board"> <input
+											type="text" name="content" value="${c.content}"
 											style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; font-size: 13px;"
 											required>
-										<div style="display: flex; justify-content: flex-end; gap: 6px; margin-top: 6px;">
+										<div
+											style="display: flex; justify-content: flex-end; gap: 6px; margin-top: 6px;">
 											<button type="button" class="edit-btn"
 												style="padding: 8px 12px; background: #eee; color: #333; border-radius: 8px; font-size: 13px;"
 												onclick="toggleEditForm(${c.commentNo})">취소</button>
@@ -188,11 +310,15 @@ body {
 							</c:if>
 
 							<div class="comment-actions">
-								<c:if test="${loginUser != null && (loginUser.userNo == c.authorNo || loginUser.userRole == 'ROLE_ADMIN')}">
+								<c:if
+									test="${loginUser != null && (loginUser.userNo == c.authorNo || loginUser.userRole == 'ROLE_ADMIN')}">
 									<c:if test="${loginUser.userNo == c.authorNo}">
-										<button type="button" class="edit-btn" onclick="toggleEditForm(${c.commentNo})">수정</button>
+										<button type="button" class="edit-btn"
+											onclick="toggleEditForm(${c.commentNo})">수정</button>
 									</c:if>
-									<form action="${ctx}/comment/${c.commentNo}/delete#commentSection" method="post">
+									<form
+										action="${ctx}/comment/${c.commentNo}/delete#commentSection"
+										method="post">
 										<input type="hidden" name="boardNo" value="${board.boardNo}">
 										<input type="hidden" name="returnTo" value="board">
 										<button type="submit" onclick="return confirm('삭제하시겠습니까?')">삭제</button>
@@ -200,7 +326,8 @@ body {
 								</c:if>
 
 								<c:if test="${not empty loginUser && c.parentCommentNo == 0}">
-									<button type="button" class="reply-btn" onclick="toggleReplyForm(${c.commentNo})">답글</button>
+									<button type="button" class="reply-btn"
+										onclick="toggleReplyForm(${c.commentNo})">답글</button>
 								</c:if>
 							</div>
 
@@ -209,14 +336,16 @@ body {
 									<form action="${ctx}/comment/add#commentSection" method="post">
 										<input type="hidden" name="boardNo" value="${board.boardNo}">
 										<input type="hidden" name="targetType" value="BOARD">
-										<input type="hidden" name="returnTo" value="board">
-										<input type="hidden" name="parentCommentNo" value="${c.commentNo}">
+										<input type="hidden" name="returnTo" value="board"> <input
+											type="hidden" name="parentCommentNo" value="${c.commentNo}">
 										<input type="text" name="content"
 											style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; font-size: 13px;"
 											placeholder="답글을 입력하세요" required>
-										<div style="display: flex; justify-content: space-between; align-items: center; margin-top: 6px;">
+										<div
+											style="display: flex; justify-content: space-between; align-items: center; margin-top: 6px;">
 											<label style="font-size: 12px; color: #555; cursor: pointer;">
-												<input type="checkbox" name="isSecret" value="1"> 비밀답글
+												<input type="checkbox" name="isSecret" value="1">
+												비밀답글
 											</label>
 											<button type="submit"
 												style="padding: 8px 12px; background: #000; color: #fff; border: none; border-radius: 8px; cursor: pointer; font-size: 13px;">등록</button>
@@ -232,6 +361,7 @@ body {
 	</div>
 
 	<%@ include file="/WEB-INF/views/footer.jsp"%>
+	<%@ include file="/WEB-INF/views/reportModal.jsp"%>
 
 	<script>
 		function toggleReplyForm(commentNo) {

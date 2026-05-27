@@ -66,6 +66,7 @@
 
 						<c:if test="${sessionScope.loginUser.userRole == 'ROLE_ADMIN'}">
 							<a href="${ctx}/users/search/allUsers" class="nav-link admin-link">계정관리</a>
+							<a href="${ctx}/admin/reports" class="nav-link admin-link">신고관리</a>
 						</c:if>
 
 						<form action="${ctx}/logout" method="post" style="margin: 0;">
@@ -110,12 +111,14 @@
 				transfer_request : { cls : 'bought', fa : 'fa-paper-plane' },
 				transfer_approved : { cls : 'sold', fa : 'fa-circle-check' },
 				trade_cancelled : { cls : 'favorite', fa : 'fa-ban' },
-				trade_rejected : { cls : 'favorite', fa : 'fa-circle-xmark' }
+				trade_rejected : { cls : 'favorite', fa : 'fa-circle-xmark' },
+				report : { cls : 'notice', fa : 'fa-flag' }
 			};
 
 			function formatTime(dateStr) {
 				var now = new Date();
 				var past = new Date(dateStr);
+				past.setHours(past.getHours() + 9);
 				var diff = Math.floor((now - past) / 1000);
 				if (diff < 60) return '방금 전';
 				if (diff < 3600) return Math.floor(diff / 60) + '분 전';

@@ -26,8 +26,7 @@
 	<!-- 이미지 업로드 경로 상세 매핑 -->
 
 
-	<resources mapping="/upload/**"
-		location="file:///C:/team404_upload/" />
+	<resources mapping="/upload/**" location="file:///C:/team404_upload/" />
 
 	<!-- 유저 이미지 경로 -->
 	<resources mapping="/team404_upload/userImg/**"
@@ -53,8 +52,8 @@
 	</beans:bean>
 
 
-	<!-- multipartResolver -->
-	<beans:bean id="multipartResolver"
-		class="org.springframework.web.multipart.support.StandardServletMultipartResolver" />
+    <!-- multipartResolver -->
+    <beans:bean id="multipartResolver"
+        class="org.springframework.web.multipart.support.StandardServletMultipartResolver" />
 
 </beans:beans>

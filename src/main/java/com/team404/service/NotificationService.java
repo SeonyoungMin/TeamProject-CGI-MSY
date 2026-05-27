@@ -73,4 +73,7 @@ public interface NotificationService {
 	// 계좌이체 거래 취소 알림 (승인완료/입금대기 단계에서 취소된 경우)
 	// cancelledBySeller=true 면 receiver=구매자, false 면 receiver=판매자
 	void notifyTransferCancelled(int receiverNo, int productNo, String productName, boolean cancelledBySeller);
+	
+	// 신고 접수 관리자 알림
+	void notifyReport(int reporterNo, String targetType, String targetName);
 }

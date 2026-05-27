@@ -20,4 +20,8 @@ public interface ReportRepository {
 
     // 중복 신고 확인 (같은 사람이 같은 대상을 이미 신고했는지)
     boolean existsReport(int reporterNo, String targetType, int targetNo);
+    
+    // 신고 처리 상태 드롭다운
+    List<Report> findByStatus(String status);
+
 }

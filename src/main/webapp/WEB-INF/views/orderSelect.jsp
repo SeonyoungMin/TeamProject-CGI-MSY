@@ -71,6 +71,14 @@
 			</p>
 		</div>
 
+<<<<<<< HEAD
+		<form action="${pageContext.request.contextPath}/order/complete"
+			method="post">
+			<input type="hidden" name="productNo" value="${product.productNo}">
+			<button type="submit">직거래</button>
+			<br> <br>
+			<button type="submit">계좌이체(배송)</button>
+=======
 		<form action="${pageContext.request.contextPath}/order/route"
 			method="post">
 			<input type="hidden" name="productNo" value="${product.productNo}">
@@ -80,6 +88,7 @@
 
 			<button type="submit" name="type" value="TRANSFER"
 				class="btn btn-transfer">계좌이체(배송)</button>
+>>>>>>> main
 		</form>
 		<br>
 

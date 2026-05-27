@@ -22,6 +22,11 @@ public class Report {
 	
     private String reporterNickname;
     private String targetName; // 신고 대상 이름 (상품명, 닉네임 등)
+    
+    private int accusedUserNo;
+    private String accusedNickname;
+    
+    private double userRiskScore;
 
 	public int getReportNo() {
 		return reportNo;
@@ -118,5 +123,31 @@ public class Report {
 	public void setTargetName(String targetName) {
 		this.targetName = targetName;
 	}
+
+	public int getAccusedUserNo() {
+		return accusedUserNo;
+	}
+
+	public void setAccusedUserNo(int accusedUserNo) {
+		this.accusedUserNo = accusedUserNo;
+	}
+
+	public String getAccusedNickname() {
+		return accusedNickname;
+	}
+
+	public void setAccusedNickname(String accusedNickname) {
+		this.accusedNickname = accusedNickname;
+	}
+
+	public double getUserRiskScore() {
+		return userRiskScore;
+	}
+
+	public void setUserRiskScore(double userRiskScore) {
+		this.userRiskScore = userRiskScore;
+	}
+	
+	
 	
 }

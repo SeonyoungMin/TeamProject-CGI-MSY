@@ -245,4 +245,16 @@ public class UserRepositoryImpl implements UserRepository {
 		String SQL = "UPDATE users SET bank_name = ?, account_number = ?, account_holder = ? WHERE user_no = ?";
 		template.update(SQL, bankName, accountNumber, accountHolder, userNo);
 	}
+	
+	@Override
+	public void updateRiskScore(int userNo, double score) {
+	    String sql = "UPDATE users SET risk_score = risk_score + ? WHERE user_no = ?";
+	    template.update(sql, score, userNo);
+	}
+	
+	@Override
+	public List<User> findAdmins() {
+		String SQL = "select * from users where role = 'ROLE_ADMIN'";
+		return template.query(SQL, new UserRowMapper());
+	}
 }

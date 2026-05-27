@@ -10,7 +10,7 @@
 <title>신고 관리</title>
 <style>
 .report-container {
-	max-width: 1100px;
+	max-width: 1300px;
 	margin: 30px auto;
 	padding: 20px;
 	font-family: 'Pretendard', sans-serif;
@@ -45,12 +45,13 @@
 	width: 100%;
 	border-collapse: collapse;
 	font-size: 14px;
+	table-layout: fixed;
 }
 
 .report-table th {
 	background: #f5f5f5;
 	padding: 12px;
-	text-align: left;
+	text-align: center;
 	border-bottom: 2px solid #ddd;
 	font-weight: bold;
 	color: #333;
@@ -60,6 +61,7 @@
 	padding: 12px;
 	border-bottom: 1px solid #eee;
 	vertical-align: middle;
+	text-align: center;
 }
 
 .report-table tr:hover td {
@@ -100,7 +102,7 @@
 
 .empty-msg {
 	text-align: center;
-	padding: 60px 0;
+	padding: 40px 0;
 	color: #bbb;
 	font-size: 15px;
 }
@@ -112,43 +114,58 @@
 	<div class="report-container">
 		<h2 class="section-title">신고 관리</h2>
 
-		<%-- 탭 --%>
-		<div class="tab-bar">
-			<a href="${ctx}/admin/reports"
-				class="tab-btn ${empty selectedType ? 'active' : ''}">전체</a> <a
-				href="${ctx}/admin/reports?type=user"
-				class="tab-btn ${'user' eq selectedType ? 'active' : ''}">유저 신고</a>
-			<a href="${ctx}/admin/reports?type=product"
-				class="tab-btn ${'product' eq selectedType ? 'active' : ''}">상품
-				신고</a> <a href="${ctx}/admin/reports?type=board"
-				class="tab-btn ${'board' eq selectedType ? 'active' : ''}">게시글
-				신고</a>
+		<div
+			style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+			<div class="tab-bar" style="margin-bottom: 0;">
+				<a href="${ctx}/admin/reports"
+					class="tab-btn ${empty selectedType ? 'active' : ''}">전체</a> <a
+					href="${ctx}/admin/reports?type=user"
+					class="tab-btn ${'user' eq selectedType ? 'active' : ''}">유저 신고</a>
+				<a href="${ctx}/admin/reports?type=product"
+					class="tab-btn ${'product' eq selectedType ? 'active' : ''}">상품
+					신고</a> <a href="${ctx}/admin/reports?type=board"
+					class="tab-btn ${'board' eq selectedType ? 'active' : ''}">게시글
+					신고</a>
+			</div>
+			<select onchange="location.href=this.value"
+				style="padding: 8px 12px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px; cursor: pointer;">
+				<option value="${ctx}/admin/reports"
+					${empty selectedStatus ? 'selected' : ''}>전체</option>
+				<option value="${ctx}/admin/reports?status=대기"
+					${'대기' eq selectedStatus ? 'selected' : ''}>대기</option>
+				<option value="${ctx}/admin/reports?status=처리완료"
+					${'처리완료' eq selectedStatus ? 'selected' : ''}>처리완료</option>
+			</select>
 		</div>
 
-		<c:choose>
-			<c:when test="${empty reports}">
-				<div class="empty-msg">신고 내역이 없습니다.</div>
-			</c:when>
-			<c:otherwise>
-				<table class="report-table">
-					<thead>
+		<table class="report-table">
+			<thead>
+				<tr>
+					<th>번호</th>
+					<th>신고일</th>
+					<th>신고 유형</th>
+					<th>신고 대상</th>
+					<th>신고자</th>
+					<th>신고 사유</th>
+					<th>위험 점수</th>
+					<th>누적 점수</th>
+					<th>위험 등급</th>
+					<th>상태</th>
+					<th>처리</th>
+				</tr>
+			</thead>
+			<tbody>
+				<c:choose>
+					<c:when test="${empty reports}">
 						<tr>
-							<th>번호</th>
-							<th>신고 유형</th>
-							<th>신고 대상</th>
-							<th>신고자</th>
-							<th>신고 사유</th>
-							<th>AI 점수</th>
-							<th>AI 결과</th>
-							<th>상태</th>
-							<th>신고일</th>
-							<th>처리</th>
+							<td colspan="11" class="empty-msg">신고 내역이 없습니다.</td>
 						</tr>
-					</thead>
-					<tbody>
+					</c:when>
+					<c:otherwise>
 						<c:forEach var="r" items="${reports}">
 							<tr>
 								<td>${r.reportNo}</td>
+								<td>${r.createdTime.toString().substring(0, 10)}</td>
 								<td><c:choose>
 										<c:when test="${r.targetType == 'user'}">유저</c:when>
 										<c:when test="${r.targetType == 'product'}">상품</c:when>
@@ -169,42 +186,66 @@
 									</c:choose></td>
 								<td>${r.reporterNickname}</td>
 								<td>
-									<div>${r.reasonType}</div> <c:if
-										test="${not empty r.reasonDetail}">
+									<div>
+										<c:choose>
+											<c:when test="${r.reasonType == 'SCAM_ACCOUNT'}">사기계좌 사용</c:when>
+											<c:when test="${r.reasonType == 'FRAUD'}">허위 정보</c:when>
+											<c:when test="${r.reasonType == 'FALSE_LISTING'}">허위매물</c:when>
+											<c:when test="${r.reasonType == 'DUPLICATE'}">중복 게시</c:when>
+											<c:when test="${r.reasonType == 'ABUSE'}">욕설/비방</c:when>
+											<c:when test="${r.reasonType == 'SPAM'}">스팸</c:when>
+											<c:when test="${r.reasonType == 'RULE_VIOLATION'}">규정 위반</c:when>
+											<c:when test="${r.reasonType == 'ETC'}">기타</c:when>
+											<c:otherwise>${r.reasonType}</c:otherwise>
+										</c:choose>
+									</div> <c:if test="${not empty r.reasonDetail}">
 										<div style="font-size: 12px; color: #888; margin-top: 3px;">${r.reasonDetail}</div>
 									</c:if>
 								</td>
+								<%-- 위험 점수: 건별 ai_score --%>
 								<td><c:choose>
 										<c:when test="${r.aiScore >= 0.8}">
-											<span class="ai-high"><fmt:formatNumber
-													value="${r.aiScore}" pattern="0.0" /></span>
+											<span class="ai-high">${r.aiScore}</span>
 										</c:when>
 										<c:when test="${r.aiScore >= 0.5}">
+											<span class="ai-suspicious">${r.aiScore}</span>
+										</c:when>
+										<c:otherwise>
+											<span class="ai-clean">${r.aiScore}</span>
+										</c:otherwise>
+									</c:choose></td>
+								<%-- 누적 점수 --%>
+								<td><c:set var="riskScore" value="${r.userRiskScore}" /> <fmt:formatNumber
+										value="${riskScore}" pattern="0.0" var="formattedRisk" /> <c:choose>
+										<c:when test="${riskScore >= 1.0}">
+											<span class="ai-high"><fmt:formatNumber
+													value="${riskScore}" pattern="0.0" /></span>
+										</c:when>
+										<c:when test="${riskScore >= 0.5}">
 											<span class="ai-suspicious"><fmt:formatNumber
-													value="${r.aiScore}" pattern="0.0" /></span>
+													value="${riskScore}" pattern="0.0" /></span>
 										</c:when>
 										<c:otherwise>
 											<span class="ai-clean"><fmt:formatNumber
-													value="${r.aiScore}" pattern="0.0" /></span>
+													value="${riskScore}" pattern="0.0" /></span>
 										</c:otherwise>
 									</c:choose></td>
+								<%-- 위험 등급: 누적 점수 기준 --%>
 								<td><c:choose>
-										<c:when test="${r.aiResult == 'HIGH_RISK'}">
-											<span class="ai-high">HIGH_RISK</span>
+										<c:when test="${r.userRiskScore >= 1.0}">
+											<span class="ai-high">위험</span>
 										</c:when>
-										<c:when test="${r.aiResult == 'SUSPICIOUS'}">
-											<span class="ai-suspicious">SUSPICIOUS</span>
+										<c:when test="${r.userRiskScore >= 0.5}">
+											<span class="ai-suspicious">주의</span>
 										</c:when>
-										<c:when test="${r.aiResult == 'CLEAN'}">
-											<span class="ai-clean">CLEAN</span>
-										</c:when>
-										<c:otherwise>${r.aiResult}</c:otherwise>
+										<c:otherwise>
+											<span class="ai-clean">안전</span>
+										</c:otherwise>
 									</c:choose></td>
 								<td><span
 									class="status-badge ${r.status == '대기' ? 'status-pending' : 'status-done'}">
 										${r.status} </span></td>
-								<td><fmt:formatDate value="${r.createdTime}"
-										pattern="yyyy.MM.dd" /></td>
+								
 								<td><c:if test="${r.status == '대기'}">
 										<form action="${ctx}/admin/reports/${r.reportNo}/process"
 											method="post" style="margin: 0;">
@@ -218,10 +259,10 @@
 									</c:if></td>
 							</tr>
 						</c:forEach>
-					</tbody>
-				</table>
-			</c:otherwise>
-		</c:choose>
+					</c:otherwise>
+				</c:choose>
+			</tbody>
+		</table>
 	</div>
 
 	<%@ include file="/WEB-INF/views/footer.jsp"%>

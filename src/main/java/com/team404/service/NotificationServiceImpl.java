@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.team404.domain.Notification;
+import com.team404.domain.User;
 import com.team404.repository.NotificationRepository;
 
 @Service
@@ -13,6 +14,9 @@ public class NotificationServiceImpl implements NotificationService {
 
 	@Autowired
 	private NotificationRepository notificationRepository;
+	
+	@Autowired
+	private UserService userService;
 
 	private static final String CTX = "/minimarket";
 
@@ -258,5 +262,20 @@ public class NotificationServiceImpl implements NotificationService {
 		n.setMessage("'" + productName + "' 상품의 거래 요청이 승인되었습니다. 입금 정보를 입력해 주세요.");
 		n.setLinkUrl(CTX + "/order/transfer/form?productNo=" + productNo);
 		notificationRepository.insert(n);
+	}
+	
+	@Override
+	public void notifyReport(int reporterNo, String targetType, String targetName) {
+		List<User> admins = userService.findAdmins();
+		for (User admin : admins) {
+			Notification n = new Notification();
+			n.setReceiverNo(admin.getUserNo());
+			n.setSenderNo(reporterNo);
+			n.setNotiType("report");
+			n.setMessage("[신고접수] " + targetType + " 신고가 접수되었습니다: " + targetName);
+			n.setLinkUrl(CTX + "/admin/reports");
+			notificationRepository.insert(n);
+		}
+		
 	}
 }

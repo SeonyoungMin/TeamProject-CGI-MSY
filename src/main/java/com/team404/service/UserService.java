@@ -3,8 +3,6 @@ package com.team404.service;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import org.springframework.web.multipart.MultipartFile;
-
 import com.team404.domain.SearchDTO;
 import com.team404.domain.User;
 
@@ -67,4 +65,10 @@ public interface UserService {
 	// 계좌 정보 등록/수정
 	void updateAccount(int userNo, String bankName, String accountNumber, String accountHolder);
 
+	// 유저 신고 누적 점수
+	void updateRiskScore(int userNo, double score);
+	
+	// 관리자 신고 알림
+	List<User> findAdmins();
+	
 }

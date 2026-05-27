@@ -241,6 +241,12 @@
 	display: none;
 	margin-top: 8px;
 }
+
+.report-line {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+}
 </style>
 </head>
 <body>
@@ -277,7 +283,13 @@
 
 				<!-- 상품 정보 섹션 -->
 				<div class="detail-info">
-					<div class="product-status">${product.tradeStatus == '판매중' ? '판매중' : product.tradeStatus == '예약중' ? '예약중' : '판매완료'}
+					<div class="report-line">
+						<div class="product-status">${product.tradeStatus == '판매중' ? '판매중' : product.tradeStatus == '예약중' ? '예약중' : '판매완료'}</div>
+						<c:if
+							test="${not empty loginUser && loginUser.userNo != product.sellerNo}">
+							<button type="button" class="btn btn-danger"
+								onclick="openReportModal('product', ${product.productNo})">신고</button>
+						</c:if>
 					</div>
 					<div class="product-title">${product.productName}</div>
 					<div class="product-price">
@@ -561,7 +573,8 @@
 													style="font-size: 12px; background: none; border: none; color: #888; cursor: pointer; padding: 0;"
 													onclick="toggleEditForm(${c.commentNo})">수정</button>
 											</c:if>
-											<form action="${ctx}/comment/${c.commentNo}/delete#commentSection"
+											<form
+												action="${ctx}/comment/${c.commentNo}/delete#commentSection"
 												method="post" style="margin: 0;">
 												<input type="hidden" name="boardNo"
 													value="${product.productNo}">
@@ -583,7 +596,8 @@
 									<c:if test="${not empty loginUser && c.parentCommentNo == 0}">
 										<div id="replyForm_${c.commentNo}"
 											style="display: none; margin-top: 10px;">
-											<form action="${ctx}/comment/add#commentSection" method="post">
+											<form action="${ctx}/comment/add#commentSection"
+												method="post">
 												<input type="hidden" name="boardNo"
 													value="${product.productNo}"> <input type="hidden"
 													name="targetType" value="PRODUCT"> <input
@@ -641,6 +655,7 @@
 	</div>
 
 	<%@ include file="/WEB-INF/views/footer.jsp"%>
+	<%@ include file="/WEB-INF/views/reportModal.jsp"%>
 
 	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 	<script>

@@ -38,7 +38,18 @@
 		<filter-name>encodingFilter</filter-name>
 		<url-pattern>/*</url-pattern>
 	</filter-mapping>
-	
+
+
+	<filter>
+		<filter-name>springSecurityFilterChain</filter-name>
+		<filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
+	</filter>
+	<filter-mapping>
+		<filter-name>springSecurityFilterChain</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping>
+
+
 	<!-- ===== Hidden Method (PUT, DELETE 지원) ===== -->
 	<filter>
 		<filter-name>httpMethodFilter</filter-name>
@@ -53,16 +64,6 @@
 		<filter-name>httpMethodFilter</filter-name>
 		<url-pattern>/*</url-pattern>
 	</filter-mapping>
-
-	<filter>
-		<filter-name>springSecurityFilterChain</filter-name>
-		<filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
-	</filter>
-	<filter-mapping>
-		<filter-name>springSecurityFilterChain</filter-name>
-		<url-pattern>/*</url-pattern>
-	</filter-mapping>
-
 
 
 	<!-- ===== DispatcherServlet ===== -->
@@ -93,7 +94,6 @@
 	</servlet-mapping>
 	
 
-
 	<!-- ===== Session ===== -->
 	<!-- <session-config> <session-timeout>30</session-timeout> <cookie-config> 
 		<http-only>true</http-only> </cookie-config> <tracking-mode>COOKIE</tracking-mode> 
@@ -110,6 +110,8 @@
 		<error-code>500</error-code>
 		<location>/WEB-INF/views/error/500.jsp</location>
 	</error-page>
+
+	
  -->
 
 

@@ -30,30 +30,40 @@ public class ReportRepositoryImpl implements ReportRepository {
             r.setAiScore(rs.getDouble("ai_score"));
             r.setAiResult(rs.getString("ai_result"));
             r.setStatus(rs.getString("status"));
-            r.setCreatedTime(rs.getTimestamp("created_time").toLocalDateTime());
+            java.sql.Timestamp ts = rs.getTimestamp("created_time");
+            r.setCreatedTime(ts != null ? ts.toLocalDateTime() : null);
             r.setReporterNickname(rs.getString("reporter_nickname"));
             r.setTargetName(rs.getString("target_name"));
+            r.setAccusedUserNo(rs.getInt("accused_user_no"));
+            r.setAccusedNickname(rs.getString("accused_nickname"));
+            r.setUserRiskScore(rs.getDouble("user_risk_score"));
             return r;
         }
     };
 
     @Override
     public void insert(Report report) {
-        String sql = "INSERT INTO report (reporter_no, target_type, target_no, reason_type, reason_detail, status) "
-                   + "VALUES (?, ?, ?, ?, ?, '대기')";
+        String sql = "INSERT INTO report (reporter_no, target_type, target_no, reason_type, reason_detail, ai_score, ai_result, status, accused_user_no) "
+                   + "VALUES (?, ?, ?, ?, ?, ?, ?, '대기', ?)";
         jdbcTemplate.update(sql,
                 report.getReporterNo(),
                 report.getTargetType(),
                 report.getTargetNo(),
                 report.getReasonType(),
-                report.getReasonDetail());
+                report.getReasonDetail(),
+                report.getAiScore(),
+                report.getAiResult(),
+                report.getAccusedUserNo());
     }
 
     @Override
     public List<Report> findAll() {
         String sql = "SELECT r.report_no, r.reporter_no, r.target_type, r.target_no, "
                    + "r.reason_type, r.reason_detail, r.ai_score, r.ai_result, r.status, r.created_time, "
+                   + "r.accused_user_no, "
                    + "u.nickname AS reporter_nickname, "
+                   + "au.nickname AS accused_nickname, "
+                   + "au.risk_score AS user_risk_score, "
                    + "CASE r.target_type "
                    + "  WHEN 'user'    THEN (SELECT nickname FROM users WHERE user_no = r.target_no) "
                    + "  WHEN 'product' THEN (SELECT name    FROM product WHERE product_no = r.target_no) "
@@ -61,6 +71,7 @@ public class ReportRepositoryImpl implements ReportRepository {
                    + "END AS target_name "
                    + "FROM report r "
                    + "LEFT JOIN users u ON r.reporter_no = u.user_no "
+                   + "LEFT JOIN users au ON r.accused_user_no = au.user_no "
                    + "ORDER BY r.created_time DESC";
         return jdbcTemplate.query(sql, rowMapper);
     }
@@ -69,7 +80,10 @@ public class ReportRepositoryImpl implements ReportRepository {
     public List<Report> findByTargetType(String targetType) {
         String sql = "SELECT r.report_no, r.reporter_no, r.target_type, r.target_no, "
                    + "r.reason_type, r.reason_detail, r.ai_score, r.ai_result, r.status, r.created_time, "
+                   + "r.accused_user_no, "
                    + "u.nickname AS reporter_nickname, "
+                   + "au.nickname AS accused_nickname, "
+                   + "au.risk_score AS user_risk_score, "
                    + "CASE r.target_type "
                    + "  WHEN 'user'    THEN (SELECT nickname FROM users WHERE user_no = r.target_no) "
                    + "  WHEN 'product' THEN (SELECT name    FROM product WHERE product_no = r.target_no) "
@@ -77,6 +91,7 @@ public class ReportRepositoryImpl implements ReportRepository {
                    + "END AS target_name "
                    + "FROM report r "
                    + "LEFT JOIN users u ON r.reporter_no = u.user_no "
+                   + "LEFT JOIN users au ON r.accused_user_no = au.user_no "
                    + "WHERE r.target_type = ? "
                    + "ORDER BY r.created_time DESC";
         return jdbcTemplate.query(sql, rowMapper, targetType);
@@ -94,4 +109,27 @@ public class ReportRepositoryImpl implements ReportRepository {
         Integer count = jdbcTemplate.queryForObject(sql, Integer.class, reporterNo, targetType, targetNo);
         return count != null && count > 0;
     }
+    
+    @Override
+    public List<Report> findByStatus(String status) {
+        String sql = "SELECT r.report_no, r.reporter_no, r.target_type, r.target_no, "
+                   + "r.reason_type, r.reason_detail, r.ai_score, r.ai_result, r.status, r.created_time, "
+                   + "r.accused_user_no, "
+                   + "u.nickname AS reporter_nickname, "
+                   + "au.nickname AS accused_nickname, "
+                   + "au.risk_score AS user_risk_score, "
+                   + "CASE r.target_type "
+                   + "  WHEN 'user'    THEN (SELECT nickname FROM users WHERE user_no = r.target_no) "
+                   + "  WHEN 'product' THEN (SELECT name    FROM product WHERE product_no = r.target_no) "
+                   + "  WHEN 'board'   THEN (SELECT title   FROM board WHERE board_no = r.target_no) "
+                   + "END AS target_name "
+                   + "FROM report r "
+                   + "LEFT JOIN users u ON r.reporter_no = u.user_no "
+                   + "LEFT JOIN users au ON r.accused_user_no = au.user_no "
+                   + "WHERE r.status = ? "
+                   + "ORDER BY r.created_time DESC";
+        return jdbcTemplate.query(sql, rowMapper, status);
+    }
+    
+    
 }
