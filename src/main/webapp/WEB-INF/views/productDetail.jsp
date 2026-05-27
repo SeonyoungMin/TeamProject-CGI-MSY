@@ -243,7 +243,6 @@
 	<%@ include file="/WEB-INF/views/header.jsp"%>
 
 	<div class="detail-container">
-		<!-- app-container 대신 더 넓은 detail-container 사용 -->
 		<div class="card">
 			<div class="detail-top">
 				<!-- 이미지 섹션 -->
@@ -323,6 +322,7 @@
 								</c:when>
 
 								<%-- 본인이 승인받은 거래 → 결제 진행 (예약중 분기보다 먼저!) --%>
+
 								<c:when
 									test="${not empty myOrder && myOrder.orderStatus == '승인완료'}">
 									<a
@@ -330,14 +330,14 @@
 										class="btn-order">결제 진행</a>
 								</c:when>
 
-								<%-- 본인이 입금 대기 중 → 입금 안내로 --%>
+								<%-- 본인이 입금 대기 중 -> 입금 안내로 --%>
 								<c:when
 									test="${not empty myOrder && myOrder.orderStatus == '입금대기'}">
 									<a href="${ctx}/order/waiting/${myOrder.orderNo}"
 										class="btn-order">입금 안내 보기</a>
 								</c:when>
 
-								<%-- 본인이 거래 요청 보낸 상태 → 승인 대기 안내 --%>
+								<%-- 본인이 거래 요청 보낸 상태 -> 승인 대기 안내 --%>
 								<c:when
 									test="${not empty myOrder && myOrder.orderStatus == '요청'}">
 									<span class="status-msg">판매자 승인 대기 중입니다.</span>
@@ -364,7 +364,7 @@
 									</span>
 								</c:when>
 
-								<%-- 그 외 (예: '취소' 등) --%>
+								<%-- 그 외 --%>
 								<c:otherwise>
 									<span class="status-msg">현재 구매할 수 없는 상품입니다.</span>
 								</c:otherwise>
@@ -396,7 +396,91 @@
 					</div>
 				</div>
 			</div>
+			<!-- ai검증 섹션 -->
+			<div class="card"
+				style="margin-top: 40px; border: 1px solid #e0e0e0; background: #fafafa; padding: 20px; border-radius: 8px;">
 
+				<div
+					style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+					<h3 class="section-title"
+						style="color: #121212; display: flex; align-items: center; gap: 8px; margin: 0;">
+						AI 품질 검증 및 시세 비교</h3>
+					<button type="button" class="btn btn-primary" id="btnAiAnalyze"
+						onclick="startAiAnalysis()"
+						style="border: none; padding: 8px 16px; font-weight: bold;">
+						AI 품질 비교·분석 시작</button>
+				</div>
+
+				<div id="aiLoading"
+					style="display: none; text-align: center; padding: 20px 0;">
+					<div class="spinner"></div>
+					<p style="color: #666; font-size: 14px; margin-top: 10px;">AI가
+						실시간으로 이미지 상태, 본문 신뢰도, 시장 시세를 분석 중입니다...</p>
+				</div>
+
+				<div id="aiResultArea" style="display: none; padding: 10px 0;">
+					<table
+						style="width: 100%; border-collapse: collapse; background: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);">
+						<tr
+							style="background: #121212; color: #ffffff; text-align: center;">
+							<th style="padding: 12px; width: 33%;">외관 상태 등급</th>
+							<th style="padding: 12px; width: 33%;">리스크 탐지</th>
+							<th style="padding: 12px; width: 34%;">재판매 가치</th>
+						</tr>
+						<tr style="text-align: center; font-size: 15px; color: #333;">
+							<td style="padding: 20px; border-right: 1px solid #eee;"><span
+								id="resGrade"
+								style="font-size: 22px; font-weight: bold; color: #2ecc71;">-</span>
+							</td>
+							<td
+								style="padding: 20px; border-right: 1px solid #eee; text-align: left; font-size: 13px; line-height: 1.5;">
+								<span id="resRisk" style="color: #e74c3c; font-weight: 500;">-</span>
+							</td>
+							<td
+								style="padding: 20px; font-size: 14px; font-weight: bold; color: #34495e;">
+								<span id="resValue">-</span>
+							</td>
+						</tr>
+					</table>
+
+					<!-- ai이미지 분석-->
+					<div
+						style="display: flex; gap: 12px; margin-top: 15px; flex-wrap: wrap;">
+
+						<div
+							style="flex: 1; min-width: 220px; background: #fff; padding: 15px; border-radius: 6px; border: 1px solid #eee; font-size: 13px; line-height: 1.7;">
+							<strong style="color: #121212;">이미지 분석</strong>
+							<div style="margin-top: 8px; color: #555;">
+								상태 설명 : <span id="resImgCondition">-</span><br> 훼손/스크래치 : <span
+									id="resImgDamage">-</span><br> 외관 등급 : <span
+									id="resImgGrade" style="font-weight: bold; color: #2ecc71;">-</span>
+							</div>
+						</div>
+
+						<div
+							style="flex: 1; min-width: 220px; background: #fff; padding: 15px; border-radius: 6px; border: 1px solid #eee; font-size: 13px; line-height: 1.7;">
+							<strong style="color: #121212;">텍스트 분석</strong>
+							<div style="margin-top: 8px; color: #555;">
+								과장 여부 : <span id="resTxtExag">-</span><br> 신뢰도 : <span
+									id="resTxtTrust" style="font-weight: bold;">-</span><br>
+								도용 가능성 : <span id="resTxtPlag">-</span>
+							</div>
+						</div>
+
+						<div
+							style="flex: 1; min-width: 220px; background: #fff; padding: 15px; border-radius: 6px; border: 1px solid #eee; font-size: 13px; line-height: 1.7;">
+							<strong style="color: #121212;">시세 비교 (네이버 쇼핑 기반)</strong>
+							<div id="resSimList"
+								style="margin-top: 8px; color: #555; word-break: break-all; overflow-wrap: anywhere;">-</div>
+						</div>
+					</div>
+
+					<div
+						style="margin-top: 15px; background: #fff; padding: 15px; border-radius: 6px; border: 1px solid #eee; font-size: 13.5px; line-height: 1.6; color: #555;">
+						<strong> AI 분석 총평 :</strong> <span id="resComment">-</span>
+					</div>
+				</div>
+			</div>
 			<!-- 댓글 섹션 -->
 			<div class="card" style="margin-top: 40px;">
 				<h3 class="section-title">댓글</h3>
@@ -464,10 +548,7 @@
 	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 	<script>
 		var ctx = "${ctx}";
-		var productNo = $
-		{
-			product.productNo
-		};
+		var productNo = parseInt("${product.productNo}") || 0;
 
 		function changeImage(src) {
 			document.getElementById("mainImage").src = src;
@@ -479,7 +560,6 @@
 			}, function(result) {
 				var countEl = document.getElementById('favCount');
 				var count = parseInt(countEl.textContent) || 0;
-
 				if (result === "added") {
 					$("#favIcon").removeClass("fa-regular")
 							.addClass("fa-solid");
@@ -507,49 +587,141 @@
 			var waiting = btn.classList.contains('waiting');
 			var url = waiting ? ctx + '/waitlist/remove' : ctx
 					+ '/waitlist/add';
+			$.post(url, {
+				productNo : productNo
+			}, function(result) {
+			});
+		}
+
+		$(document).ready(function() {
+		});
+
+		function startAiAnalysis() {
+			var pNo = parseInt("${product.productNo}") || 0;
+			var pDesc = String(`${product.description}`).trim();
+			if (!pDesc || pDesc === "undefined") {
+				pDesc = "등록된 상세 설명이 없습니다.";
+			}
+
+			$("#btnAiAnalyze").prop("disabled", true).text("분석 진행 중...");
+			$("#aiResultArea").hide();
+
+			$("#aiLoading")
+					.html(
+							'<div class="spinner"></div>'
+									+ '<p style="color: #666; font-size: 14px; margin-top: 10px;">'
+									+ 'AI가 실시간으로 이미지 상태, 본문 신뢰도, 시장 시세를 분석 중입니다... '
+									+ '</p>').fadeIn(300);
 
 			$
-					.post(
-							url,
-							{
-								productNo : productNo
-							},
-							function(result) {
-								if (result === 'login') {
-									alert('로그인이 필요합니다.');
-									location.href = ctx + '/login';
-									return;
+					.ajax({
+						url : ctx + "/product/ai/analyze",
+						type : "POST",
+						data : {
+							productNo : pNo,
+							description : pDesc
+						},
+						dataType : "text",
+						success : function(data) {
+							try {
+								var startIndex = data.indexOf("{");
+								var endIndex = data.lastIndexOf("}");
+								if (startIndex === -1 || endIndex === -1) {
+									throw new Error("올바른 JSON 형식을 찾을 수 없습니다.");
 								}
-								if (result === 'self') {
-									alert('본인 상품에는 대기 신청할 수 없습니다.');
-									return;
-								}
-								if (result === 'notreserved') {
-									alert('예약중 상품에만 대기 신청할 수 있습니다.');
-									location.reload();
-									return;
-								}
-								if (result === 'notfound') {
-									alert('상품을 찾을 수 없습니다.');
+								var response = JSON.parse(data.substring(
+										startIndex, endIndex + 1));
+
+								if (response.error) {
+									alert(response.error);
+									$("#aiLoading").hide();
+									$("#btnAiAnalyze").prop("disabled", false)
+											.text("AI 품질 비교·분석 시작");
 									return;
 								}
 
-								var countEl = document
-										.getElementById('waitlistCount');
-								var count = parseInt(countEl.textContent) || 0;
+								//결과 
+								var img = response.imageAnalysis || {};
+								var txt = response.textAnalysis || {};
+								var con = response.conclusion || {};
+								var simList = con.similarProductInfo || [];
+								if (!Array.isArray(simList))
+									simList = [];
 
-								if (result === 'added') {
-									btn.classList.add('waiting');
-									btn.innerHTML = '<i class="fa-solid fa-bell"></i> 대기 신청됨';
-									countEl.textContent = count + 1;
-								} else if (result === 'removed') {
-									btn.classList.remove('waiting');
-									btn.innerHTML = '<i class="fa-regular fa-bell"></i> 예약 대기 신청';
-									countEl.textContent = Math
-											.max(0, count - 1);
+								var won = function(v) {
+									var n = String(v == null ? "" : v).replace(
+											/[^0-9]/g, "");
+									return (n && n !== "0") ? Number(n)
+											.toLocaleString() : "-";
+								};
+
+								// 결론(종합 요약)
+								$("#resGrade").text(con.grade || "-");
+								$("#resRisk").text(con.risk || "-");
+								$("#resValue").text(con.resaleGrade || "-");
+								$("#resComment").text(con.comment || "-");
+
+								// 이미지
+								$("#resImgCondition")
+										.text(img.condition || "-");
+								$("#resImgDamage").text(img.damage || "-");
+								$("#resImgGrade").text(img.grade || "-");
+
+								// 텍스트
+								$("#resTxtExag").text(txt.exaggeration || "-");
+								$("#resTxtTrust").text(
+										txt.trustScore ? (txt.trustScore + "점")
+												: "-");
+								$("#resTxtPlag")
+										.text(txt.plagiarismRisk || "-");
+
+								// 시세 비교 (네이버 유사 상품 1~3개를 그대로 표시)
+								$("#resSimList").empty();
+								if (simList.length === 0) {
+									$("#resSimList").text("유사 상품을 찾지 못했습니다.");
+								} else {
+									simList
+											.forEach(function(p) {
+												var row = $('<div style="margin-bottom: 6px;"></div>');
+												var a = $(
+														'<a target="_blank" rel="noopener" style="color: #2962ff; text-decoration: none;"></a>')
+														.attr("href",
+																p.link || "#")
+														.text(p.name || "상품");
+												var price = $(
+														'<span style="font-weight: bold; color: #ff9800;"></span>')
+														.text(won(p.price));
+												row.append(a).append("<br>")
+														.append(price).append(
+																" 원");
+												$("#resSimList").append(row);
+											});
 								}
-							}).fail(function() {
-						alert('처리 중 오류가 발생했습니다.');
+								$("#aiLoading").hide();
+								$("#aiResultArea").fadeIn(500);
+								$("#btnAiAnalyze")
+										.prop("disabled", false)
+										.html(
+												'<i class="fa-solid fa-arrows-rotate"></i> AI 품질 재분석하기');
+
+							} catch (jsonError) {
+								console.error("JSON 파싱 에러:", jsonError);
+								$("#aiLoading")
+										.html(
+												'<p style="color: #e74c3c; font-size: 14px; padding: 10px 0;">AI 데이터를 화면에 표시하는 중 오류가 발생했습니다.</p>');
+								$("#btnAiAnalyze").prop("disabled", false)
+										.text("AI 품질 비교·분석 시작");
+							}
+						},
+						error : function(xhr, status, error) {
+							console.error("HTTP Ajax 요청 실패:", error);
+							$("#aiLoading")
+									.html(
+											'<p style="color: #e74c3c; font-size: 14px; padding: 10px 0;"> 서버 응답 에러가 발생했습니다. (Status: '
+													+ xhr.status + ')</p>');
+							$("#btnAiAnalyze").prop("disabled", false).text(
+									"AI 품질 비교·분석 시작");
+						}
 					});
 		}
 	</script>
