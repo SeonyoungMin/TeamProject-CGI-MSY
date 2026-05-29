@@ -62,6 +62,13 @@ public interface OrderRepository {
 	// 판매자가 승인해야 할 거래 요청 목록
 	List<Order> findTransferRequestsBySeller(int sellerNo);
 
+	// 판매자가 승인했으나 아직 구매자가 결제하지 않은 계좌이체 주문 목록
+	List<Order> findApprovedTransfersBySeller(int sellerNo);
+
+	// 한 상품을 현재 예약하고 있는 활성 주문 — 직거래 예약중 또는 계좌이체 승인완료/입금대기.
+	// 예약자를 판매자에게 보여줄 때 사용. 없으면 null
+	Order findActiveReservationByProduct(int productNo);
+
 	// 계좌조회 승인 알람
 	void approveTransfer(int orderNo, int userNo);
 

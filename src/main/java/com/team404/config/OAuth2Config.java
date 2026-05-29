@@ -18,45 +18,39 @@ import com.team404.service.UserService;
 @Configuration
 public class OAuth2Config {
 
-    @Autowired
-    private UserService userService;
+	@Autowired
+	private UserService userService;
 
-    @Value("${google.client.id}")
-    private String googleClientId;
+	@Value("${spring.security.oauth2.client.registration.google.client-id}")
+	private String googleClientId;
 
-    @Value("${google.client.secret}")
-    private String googleClientSecret;
+	@Value("${spring.security.oauth2.client.registration.google.client-secret}")
+	private String googleClientSecret;
 
-    @Bean
-    public ClientRegistrationRepository clientRegistrationRepository() {
-        return new InMemoryClientRegistrationRepository(
-            googleClientRegistration()
-        );
-    }
+	@Bean
+	public ClientRegistrationRepository clientRegistrationRepository() {
+		return new InMemoryClientRegistrationRepository(googleClientRegistration());
+	}
 
-    @Bean
-    public OAuth2AuthorizedClientService authorizedClientService(
-            ClientRegistrationRepository clientRegistrationRepository) {
-        return new InMemoryOAuth2AuthorizedClientService(clientRegistrationRepository);
-    }
+	@Bean
+	public OAuth2AuthorizedClientService authorizedClientService(
+			ClientRegistrationRepository clientRegistrationRepository) {
+		return new InMemoryOAuth2AuthorizedClientService(clientRegistrationRepository);
+	}
 
-    @Bean
-    public CustomOAuth2UserService customOAuth2UserService() {
-        return new CustomOAuth2UserService();
-    }
+	@Bean
+	public CustomOAuth2UserService customOAuth2UserService() {
+		return new CustomOAuth2UserService();
+	}
 
-    @Bean
-    public OAuth2SuccessHandler oAuth2SuccessHandler() {
-        return new OAuth2SuccessHandler(userService);
-    }
+	@Bean
+	public OAuth2SuccessHandler oAuth2SuccessHandler() {
+		return new OAuth2SuccessHandler(userService);
+	}
 
-    private ClientRegistration googleClientRegistration() {
-        return ClientRegistrations.fromIssuerLocation("https://accounts.google.com")
-            .registrationId("google")
-            .clientId(googleClientId)
-            .clientSecret(googleClientSecret)
-            .redirectUri("{baseUrl}/login/oauth2/code/google")
-            .scope("openid", "profile", "email")
-            .build();
-    }
+	private ClientRegistration googleClientRegistration() {
+		return ClientRegistrations.fromIssuerLocation("https://accounts.google.com").registrationId("google")
+				.clientId(googleClientId).clientSecret(googleClientSecret)
+				.redirectUri("{baseUrl}/login/oauth2/code/google").scope("openid", "profile", "email").build();
+	}
 }

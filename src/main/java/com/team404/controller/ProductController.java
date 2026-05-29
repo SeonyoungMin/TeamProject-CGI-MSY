@@ -177,6 +177,18 @@ public class ProductController {
 		}
 		model.addAttribute("myOrder", myOrder);
 
+		// 예약중 상품: 판매자 본인에게 예약자 닉네임 표시
+		if (product != null && "예약중".equals(product.getTradeStatus()) && loginUser != null
+				&& loginUser.getUserNo() == product.getSellerNo()) {
+			Order reservation = orderService.findActiveReservationByProduct(productNo);
+			if (reservation != null) {
+				User reserver = userService.getUserByNo(reservation.getBuyerNo());
+				if (reserver != null) {
+					model.addAttribute("reserverNickname", reserver.getUserNickName());
+				}
+			}
+		}
+
 		return "productDetail";
 	}
 

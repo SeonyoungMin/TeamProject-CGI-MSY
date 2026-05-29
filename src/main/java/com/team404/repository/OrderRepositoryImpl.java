@@ -278,4 +278,28 @@ public class OrderRepositoryImpl implements OrderRepository {
 			return o;
 		}, sellerNo);
 	}
+
+	// 승인했으나 아직 구매자 결제 전인 계좌이체 주문 목록
+	@Override
+	public List<Order> findApprovedTransfersBySeller(int sellerNo) {
+		String sql = "SELECT o.*, p.name AS product_name FROM orders o "
+				+ "JOIN product p ON o.product_no=p.product_no "
+				+ "WHERE o.seller_no=? AND o.trade_type='TRANSFER' AND o.order_status='승인완료' "
+				+ "ORDER BY o.created_time DESC";
+		return template.query(sql, (rs, rn) -> {
+			Order o = rowMapper.mapRow(rs, rn);
+			o.setProductName(rs.getString("product_name"));
+			return o;
+		}, sellerNo);
+	}
+
+	// 상품을 현재 점유 중인 활성 예약 주문 — 직거래 예약중 / 계좌이체 승인완료·입금대기
+	@Override
+	public Order findActiveReservationByProduct(int productNo) {
+		String sql = "SELECT * FROM orders WHERE product_no=? "
+				+ "AND order_status IN ('예약중','승인완료','입금대기') "
+				+ "ORDER BY order_no DESC LIMIT 1";
+		List<Order> list = template.query(sql, rowMapper, productNo);
+		return list.isEmpty() ? null : list.get(0);
+	}
 }

@@ -201,10 +201,46 @@
 									onclick="return confirm('거래 요청을 승인하시겠어요?\n구매자에게 입금 폼 접근 권한이 부여됩니다.');">
 									승인</button>
 							</form>
-							<form action="${ctx}/order/transfer/${o.orderNo}/cancel" method="post" style="margin: 0;">
+							<form action="${ctx}/order/transfer/cancel" method="post" style="margin: 0;">
+								<input type="hidden" name="orderNo" value="${o.orderNo}">
 								<button type="submit" class="cancel-btn"
 									onclick="return confirm('이 거래 요청을 거절하시겠어요?');">
 									거절</button>
+							</form>
+						</div>
+					</div>
+				</c:forEach>
+			</c:otherwise>
+		</c:choose>
+
+		<h3 style="font-size: 16px; margin: 24px 0 10px;">계좌이체 승인 완료 (구매자 결제 대기)</h3>
+		<c:choose>
+			<c:when test="${empty approvedTransfers}">
+				<div class="empty-state" style="padding: 30px 20px;">결제를 기다리는 승인 거래가 없습니다.</div>
+			</c:when>
+			<c:otherwise>
+				<c:forEach var="o" items="${approvedTransfers}">
+					<div class="pending-card">
+						<div class="pending-info">
+							<div>
+								<span class="pending-badge" style="background: #dbeafe; color: #1e40af;">승인 완료</span>
+								<span style="font-size: 12px; color: #999;">#${o.orderNo}</span>
+							</div>
+							<div class="product-name">${o.productName}</div>
+							<div class="meta-row">
+								금액 <strong><fmt:formatNumber value="${o.price}" />원</strong>
+							</div>
+							<div class="meta-row" style="color: #999;">구매자의 입금을 기다리는 중입니다.</div>
+							<div class="meta-row" style="color: #999;">
+								<fmt:formatDate value="${o.createdTime}" pattern="yyyy-MM-dd HH:mm" /> 승인
+							</div>
+						</div>
+						<div class="action-group">
+							<form action="${ctx}/order/transfer/cancel" method="post" style="margin: 0;">
+								<input type="hidden" name="orderNo" value="${o.orderNo}">
+								<button type="submit" class="cancel-btn"
+									onclick="return confirm('이 승인 거래를 취소하시겠어요?\n상품이 다시 판매중으로 바뀌고 구매자에게 알림이 발송됩니다.');">
+									거래 취소</button>
 							</form>
 						</div>
 					</div>
@@ -245,8 +281,9 @@
 									onclick="return confirm('정말 입금이 확인됐나요?\n확인하면 거래가 완료 처리됩니다.');">
 									입금 확인</button>
 							</form>
-							<form action="${ctx}/order/transfer/${o.orderNo}/cancel"
+							<form action="${ctx}/order/transfer/cancel"
 								method="post" style="margin: 0;">
+								<input type="hidden" name="orderNo" value="${o.orderNo}">
 								<button type="submit" class="cancel-btn"
 									onclick="return confirm('이 거래를 취소하시겠어요?\n상품이 다시 판매중으로 바뀌고 관련 알림이 정리됩니다.');">
 									거래 취소</button>

@@ -41,6 +41,12 @@ public interface OrderService {
 	// 판매자가 승인해야 할 거래 요청 목록
 	List<Order> findTransferRequestsBySeller(int sellerNo);
 
+	// 판매자가 승인했으나 구매자 결제 대기 중인 계좌이체 주문 목록
+	List<Order> findApprovedTransfersBySeller(int sellerNo);
+
+	// 상품을 현재 예약하고 있는 활성 주문 — 없으면 null
+	Order findActiveReservationByProduct(int productNo);
+
 	// 거래 요청 승인 — 중복 승인 방지 + product '예약중' + 다른 요청 자동 거절.
 	// 이미 다른 거래가 진행 중이면 false 반환
 	boolean approveTransfer(int orderNo, int userNo);
