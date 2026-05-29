@@ -126,7 +126,7 @@
 							${fn:length(myReservedDirects)}건 예약중 </span>
 					</h3>
 					<a href="${ctx}/order/pending"
-						style="font-size: 12px; color: #666;">판매자 관리 &gt;</a>
+						style="font-size: 12px; color: #666;">거래 관리 &gt;</a>
 				</div>
 				<div style="display: flex; flex-direction: column; gap: 8px;">
 					<c:forEach var="d" items="${myReservedDirects}">

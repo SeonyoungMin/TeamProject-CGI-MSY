@@ -118,8 +118,7 @@ label.form-label {
 .header-inner {
 	max-width: 1300px;
 	width: 100%;
-	margin: 0 auto;
-	padding: 0 20px;
+	padding: 0px;
 }
 
 /* ===== top-bar ===== */
@@ -131,16 +130,27 @@ label.form-label {
 	color: #888;
 }
 
+.top-bar a {
+    color: #888;
+    margin-right: 4px;
+}
+
 .top-bar .header-inner {
 	display: flex;
 	justify-content: space-between;
 	align-items: center;
 }
 
-.top-bar a {
-	color: #888;
-	margin-right: 14px;
+.top-bar-group {
+    display: flex;
+    align-items: center;
+    gap: 6px;
 }
+
+.top-bar-divider {
+    color: #ccc;
+}
+
 
 /* ===== main-header ===== */
 .main-header {
