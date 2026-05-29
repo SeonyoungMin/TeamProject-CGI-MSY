@@ -12,12 +12,14 @@
 	<div class="top-bar">
 		<div class="header-inner">
 			<div class="top-bar-group">
-				<a href="${ctx}/home">홈</a><span class="top-bar-divider">|</span><a
-						href="${ctx}/productList">상품 목록</a>
+				<a href="${ctx}/home">홈</a>
+				<span class="top-bar-divider">|</span>
+				<a href="${ctx}/productList">상품 목록</a>
 			</div>
 			<div class="top-bar-group">
-				<a href="${ctx}/notice" class="notice-link">공지사항</a><span class="top-bar-divider">|</span> <span>TEAM
-					404</span>
+				<a href="${ctx}/notice" class="notice-link">공지사항</a>
+				<span class="top-bar-divider">|</span>
+				<span>TEAM 404</span>
 			</div>
 		</div>
 	</div>
@@ -45,8 +47,8 @@
 
 						<div class="noti-wrapper">
 							<button type="button" class="noti-btn" id="notiBtn" title="알림">
-								<i class="fa-solid fa-bell"></i> <span class="noti-badge hidden"
-									id="notiBadge"></span>
+								<i class="fa-solid fa-bell"></i>
+								<span class="noti-badge hidden" id="notiBadge"></span>
 							</button>
 							<div class="noti-dropdown" id="notiDropdown">
 								<div class="noti-dropdown-header">
@@ -67,9 +69,14 @@
 						<a href="${ctx}/mypage" class="nav-link">마이페이지</a>
 
 						<c:if test="${sessionScope.loginUser.userRole == 'ROLE_ADMIN'}">
-							<a href="${ctx}/users/search/allUsers"
-								class="nav-link admin-link">계정관리</a>
-							<a href="${ctx}/admin/reports" class="nav-link admin-link">신고관리</a>
+							<div class="admin-dropdown-wrapper">
+								<button class="admin-dropdown-btn nav-link admin-link">관리 ▾</button>
+								<div class="admin-dropdown-menu">
+									<a href="${ctx}/users/search/allUsers">계정관리</a>
+									<a href="${ctx}/admin/reports">신고관리</a>
+									<a href="${ctx}/admin/chat">상담관리</a>
+								</div>
+							</div>
 						</c:if>
 
 						<form action="${ctx}/logout" method="post" style="margin: 0;">
@@ -81,6 +88,8 @@
 		</div>
 	</div>
 </header>
+
+<%@ include file="/WEB-INF/views/chatBot.jsp"%>
 
 <script>
 	function validateSearch() {
@@ -104,54 +113,18 @@
 			var readAllBtn = document.getElementById('notiReadAllBtn');
 
 			var iconMap = {
-				favorite : {
-					cls : 'favorite',
-					fa : 'fa-heart'
-				},
-				comment : {
-					cls : 'comment',
-					fa : 'fa-comment'
-				},
-				review : {
-					cls : 'review',
-					fa : 'fa-star'
-				},
-				sold : {
-					cls : 'sold',
-					fa : 'fa-circle-check'
-				},
-				bought : {
-					cls : 'bought',
-					fa : 'fa-bag-shopping'
-				},
-				notice : {
-					cls : 'notice',
-					fa : 'fa-bullhorn'
-				},
-				waitlist : {
-					cls : 'notice',
-					fa : 'fa-bell'
-				},
-				transfer_request : {
-					cls : 'bought',
-					fa : 'fa-paper-plane'
-				},
-				transfer_approved : {
-					cls : 'sold',
-					fa : 'fa-circle-check'
-				},
-				trade_cancelled : {
-					cls : 'favorite',
-					fa : 'fa-ban'
-				},
-				trade_rejected : {
-					cls : 'favorite',
-					fa : 'fa-circle-xmark'
-				},
-				report : {
-					cls : 'notice',
-					fa : 'fa-flag'
-				}
+				favorite : { cls : 'favorite', fa : 'fa-heart' },
+				comment : { cls : 'comment', fa : 'fa-comment' },
+				review : { cls : 'review', fa : 'fa-star' },
+				sold : { cls : 'sold', fa : 'fa-circle-check' },
+				bought : { cls : 'bought', fa : 'fa-bag-shopping' },
+				notice : { cls : 'notice', fa : 'fa-bullhorn' },
+				waitlist : { cls : 'notice', fa : 'fa-bell' },
+				transfer_request : { cls : 'bought', fa : 'fa-paper-plane' },
+				transfer_approved : { cls : 'sold', fa : 'fa-circle-check' },
+				trade_cancelled : { cls : 'favorite', fa : 'fa-ban' },
+				trade_rejected : { cls : 'favorite', fa : 'fa-circle-xmark' },
+				report : { cls : 'notice', fa : 'fa-flag' }
 			};
 
 			function formatTime(dateStr) {
@@ -159,12 +132,9 @@
 				var past = new Date(dateStr);
 				past.setHours(past.getHours() + 9);
 				var diff = Math.floor((now - past) / 1000);
-				if (diff < 60)
-					return '방금 전';
-				if (diff < 3600)
-					return Math.floor(diff / 60) + '분 전';
-				if (diff < 86400)
-					return Math.floor(diff / 3600) + '시간 전';
+				if (diff < 60) return '방금 전';
+				if (diff < 3600) return Math.floor(diff / 60) + '분 전';
+				if (diff < 86400) return Math.floor(diff / 3600) + '시간 전';
 				var m = past.getMonth() + 1, d = past.getDate();
 				return (m < 10 ? '0' : '') + m + '.' + (d < 10 ? '0' : '') + d;
 			}
@@ -175,27 +145,16 @@
 					return;
 				}
 				var html = '';
-				notifications
-						.forEach(function(n) {
-							var icon = iconMap[n.notiType] || {
-								cls : 'default',
-								fa : 'fa-bell'
-							};
-							var cls = n.read ? '' : 'unread';
-							html += '<li class="noti-drop-item '
-									+ cls
-									+ '" onclick="notiClick('
-									+ n.notificationNo
-									+ ',\''
-									+ (n.linkUrl || '')
-									+ '\')">'
-									+ '<div class="noti-drop-icon ' + icon.cls + '"><i class="fa-solid ' + icon.fa + '"></i></div>'
-									+ '<div class="noti-drop-body">'
-									+ '<div class="noti-drop-msg">' + n.message
-									+ '</div>' + '<div class="noti-drop-time">'
-									+ formatTime(n.createdTime) + '</div>'
-									+ '</div></li>';
-						});
+				notifications.forEach(function(n) {
+					var icon = iconMap[n.notiType] || { cls : 'default', fa : 'fa-bell' };
+					var cls = n.read ? '' : 'unread';
+					html += '<li class="noti-drop-item ' + cls + '" onclick="notiClick(' + n.notificationNo + ',\'' + (n.linkUrl || '') + '\')">'
+						+ '<div class="noti-drop-icon ' + icon.cls + '"><i class="fa-solid ' + icon.fa + '"></i></div>'
+						+ '<div class="noti-drop-body">'
+						+ '<div class="noti-drop-msg">' + n.message + '</div>'
+						+ '<div class="noti-drop-time">' + formatTime(n.createdTime) + '</div>'
+						+ '</div></li>';
+				});
 				list.innerHTML = html;
 			}
 
@@ -226,8 +185,7 @@
 				var isOpen = dropdown.classList.contains('open');
 				dropdown.classList.toggle('open', !isOpen);
 				btn.classList.toggle('active', !isOpen);
-				if (!isOpen)
-					fetchNotifications();
+				if (!isOpen) fetchNotifications();
 			});
 
 			document.addEventListener('click', function(e) {
@@ -244,9 +202,7 @@
 			});
 
 			window.notiClick = function(notiNo, linkUrl) {
-				$.post(ctx + '/notification/read', {
-					no : notiNo
-				}, function() {
+				$.post(ctx + '/notification/read', { no : notiNo }, function() {
 					dropdown.classList.remove('open');
 					btn.classList.remove('active');
 					if (linkUrl && linkUrl.trim() !== '')

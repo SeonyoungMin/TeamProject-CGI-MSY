@@ -100,8 +100,8 @@ public class ChatRepositoryImpl implements ChatRepository {
 
 	@Override
 	public List<ChatMessage> findMessageByRoomNo(int roomNo) {
-		String sql = "select m*, u.nickname from chat_message m " + "left join users u on m.sender_no = u.user_no "
-				+ " where m.room_no = ? order by m.create_time asc";
+		String sql = "select m.*, u.nickname from chat_message m " + "left join users u on m.sender_no = u.user_no "
+				+ " where m.room_no = ? order by m.created_time asc";
 		return jdbcTemplate.query(sql, messageMapper, roomNo);
 	}
 	

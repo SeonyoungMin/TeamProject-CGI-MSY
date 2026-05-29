@@ -87,7 +87,7 @@ public class ChatController {
 	// 봇 응답 (REST)
 	@PostMapping("/chat/bot")
 	@ResponseBody
-	public String botResponse(@RequestParam String message, HttpSession session) {
+	public String botResponse(@RequestParam("message") String message, HttpSession session) {
 		String botReply = chatService.askBot(message);
 		
 		User loginUser = (User) session.getAttribute("loginUser");
