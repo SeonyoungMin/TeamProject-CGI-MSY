@@ -28,4 +28,6 @@ public interface ChatRepository {
 	//채팅방 상태 변경
 	void updateRoomStatus(int roomNo, String status);
 	
+	ChatRoom findActiveRoomByUserNo(int userNo);
+	
 }

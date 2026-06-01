@@ -53,7 +53,7 @@
 	margin-top: 10px;
 	display: flex;
 	align-items: center;
-	justify-content: space-betwwen;
+	justify-content: space-between;
 }
 
 .thumb-list {
@@ -96,9 +96,6 @@
 	z-index: 1;
 }
 
-/* .thumb-slide-btn:hover {
-	background: #e0e0e0;
-} */
 .product-status {
 	display: inline-block;
 	padding: 4px 10px;
@@ -229,14 +226,6 @@
 	gap: 10px;
 }
 
-.fav-count-wrap {
-	display: inline-flex;
-	align-items: center;
-	gap: 4px;
-	font-size: 14px;
-	color: #888;
-}
-
 .comment-edit-form {
 	display: none;
 	margin-top: 8px;
@@ -256,7 +245,6 @@
 	<div class="detail-container">
 		<div class="card">
 			<div class="detail-top">
-				<!-- 이미지 섹션 -->
 				<div class="detail-image">
 					<div class="main-image">
 						<c:if test="${not empty product.imgPath}">
@@ -281,10 +269,13 @@
 					</c:if>
 				</div>
 
-				<!-- 상품 정보 섹션 -->
 				<div class="detail-info">
 					<div class="report-line">
 						<div class="product-status">${product.tradeStatus == '판매중' ? '판매중' : product.tradeStatus == '예약중' ? '예약중' : '판매완료'}</div>
+						<c:if test="${not empty reserverNickname}">
+							<span
+								style="font-size: 13px; font-weight: bold; color: #1e40af; margin-left: 6px;">예약자: ${reserverNickname}</span>
+						</c:if>
 						<c:if
 							test="${not empty loginUser && loginUser.userNo != product.sellerNo}">
 							<button type="button" class="btn btn-danger"
@@ -413,7 +404,6 @@
 					</div>
 				</div>
 			</div>
-			<!-- ai검증 섹션 -->
 			<div class="card"
 				style="margin-top: 40px; border: 1px solid #e0e0e0; background: #fafafa; padding: 20px; border-radius: 8px;">
 
@@ -460,7 +450,6 @@
 						</tr>
 					</table>
 
-					<!-- ai이미지 분석-->
 					<div
 						style="display: flex; gap: 12px; margin-top: 15px; flex-wrap: wrap;">
 
@@ -498,7 +487,6 @@
 					</div>
 				</div>
 			</div>
-			<!-- 댓글 섹션 -->
 			<div class="card" id="commentSection" style="margin-top: 40px;">
 				<h3 class="section-title">댓글</h3>
 
@@ -510,12 +498,10 @@
 						</c:when>
 						<c:otherwise>
 							<c:forEach var="c" items="${comments}">
-								<%-- 대댓글이면 들여쓰기 --%>
 								<div class="comment-item"
 									style="border-bottom: 1px solid #eee; padding: 10px 0;
 									${c.parentCommentNo > 0 ? 'margin-left: 30px; background: #fafafa; padding-left: 12px; border-left: 3px solid #eee;' : ''}">
 
-									<%-- 대댓글 표시 아이콘 --%>
 									<c:if test="${c.parentCommentNo > 0}">
 										<span style="color: #aaa; font-size: 13px; margin-right: 4px;">↳</span>
 									</c:if>
@@ -530,7 +516,6 @@
 									<span class="comment-date"
 										style="font-size: 12px; color: #999; margin-left: 8px;">${c.createdTime}</span>
 
-									<%-- 비밀댓글: 본인/판매자/관리자만 내용 표시 --%>
 									<c:choose>
 										<c:when
 											test="${c.isSecret == 1 && loginUser.userNo != c.authorNo && loginUser.userNo != product.sellerNo && loginUser.userRole != 'ROLE_ADMIN'}">
@@ -563,9 +548,7 @@
 										</div>
 									</c:if>
 
-									<%-- 수정/삭제/답글 버튼 --%>
 									<div style="display: flex; gap: 8px; margin-top: 4px;">
-										<%-- 수정/삭제: 본인 또는 관리자 --%>
 										<c:if
 											test="${c.authorNo == loginUser.userNo || loginUser.userRole == 'ROLE_ADMIN'}">
 											<c:if test="${c.authorNo == loginUser.userNo}">
@@ -584,7 +567,6 @@
 											</form>
 										</c:if>
 
-										<%-- 답글 버튼: 로그인한 경우, 원댓글에만 표시 --%>
 										<c:if test="${not empty loginUser && c.parentCommentNo == 0}">
 											<button type="button"
 												style="font-size: 12px; background: none; border: none; color: #3498db; cursor: pointer; padding: 0;"
@@ -592,7 +574,6 @@
 										</c:if>
 									</div>
 
-									<%-- 대댓글 입력 폼 (답글 버튼 클릭 시 표시) --%>
 									<c:if test="${not empty loginUser && c.parentCommentNo == 0}">
 										<div id="replyForm_${c.commentNo}"
 											style="display: none; margin-top: 10px;">
@@ -624,7 +605,6 @@
 					</c:choose>
 				</div>
 
-				<%-- 댓글 등록 폼 --%>
 				<c:choose>
 					<c:when test="${empty loginUser}">
 						<div style="color: #888; margin-top: 16px;">
@@ -708,12 +688,44 @@
         }
     }
 
+<<<<<<< HEAD
     function toggleWaitlist() {
         var btn = document.getElementById('waitlistBtn');
         if (!btn) return;
         var waiting = btn.classList.contains('waiting');
         var url = waiting ? ctx + '/waitlist/remove' : ctx + '/waitlist/add';
+=======
+		function toggleWaitlist() {
+			var btn = document.getElementById('waitlistBtn');
+			if (!btn) return;
+			
+			var url = btn.classList.contains('waiting') ? ctx + '/waitlist/remove' : ctx + '/waitlist/add';
+			
+			$.post(url, { productNo : productNo }, function(result) {
+				if (result === 'login') { alert('로그인이 필요합니다.'); location.href = ctx + '/login'; return; }
+				if (result === 'self') { alert('본인 상품에는 대기 신청할 수 없습니다.'); return; }
+				if (result === 'notreserved') { alert('예약중 상품에만 대기 신청할 수 있습니다.'); location.reload(); return; }
+				if (result === 'notfound') { alert('상품을 찾을 수 없습니다.'); return; }
 
+				var countEl = document.getElementById('waitlistCount');
+				var count = parseInt(countEl.textContent) || 0;
+				
+				if (result === 'added') {
+					btn.classList.add('waiting');
+					btn.innerHTML = '<i class="fa-solid fa-bell"></i> 대기 신청됨';
+					countEl.textContent = count + 1;
+				} else if (result === 'removed') {
+					btn.classList.remove('waiting');
+					btn.innerHTML = '<i class="fa-regular fa-bell"></i> 예약 대기 신청';
+					countEl.textContent = Math.max(0, count - 1);
+				}
+			}).fail(function() {
+				alert('처리 중 오류가 발생했습니다.');
+			});
+		}
+>>>>>>> branch 'main' of https://github.com/SeonyoungMin/TeamProject-CGI-MSY.git
+
+<<<<<<< HEAD
         $.post(url, { productNo : productNo }, function(result) {
             if (result === 'login') {
                 alert('로그인이 필요합니다.');
@@ -736,6 +748,14 @@
 
             var countEl = document.getElementById('waitlistCount');
             var count = parseInt(countEl.textContent) || 0;
+=======
+		function startAiAnalysis() {
+			var pNo = parseInt("${product.productNo}") || 0;
+			var pDesc = String(`${product.description}`).trim();
+			if (!pDesc || pDesc === "undefined") {
+				pDesc = "등록된 상세 설명이 없습니다.";
+			}
+>>>>>>> branch 'main' of https://github.com/SeonyoungMin/TeamProject-CGI-MSY.git
 
             if (result === 'added') {
                 btn.classList.add('waiting');
@@ -751,13 +771,18 @@
         });
     }
 
+<<<<<<< HEAD
     function startAiAnalysis() {
         var pNo = parseInt("${product.productNo}") || 0;
         var pDesc = String(`${product.description}`).trim();
         if (!pDesc || pDesc === "undefined") {
             pDesc = "등록된 상세 설명이 없습니다.";
         }
+=======
+			$("#aiLoading").html('<div class="spinner"></div><p style="color: #666; font-size: 14px; margin-top: 10px;">AI가 실시간으로 이미지 상태, 본문 신뢰도, 시장 시세를 분석 중입니다...</p>').fadeIn(300);
+>>>>>>> branch 'main' of https://github.com/SeonyoungMin/TeamProject-CGI-MSY.git
 
+<<<<<<< HEAD
         $("#btnAiAnalyze").prop("disabled", true).text("분석 진행 중...");
         $("#aiResultArea").hide();
         $("#aiLoading").html(
@@ -840,5 +865,77 @@
         });
     }
 </script>
+=======
+			$.ajax({
+				url : ctx + "/product/ai/analyze",
+				type : "POST",
+				data : { productNo : pNo, description : pDesc },
+				dataType : "text",
+				success : function(data) {
+					try {
+						var startIndex = data.indexOf("{");
+						var endIndex = data.lastIndexOf("}");
+						if (startIndex === -1 || endIndex === -1) {
+							throw new Error("올바른 JSON 형식을 찾을 수 없습니다.");
+						}
+						var response = JSON.parse(data.substring(startIndex, endIndex + 1));
+
+						if (response.error) {
+							alert(response.error);
+							$("#aiLoading").hide();
+							$("#btnAiAnalyze").prop("disabled", false).text("AI 품질 비교·분석 시작");
+							return;
+						}
+
+						var img = response.imageAnalysis || {};
+						var txt = response.textAnalysis || {};
+						var con = response.conclusion || {};
+						var simList = con.similarProductInfo || [];
+						if (!Array.isArray(simList)) simList = [];
+
+						var won = function(v) {
+							var n = String(v == null ? "" : v).replace(/[^0-9]/g, "");
+							return (n && n !== "0") ? Number(n).toLocaleString() : "-";
+						};
+
+						$("#resGrade").text(con.grade || "-");
+						$("#resRisk").text(con.risk || "-");
+						$("#resValue").text(con.resaleGrade || "-");
+						$("#resComment").text(con.comment || "-");
+						$("#resImgCondition").text(img.condition || "-");
+						$("#resImgDamage").text(img.damage || "-");
+						$("#resImgGrade").text(img.grade || "-");
+						$("#resTxtExag").text(txt.exaggeration || "-");
+						$("#resTxtTrust").text(txt.trustScore ? (txt.trustScore + "점") : "-");
+						$("#resTxtPlag").text(txt.plagiarismRisk || "-");
+
+						$("#resSimList").empty();
+						if (simList.length === 0) {
+							$("#resSimList").text("유사 상품을 찾지 못했습니다.");
+						} else {
+							simList.forEach(function(p) {
+								var row = $('<div style="margin-bottom: 6px;"></div>');
+								var a = $('<a target="_blank" rel="noopener" style="color: #2962ff; text-decoration: none;"></a>').attr("href", p.link || "#").text(p.name || "상품");
+								var price = $('<span style="font-weight: bold; color: #ff9800;"></span>').text(won(p.price));
+								row.append(a).append("<br>").append(price).append(" 원");
+								$("#resSimList").append(row);
+							});
+						}
+						$("#aiLoading").hide();
+						$("#aiResultArea").fadeIn(500);
+						$("#btnAiAnalyze").prop("disabled", false).html('<i class="fa-solid fa-arrows-rotate"></i> AI 품질 재분석하기');
+					} catch (jsonError) {
+						$("#aiLoading").html('<p style="color: #e74c3c; font-size: 14px; padding: 10px 0;">AI 데이터를 화면에 표시하는 중 오류가 발생했습니다.</p>');
+						$("#btnAiAnalyze").prop("disabled", false).text("AI 품질 비교·분석 시작");
+					}
+				},
+				error : function(xhr, status, error) {
+					$("#aiLoading").html('<p style="color: #e74c3c; font-size: 14px; padding: 10px 0;"> 서버 응답 에러가 발생했습니다. (Status: ' + xhr.status + ')</p>');
+					$("#btnAiAnalyze").prop("disabled", false).text("AI 품질 비교·분석 시작");
+				}
+			});
+		}
+	</script>
+>>>>>>> branch 'main' of https://github.com/SeonyoungMin/TeamProject-CGI-MSY.git
 </body>
 </html>

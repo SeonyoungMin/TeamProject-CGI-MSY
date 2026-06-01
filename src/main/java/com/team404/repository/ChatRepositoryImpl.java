@@ -87,7 +87,7 @@ public class ChatRepositoryImpl implements ChatRepository {
 	@Override
 	public List<ChatRoom> findAllRooms() {
 		String sql = "select r.*, u.nickname from chat_room r " + "left join users u on r.user_no = u.user_no "
-				+ "order By r.created_time dessc";
+				+ "order By r.created_time desc";
 		return jdbcTemplate.query(sql, roomMapper);
 	}
 
@@ -109,5 +109,15 @@ public class ChatRepositoryImpl implements ChatRepository {
 	public void updateRoomStatus(int roomNo, String status) { 
 		String sql = "update chat_room set status = ? where room_no = ?";
 		jdbcTemplate.update(sql, status, roomNo);
+	}
+	
+	@Override
+	public ChatRoom findActiveRoomByUserNo(int userNo) {
+	    String sql = "SELECT r.*, u.nickname FROM chat_room r "
+	               + "LEFT JOIN users u ON r.user_no = u.user_no "
+	               + "WHERE r.user_no = ? AND r.status != '종료' "
+	               + "ORDER BY r.created_time DESC LIMIT 1";
+	    List<ChatRoom> rooms = jdbcTemplate.query(sql, roomMapper, userNo);
+	    return rooms.isEmpty() ? null : rooms.get(0);
 	}
 }

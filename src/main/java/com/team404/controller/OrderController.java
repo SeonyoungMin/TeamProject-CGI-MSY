@@ -372,6 +372,8 @@ public class OrderController {
 
 		model.addAttribute("loginUser", loginUser);
 
+		model.addAttribute("o", order);
+
 		return "orderTransfer";
 	}
 
@@ -438,17 +440,18 @@ public class OrderController {
 	}
 
 	// 계좌이체 거래 취소 — 판매자/구매자 본인 입금완료 이후는 차단됨
-	@PostMapping("/order/transfer/{orderNo}/cancel")
-	public String cancelTransfer(@PathVariable("orderNo") int orderNo, HttpSession session) {
+	@PostMapping("/order/transfer/cancel")
+	public String cancelTransfer(@RequestParam("orderNo") int orderNo, HttpSession session) {
 		User loginUser = (User) session.getAttribute("loginUser");
 		if (loginUser == null)
 			return "redirect:/login";
 
 		boolean ok = orderService.cancelTransferOrder(orderNo, loginUser.getUserNo());
+
 		if (!ok) {
 			return "redirect:/order/pending?error=cannot-cancel-transfer";
 		}
-		return "redirect:/order/pending?transferCancelled=" + orderNo;
+		return "redirect:/home";
 	}
 
 	// 계좌이체 주문 생성 (알림은 구매자가 송금 완료 버튼을 눌러야 발송)
@@ -552,10 +555,12 @@ public class OrderController {
 			return "redirect:/login";
 
 		List<Order> transferRequests = orderService.findTransferRequestsBySeller(loginUser.getUserNo());
+		List<Order> approvedTransfers = orderService.findApprovedTransfersBySeller(loginUser.getUserNo());
 		List<Order> pendingTransfers = orderService.findPendingTransfersBySeller(loginUser.getUserNo());
 		List<Order> reservedDirects = orderService.findReservedDirectsBySeller(loginUser.getUserNo());
 
 		model.addAttribute("transferRequests", transferRequests);
+		model.addAttribute("approvedTransfers", approvedTransfers);
 		model.addAttribute("pendingTransfers", pendingTransfers);
 		model.addAttribute("reservedDirects", reservedDirects);
 

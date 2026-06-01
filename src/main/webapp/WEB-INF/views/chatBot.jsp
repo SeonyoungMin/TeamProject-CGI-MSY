@@ -15,6 +15,7 @@
             <div class="typing-indicator" id="typingIndicator">입력 중...</div>
         </div>
         <div id="adminRequestArea"></div>
+        <div id="endChatArea"></div>
         <div class="chat-input-area">
             <input type="text" id="chatInput" placeholder="메시지를 입력하세요" />
             <button onclick="sendMessage()">전송</button>
@@ -36,7 +37,27 @@ function toggleChat() {
     var box = document.getElementById('chatBox');
     box.classList.toggle('open');
     if (box.classList.contains('open') && document.getElementById('chatMessages').children.length <= 1) {
-        appendBotMessage("안녕하세요! minimarket 고객센터입니다. 무엇을 도와드릴까요?");
+        if (chatLoginUser > 0) {
+            $.getJSON(chatCtx + '/chat/history', function(messages) {
+                if (messages.length === 0) {
+                    appendBotMessage("안녕하세요! minimarket 고객센터입니다. 무엇을 도와드릴까요?");
+                } else {
+                    messages.forEach(function(msg) {
+                        if (msg.senderType === 'user') {
+                            appendUserMessage(msg.content);
+                        } else if (msg.senderType === 'bot') {
+                            appendBotMessage(msg.content);
+                        } else if (msg.senderType === 'admin') {
+                            appendAdminMessage(msg.content);
+                        }
+                    });
+                    // 상담 진행 중이면 WebSocket 재연결
+                    if (chatRoomNo > 0) connectWebSocket();
+                }
+            });
+        } else {
+            appendBotMessage("안녕하세요! minimarket 고객센터입니다. 무엇을 도와드릴까요?");
+        }
     }
     scrollToBottom();
 }
@@ -58,14 +79,20 @@ function sendMessage() {
         }));
     } else {
         showTyping(true);
-        $.post(chatCtx + '/chat/bot', { message: msg }, function(reply) {
-            showTyping(false);
-            if (reply.includes('||NEED_ADMIN')) {
-                var text = reply.replace('||NEED_ADMIN', '');
-                appendBotMessage(text);
-                showAdminRequestBtn();
-            } else {
-                appendBotMessage(reply);
+        $.ajax({
+            url: chatCtx + '/chat/bot',
+            type: 'POST',
+            data: { message: msg },
+            contentType: 'application/x-www-form-urlencoded; charset=UTF-8',
+            success: function(reply) {
+                showTyping(false);
+                if (reply.includes('||NEED_ADMIN')) {
+                    var text = reply.replace('||NEED_ADMIN', '');
+                    appendBotMessage(text);
+                    showAdminRequestBtn();
+                } else {
+                    appendBotMessage(reply);
+                }
             }
         });
     }
@@ -105,17 +132,34 @@ function showAdminRequestBtn() {
 
 function requestAdmin() {
     $.post(chatCtx + '/chat/request-admin', function(result) {
-        if (result === 'ok') {
+        if (result !== 'fail') {
+            chatRoomNo = parseInt(result);
             document.getElementById('adminRequestArea').innerHTML =
                 '<div style="text-align:center; padding: 8px; font-size:12px; color:#888;">관리자에게 알림을 보냈습니다. 잠시만 기다려주세요.</div>';
+            document.getElementById('endChatArea').innerHTML =
+                '<button class="admin-request-btn" style="border-color: #e74c3c; color: #e74c3c;" onclick="endChat()">상담 종료</button>';
             connectWebSocket();
+        }
+    });
+}
+
+function endChat() {
+    if (!confirm('상담을 종료하시겠습니까?')) return;
+    $.post(chatCtx + '/chat/end', function(result) {
+        if (result === 'ok') {
+            document.getElementById('endChatArea').innerHTML = '';
+            document.getElementById('adminRequestArea').innerHTML = '';
+            appendBotMessage("상담이 종료되었습니다. 이용해 주셔서 감사합니다!");
+            isAdminMode = false;
+            chatRoomNo = 0;
         }
     });
 }
 
 function connectWebSocket() {
     var socket = new SockJS(chatCtx + '/ws');
-    stompClient = Stomp.connect(socket, function() {
+    stompClient = Stomp.over(socket);
+    stompClient.connect({}, function() {
         stompClient.subscribe('/topic/chat/' + chatRoomNo, function(msg) {
             var data = JSON.parse(msg.body);
             if (data.senderType === 'admin') {
@@ -149,7 +193,9 @@ function scrollToBottom() {
     msgs.scrollTop = msgs.scrollHeight;
 }
 
-document.getElementById('chatInput').addEventListener('keypress', function(e) {
-    if (e.key === 'Enter') sendMessage();
+document.addEventListener('DOMContentLoaded', function() {
+    document.getElementById('chatInput').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') sendMessage();
+    });
 });
 </script>

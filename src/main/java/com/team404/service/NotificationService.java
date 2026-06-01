@@ -76,4 +76,6 @@ public interface NotificationService {
 	
 	// 신고 접수 관리자 알림
 	void notifyReport(int reporterNo, String targetType, String targetName);
+	
+	void notifyChat(int userNo, String userNickname);
 }

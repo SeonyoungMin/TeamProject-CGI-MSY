@@ -278,4 +278,18 @@ public class NotificationServiceImpl implements NotificationService {
 		}
 		
 	}
+	
+	@Override
+	public void notifyChat(int userNo, String userNickname) {
+	    List<User> admins = userService.findAdmins();
+	    for (User admin : admins) {
+	        Notification n = new Notification();
+	        n.setReceiverNo(admin.getUserNo());
+	        n.setSenderNo(userNo);
+	        n.setNotiType("report");
+	        n.setMessage("[상담 요청] " + userNickname + "님이 상담을 요청했습니다.");
+	        n.setLinkUrl(CTX + "/admin/chat");
+	        notificationRepository.insert(n);
+	    }
+	}
 }

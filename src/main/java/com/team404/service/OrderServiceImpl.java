@@ -86,13 +86,13 @@ public class OrderServiceImpl implements OrderService {
 		order.setSellerNo(product.getSellerNo());
 		order.setPrice(product.getPrice());
 
-		// 기존 '승인완료' row는 취소 처리 (같은 (product,buyer)에 활성 row 1개만 남도록)
+		// 기존 승인완료 row는 취소 처리 (같은 (product,buyer)에 활성 row 1개만 남도록)
 		orderRepository.cancelTransferOrder(approved.getOrderNo(), order.getBuyerNo());
 
-		// 새 '입금대기' row insert (receiver/depositor 등 폼 입력값 포함)
+		// 새 입금대기 row insert (receiver/depositor 등 폼 입력값 포함)
 		int orderNo = orderRepository.insertTransferOrder(order);
 
-		// 상품이 아직 '판매중'이면 '예약중'으로 (이미 예약중이면 그대로)
+		// 상품이 아직 판매중이면 예약중으로 (이미 예약중이면 그대로)
 		if ("판매중".equals(product.getTradeStatus())) {
 			orderRepository.updateProductStatus(order.getProductNo(), "예약중");
 		}
@@ -141,7 +141,7 @@ public class OrderServiceImpl implements OrderService {
 		Order order = orderRepository.findByOrderNo(orderNo);
 		int productNo = order.getProductNo();
 
-		// 상품을 다시 '판매중'으로 복원
+		// 상품을 다시 판매중으로 복원
 		orderRepository.updateProductStatus(productNo, "판매중");
 
 		// 대기자 전원에게 알림 발송 + 대기 목록 비우기 (WaitlistService에 위임)
@@ -202,8 +202,6 @@ public class OrderServiceImpl implements OrderService {
 	public List<Order> findMyReservedDirects(int userNo) {
 		return orderRepository.findMyReservedDirects(userNo);
 	}
-	
-
 
 	@Override
 	public int cancelAllActiveByProduct(int productNo) {
@@ -233,6 +231,16 @@ public class OrderServiceImpl implements OrderService {
 		return orderRepository.findTransferRequestsBySeller(sellerNo);
 	}
 
+	@Override
+	public List<Order> findApprovedTransfersBySeller(int sellerNo) {
+		return orderRepository.findApprovedTransfersBySeller(sellerNo);
+	}
+
+	@Override
+	public Order findActiveReservationByProduct(int productNo) {
+		return orderRepository.findActiveReservationByProduct(productNo);
+	}
+
 	// 거래 요청 승인 — 중복 승인 방지를 위한 핵심 트랜잭션
 	@Override
 	@Transactional
@@ -253,13 +261,8 @@ public class OrderServiceImpl implements OrderService {
 		if (!"판매중".equals(product.getTradeStatus()))
 			return false;
 
-		// (1) 해당 요청만 '승인완료' — SQL의 order_status='요청' 조건이 동시성 가드 역할
 		orderRepository.approveTransfer(orderNo, userNo);
-
-		// (2) 상품 → '예약중' (다른 사용자는 거래 신청도, 폼 진입도 차단됨)
 		orderRepository.updateProductStatus(order.getProductNo(), "예약중");
-
-		// (3) 같은 상품의 다른 '요청'들은 자동 '취소' (중복 승인 원천 차단)
 		orderRepository.cancelOtherRequests(order.getProductNo(), orderNo);
 
 		return true;
@@ -273,17 +276,17 @@ public class OrderServiceImpl implements OrderService {
 		if (order == null)
 			return false;
 
-		// 취소 직전 상태 보관 — 알림 분기(거절 vs 취소)에 사용
+		// 취소 직전 상태 보관 — 알림 분기에 사용
 		String prevStatus = order.getOrderStatus();
 
-		// '입금완료'/'완료' 이후는 차단 (SQL의 IN 조건이 동시성 가드)
+		// 입금완료,완료 이후는 차단
 		int rows = orderRepository.cancelTransferOrder(orderNo, userNo);
 		if (rows == 0)
 			return false;
 
 		int productNo = order.getProductNo();
 
-		// 상품이 '예약중'이었다면(=승인된 거래) '판매중'으로 복원 + 대기자 알림
+		// 상품이 예약중이었다면 판매중으로 복원 + 대기자 알림
 		ProductDetailDto product = productRepository.findProductDetail(productNo);
 		if (product != null && "예약중".equals(product.getTradeStatus())) {
 			orderRepository.updateProductStatus(productNo, "판매중");

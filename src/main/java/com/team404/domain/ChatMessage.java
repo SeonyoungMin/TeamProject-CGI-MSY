@@ -1,7 +1,7 @@
 package com.team404.domain;
 
 import java.time.LocalDateTime;
-
+import com.fasterxml.jackson.annotation.JsonIgnore;
 public class ChatMessage {
 
 	private int messageNo;
@@ -10,6 +10,10 @@ public class ChatMessage {
 	private String senderType;
 	private String content;
 	private boolean isRead;
+	
+
+
+	@JsonIgnore
 	private LocalDateTime createdTime;
 	private String senderNickname;
 	

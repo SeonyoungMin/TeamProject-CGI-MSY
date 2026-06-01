@@ -70,8 +70,8 @@
 
 						<c:if test="${sessionScope.loginUser.userRole == 'ROLE_ADMIN'}">
 							<div class="admin-dropdown-wrapper">
-								<button class="admin-dropdown-btn nav-link admin-link">관리 ▾</button>
-								<div class="admin-dropdown-menu">
+								<button id="adminDropdownBtn" class="admin-dropdown-btn nav-link admin-link">관리 ▾</button>
+								<div id="adminDropdownMenu" class="admin-dropdown-menu">
 									<a href="${ctx}/users/search/allUsers">계정관리</a>
 									<a href="${ctx}/admin/reports">신고관리</a>
 									<a href="${ctx}/admin/chat">상담관리</a>
@@ -100,6 +100,23 @@
 		}
 		return true;
 	}
+	
+    var adminBtn = document.getElementById('adminDropdownBtn');
+    if (adminBtn) {
+        adminBtn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            var menu = document.getElementById('adminDropdownMenu');
+            menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
+        });
+
+        document.addEventListener('click', function() {
+            var menu = document.getElementById('adminDropdownMenu');
+            if (menu) menu.style.display = 'none';
+        });
+    }
+</script>
+
+
 </script>
 
 <c:if test="${not empty sessionScope.loginUser}">

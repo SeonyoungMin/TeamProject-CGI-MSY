@@ -396,13 +396,26 @@ h2 {
 						</div>
 
 						<div class="btn-group">
-							<button type="button" class="btn-cancel" onclick="history.back()">취소</button>
+							<button type="button" class="btn-cancel" onclick="history.back()">뒤로
+								가기</button>
 							<button type="submit" class="btn-submit" id="submitBtn">
 								<fmt:formatNumber value="${product.price}" />
 								원 결제하기
 							</button>
 						</div>
 				</form>
+				<div
+					style="margin-top: 30px; padding: 20px; border-top: 1px solid #eee; text-align: center;">
+					<form id="cancelForm" action="${ctx}/order/transfer/cancel"
+						method="post">
+
+						<input type="hidden" name="orderNo" value="${o.orderNo}">
+
+						<button type="button" onclick="confirmCancel()"
+							style="background: #fff; border: 1px solid #ff4d4d; color: #ff4d4d; padding: 8px 16px; border-radius: 6px; cursor: pointer;">
+							거래 취소하기</button>
+					</form>
+				</div>
 
 			</c:otherwise>
 		</c:choose>
@@ -480,6 +493,17 @@ h2 {
 					sel.appendChild(opt);
 				}
 			});
+		}
+
+		function confirmCancel() {
+			var orderNo = document.querySelector('input[name="orderNo"]').value;
+			if (!orderNo || orderNo === "") {
+				alert("주문 번호를 찾을 수 없습니다.");
+				return;
+			}
+			if (confirm('거래를 취소하시겠습니까?')) {
+				document.getElementById('cancelForm').submit();
+			}
 		}
 	</script>
 </body>

@@ -220,6 +220,45 @@ label.form-label {
 	font-weight: bold;
 }
 
+/* ===== 관리 드롭다운 ===== */
+.admin-dropdown-wrapper {
+    position: relative;
+    display: inline-block;
+}
+
+.admin-dropdown-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+}
+
+.admin-dropdown-menu {
+    display: none;
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    background: #fff;
+    border: 1px solid #eee;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    min-width: 100px;
+    z-index: 9998;
+}
+
+.admin-dropdown-menu a {
+    display: block;
+    padding: 10px 16px;
+    font-size: 13px;
+    color: #333;
+    white-space: nowrap;
+}
+
+.admin-dropdown-menu a:hover {
+    background: #f5f5f5;
+    color: #e74c3c;
+}
+
 /* ===== 알림 벨 ===== */
 .noti-wrapper {
 	position: relative;

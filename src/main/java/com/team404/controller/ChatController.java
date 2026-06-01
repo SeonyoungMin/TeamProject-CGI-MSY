@@ -1,5 +1,6 @@
 package com.team404.controller;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -77,6 +78,7 @@ public class ChatController {
 			return "redirect:/home";
 
 		ChatRoom room = chatService.getRoomByNo(roomNo);
+		System.out.println("room: " + room);
 		List<ChatMessage> message = chatService.getMessages(roomNo);
 		model.addAttribute("room", room);
 		model.addAttribute("message", message);
@@ -85,7 +87,7 @@ public class ChatController {
 	}
 
 	// 봇 응답 (REST)
-	@PostMapping("/chat/bot")
+	@PostMapping(value = "/chat/bot", produces = "text/plain;charset=UTF-8")
 	@ResponseBody
 	public String botResponse(@RequestParam("message") String message, HttpSession session) {
 		String botReply = chatService.askBot(message);
@@ -127,19 +129,52 @@ public class ChatController {
 		messagingTemplate.convertAndSend("/topic/chat/" + message.getRoomNo(), message);
 	}
 	
-	// 관리자 상담 요청
 	@PostMapping("/chat/request-admin")
 	@ResponseBody
 	public String requestAdmin(HttpSession session) {
-		User loginUser = (User) session.getAttribute("loginUser");
-		if (loginUser == null) return "fail";
-				
-		ChatRoom room = chatService.getRoomByUserNo(loginUser.getUserNo());
-		chatService.updateRoomStatus(room.getRoomNo(), "상담대기");
-		
-		// 관리자 알림
-		notificationService.notifyReport(loginUser.getUserNo(), "상담", "새 상담 요청이 있습니다");    
-		
-		return "ok";
+	    User loginUser = (User) session.getAttribute("loginUser");
+	    if (loginUser == null) return "fail";
+
+	    ChatRoom room = chatService.getRoomByUserNo(loginUser.getUserNo());
+	    chatService.updateRoomStatus(room.getRoomNo(), "상담대기");
+	    notificationService.notifyChat(loginUser.getUserNo(), loginUser.getUserNickName());
+
+	    return String.valueOf(room.getRoomNo());
+	}
+	
+	@GetMapping("/chat/history")
+	@ResponseBody
+	public List<ChatMessage> chatHistory(HttpSession session) {
+	    User loginUser = (User) session.getAttribute("loginUser");
+	    if (loginUser == null) return new ArrayList<>();
+	    
+	    ChatRoom room = chatService.getActiveRoomByUserNo(loginUser.getUserNo());
+	    if (room == null) return new ArrayList<>();
+	    
+	    return chatService.getMessages(room.getRoomNo());
+	}
+
+	@PostMapping("/chat/end")
+	@ResponseBody
+	public String endChat(HttpSession session) {
+	    User loginUser = (User) session.getAttribute("loginUser");
+	    if (loginUser == null) return "fail";
+	    
+	    ChatRoom room = chatService.getActiveRoomByUserNo(loginUser.getUserNo());
+	    if (room == null) return "fail";
+	    
+	    chatService.updateRoomStatus(room.getRoomNo(), "종료");
+	    return "ok";
+	}
+	
+	// 관리자 상담 종료 엔드 포인트
+	@PostMapping("/admin/chat/{roomNo}/end")
+	public String adminEndChat(@PathVariable("roomNo") int roomNo, HttpSession session) {
+	    User loginUser = (User) session.getAttribute("loginUser");
+	    if (loginUser == null) return "redirect:/login";
+	    if (!"ROLE_ADMIN".equals(loginUser.getUserRole())) return "redirect:/home";
+	    
+	    chatService.updateRoomStatus(roomNo, "종료");
+	    return "redirect:/admin/chat";
 	}
 }

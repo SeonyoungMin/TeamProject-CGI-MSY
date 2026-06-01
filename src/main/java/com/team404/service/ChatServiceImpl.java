@@ -24,7 +24,7 @@ public class ChatServiceImpl implements ChatService{
 	@Autowired
 	private ChatRepository chatRepository;
 	
-	@Value("${gemini.api.key")
+	@Value("${gemini.api.key}")
 	private String geminiApiKey;
 	
 	 private static final String MANUAL =
@@ -115,7 +115,8 @@ public class ChatServiceImpl implements ChatService{
             URL url = new URL("https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=" + geminiApiKey);
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             conn.setRequestMethod("POST");
-            conn.setRequestProperty("Content-Type", "application/json");
+            conn.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
+            conn.setRequestProperty("Accept-Charset", "UTF-8");
             conn.setDoOutput(true);
             conn.setConnectTimeout(5000);
             conn.setReadTimeout(10000);
@@ -132,6 +133,8 @@ public class ChatServiceImpl implements ChatService{
                 String line;
                 while ((line = br.readLine()) != null) sb.append(line);
             }
+            System.out.println("Gemini 응답: " + sb.toString());
+            System.out.println("API 키: " + geminiApiKey);
 
             ObjectMapper mapper = new ObjectMapper();
             JsonNode root = mapper.readTree(sb.toString());
@@ -150,5 +153,10 @@ public class ChatServiceImpl implements ChatService{
                    .replace("\n", "\\n")
                    .replace("\r", "\\r")
                    .replace("\t", "\\t");
+    }
+    
+    @Override
+    public ChatRoom getActiveRoomByUserNo(int userNo) {
+        return chatRepository.findActiveRoomByUserNo(userNo);
     }
 }

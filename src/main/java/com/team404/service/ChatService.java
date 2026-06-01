@@ -15,4 +15,5 @@ public interface ChatService {
 	List<ChatMessage> getMessages(int roomNo);
 	void updateRoomStatus(int roomNo, String status);
 	String askBot(String userMessage);
+	ChatRoom getActiveRoomByUserNo(int userNo);
 }
