@@ -1,5 +1,6 @@
 package com.team404.repository;
 
+import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -7,6 +8,7 @@ import java.util.List;
 import javax.sql.DataSource;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
@@ -183,23 +185,22 @@ public class UserRepositoryImpl implements UserRepository {
 	}
 
 	// 동네 인증까지
-		@Override
-		public void setNewUser(User newUser) {
+	@Override
+	public void setNewUser(User newUser) {
 
-			String SQL = "INSERT INTO users(" + "id, pw, name, nickname, age, address, phone, "
-					+ "latitude, longitude, verified_area, verified_at" + ") VALUES(?,?,?,?,?,?,?,?,?,?,?)";
+		String SQL = "INSERT INTO users(" + "id, pw, name, nickname, age, address, phone, "
+				+ "latitude, longitude, verified_area, verified_at" + ") VALUES(?,?,?,?,?,?,?,?,?,?,?)";
 
-			template.update(SQL, newUser.getUserId(), newUser.getUserPw(), newUser.getUserName(), newUser.getUserNickName(),
-					newUser.getUserAge(), newUser.getUserAddress(), newUser.getUserPhone(), newUser.getLatitude(),
-					newUser.getLongitude(), newUser.getVerifiedArea(), newUser.getVerifiedAt());
+		template.update(SQL, newUser.getUserId(), newUser.getUserPw(), newUser.getUserName(), newUser.getUserNickName(),
+				newUser.getUserAge(), newUser.getUserAddress(), newUser.getUserPhone(), newUser.getLatitude(),
+				newUser.getLongitude(), newUser.getVerifiedArea(), newUser.getVerifiedAt());
 
-			Integer lastId = template.queryForObject("SELECT LAST_INSERT_ID()", Integer.class);
+		Integer lastId = template.queryForObject("SELECT LAST_INSERT_ID()", Integer.class);
 
-			if (lastId != null) {
-				newUser.setUserNo(lastId);
-			}
+		if (lastId != null) {
+			newUser.setUserNo(lastId);
 		}
-
+	}
 
 	// 동네 인증포함
 	@Override
@@ -245,16 +246,40 @@ public class UserRepositoryImpl implements UserRepository {
 		String SQL = "UPDATE users SET bank_name = ?, account_number = ?, account_holder = ? WHERE user_no = ?";
 		template.update(SQL, bankName, accountNumber, accountHolder, userNo);
 	}
-	
+
 	@Override
 	public void updateRiskScore(int userNo, double score) {
-	    String sql = "UPDATE users SET risk_score = risk_score + ? WHERE user_no = ?";
-	    template.update(sql, score, userNo);
+		String sql = "UPDATE users SET risk_score = risk_score + ? WHERE user_no = ?";
+		template.update(sql, score, userNo);
 	}
-	
+
 	@Override
 	public List<User> findAdmins() {
 		String SQL = "select * from users where role = 'ROLE_ADMIN'";
 		return template.query(SQL, new UserRowMapper());
+	}
+
+	// 신고 점수 증가
+	@Override
+	public void addRiskScore(int userNo, double delta) {
+		String SQL = "UPDATE users SET risk_score = risk_score + ? WHERE user_no = ?";
+		template.update(SQL, delta, userNo); // delta(점수), userNo(유저번호) 순서
+	}
+
+	// 제재 상태 업데이트
+	@Override
+	public void updateSuspension(int userNo, Timestamp until, int level, Timestamp deadline) {
+		String SQL = "UPDATE users SET suspend_until = ?, suspend_level = ?, appeal_deadline = ? WHERE user_no = ?";
+		template.update(SQL, until, level, deadline, userNo);
+	}
+
+	@Override
+	public Double getRiskScore(int userNo) {
+		String sql = "SELECT risk_score FROM users WHERE user_no = ?";
+		try {
+			return template.queryForObject(sql, Double.class, userNo);
+		} catch (EmptyResultDataAccessException e) {
+			return 0.0;
+		}
 	}
 }

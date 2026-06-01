@@ -33,6 +33,11 @@ public class User {
 	private String userAccountNumber;
 	private String userAccountHolder;
 
+	private double riskScore;
+	private Timestamp suspendUntil;
+	private int suspendLevel;
+	private Timestamp appealDeadline;
+
 	public User() {
 	}
 
@@ -218,6 +223,38 @@ public class User {
 
 	public void setUserAccountHolder(String userAccountHolder) {
 		this.userAccountHolder = userAccountHolder;
+	}
+
+	public Timestamp getSuspendUntil() {
+		return suspendUntil;
+	}
+
+	public void setSuspendUntil(Timestamp suspendUntil) {
+		this.suspendUntil = suspendUntil;
+	}
+
+	public int getSuspendLevel() {
+		return suspendLevel;
+	}
+
+	public void setSuspendLevel(int suspendLevel) {
+		this.suspendLevel = suspendLevel;
+	}
+
+	public Timestamp getAppealDeadline() {
+		return appealDeadline;
+	}
+
+	public void setAppealDeadline(Timestamp appealDeadline) {
+		this.appealDeadline = appealDeadline;
+	}
+
+	public double getRiskScore() {
+		return riskScore;
+	}
+
+	public void setRiskScore(double riskScore) {
+		this.riskScore = riskScore;
 	}
 
 }

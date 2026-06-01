@@ -80,9 +80,9 @@ public class UserController {
 
 	@Autowired
 	private OrderService orderService;
-	
+
 	@Autowired
-	private ReportService reportService;	
+	private ReportService reportService;
 
 	@Autowired
 	private KakaoService kakaoService;
@@ -110,7 +110,16 @@ public class UserController {
 			@RequestParam(value = "pageNum", defaultValue = "1") int pageNum, HttpSession session, // 1. 세션 파라미터 추가
 			Model model) {
 
+		Boolean isReported = (Boolean) session.getAttribute("reportAlert");
+		if (isReported != null && isReported) {
+			
+			model.addAttribute("showReportModal", true);
+			model.addAttribute("msg", "신고가 접수되었습니다. 누적 점수가 변경되었습니다.");
+			session.removeAttribute("reportAlert");
+		}
+
 		User loginUser = (User) session.getAttribute("loginUser");
+
 		int loginUserNo = (loginUser != null) ? loginUser.getUserNo() : 0;
 		int limit = 9;
 		int startNum = limit * (pageNum - 1);
@@ -255,9 +264,9 @@ public class UserController {
 
 		// 내가 참여 중(예약중)인 직거래 — 구매자/판매자 모두
 		List<com.team404.domain.Order> myReservedDirects = orderService.findMyReservedDirects(userNo);
-		 // 내 신고 내역 (피신고자 기준)
+		// 내 신고 내역 (피신고자 기준)
 		List<Report> myReports = reportService.getReportsByAccused(userNo);
-		
+
 		model.addAttribute("boughtList", boughtList);
 		model.addAttribute("totalBought", totalBought);
 		model.addAttribute("user", loginUser);
@@ -287,8 +296,8 @@ public class UserController {
 	// 마이페이지 — 계좌 등록/수정 처리
 	@PostMapping("/mypage/account")
 	public String submitAccount(@RequestParam("bankName") String bankName,
-			@RequestParam("accountNumber") String accountNumber,
-			@RequestParam("accountHolder") String accountHolder, HttpSession session) {
+			@RequestParam("accountNumber") String accountNumber, @RequestParam("accountHolder") String accountHolder,
+			HttpSession session) {
 		User loginUser = (User) session.getAttribute("loginUser");
 		if (loginUser == null) {
 			return "redirect:/login";
@@ -372,7 +381,7 @@ public class UserController {
 			@RequestParam(value = "productPage", defaultValue = "1") int productPage,
 			@RequestParam(value = "productNo", required = false) Integer productNo,
 			@RequestParam(value = "content", required = false) String content,
-			@SessionAttribute(name = "loginUser", required = false) User loginUser, HttpSession session,Model model) {
+			@SessionAttribute(name = "loginUser", required = false) User loginUser, HttpSession session, Model model) {
 		int loginUserNo = (loginUser != null) ? loginUser.getUserNo() : 0;
 		User user = userService.getUserByNo(userNo);
 
@@ -426,7 +435,7 @@ public class UserController {
 				}
 			}
 		}
-		
+
 		System.out.println("allReviewed: " + allReviewed);
 
 		String prevContent = (String) session.getAttribute("prevReviewContent");
@@ -554,7 +563,6 @@ public class UserController {
 
 		return "redirect:/home";
 	}
-
 
 	// 잘못된 회원번호로 접근 시 noUserFound 로 보냄
 	@ExceptionHandler(NoUserFoundException.class)

@@ -1,5 +1,6 @@
 package com.team404.repository;
 
+import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -61,8 +62,8 @@ public interface UserRepository {
 
 	// 유저 회원탈퇴
 	void setDeleteUser(int userNo);
-	
-	//구글, 카카오 로그인
+
+	// 구글, 카카오 로그인
 	User findByEmail(String email);
 
 	void insertOAuthUser(User user);
@@ -72,8 +73,16 @@ public interface UserRepository {
 
 	// 유저 신고 누적 점수
 	void updateRiskScore(int userNo, double score);
-	
+
 	// 신고 내역 알림 대상 (관리자)
 	List<User> findAdmins();
-	
+
+	// 신고 점수 증가
+	void addRiskScore(int userNo, double delta);
+
+	// 제재 상태 업데이트
+	void updateSuspension(int userNo, Timestamp until, int level, Timestamp deadline);
+
+	Double getRiskScore(int userno);
+
 }

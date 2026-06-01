@@ -419,6 +419,13 @@
 </style>
 </head>
 <body>
+<c:if test="${not empty sessionScope.reportAlert}">
+    <script>
+        alert("${sessionScope.reportAlert}");
+        
+        <c:remove var="reportAlert" scope="session" />
+    </script>
+</c:if>
 
 	<%@ include file="/WEB-INF/views/header.jsp"%>
 

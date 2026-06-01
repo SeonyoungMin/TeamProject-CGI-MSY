@@ -1,11 +1,13 @@
 package com.team404.service;
 
+import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.team404.domain.Image;
@@ -13,6 +15,8 @@ import com.team404.domain.SearchDTO;
 import com.team404.domain.User;
 import com.team404.exception.NoUserFoundException;
 import com.team404.repository.UserRepository;
+
+import jakarta.servlet.http.HttpSession;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -204,22 +208,66 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	public void registerOAuthUser(User user) {
-	    userRepository.insertOAuthUser(user);
+		userRepository.insertOAuthUser(user);
 	}
 
 	@Override
 	public void updateAccount(int userNo, String bankName, String accountNumber, String accountHolder) {
 		userRepository.updateAccount(userNo, bankName, accountNumber, accountHolder);
 	}
-	
+
 	@Override
 	public void updateRiskScore(int userNo, double score) {
-	    userRepository.updateRiskScore(userNo, score);
+		userRepository.updateRiskScore(userNo, score);
 	}
-	
+
 	@Override
 	public List<User> findAdmins() {
 		return userRepository.findAdmins();
+	}
+
+	@Override
+	@Transactional
+	public void processReport(int userNo, double scoreAdded, HttpSession session) {
+		userRepository.addRiskScore(userNo, scoreAdded);
+
+		Double currentScore = userRepository.getRiskScore(userNo);
+		String alertMsg = "신고가 접수 되었습니다. 현재 누적 점수: " + currentScore + "점. "
+				+ "제재 기준 3(게시글 7일 업로드 금지), 5점(30일 금지), 8점(전체 활동 제재).";
+
+		session.setAttribute("reportAlert", alertMsg);
+		session.setAttribute("saddedScore", scoreAdded);
+
+		if (currentScore >= 10) {
+			userRepository.setDeleteUser(userNo);
+		} else if (currentScore >= 8) {
+			userRepository.updateSuspension(userNo, null, 3, addDays(7));
+		} else if (currentScore >= 5) {
+			userRepository.updateSuspension(userNo, addDays(30), 2, addDays(7));
+		} else if (currentScore >= 3) {
+			userRepository.updateSuspension(userNo, addDays(7), 1, addDays(7));
+		}
+
+	}
+
+	// 현재 시간 + n 일후의 Timestamp 반환
+	private Timestamp addDays(int days) {
+		return new Timestamp(System.currentTimeMillis() + (long) days * 24 * 60 * 60 * 1000L);
+	}
+
+	// 제재 상태 체크
+	@Override
+	public boolean isRestricted(int userNo, String actionType) {
+		User user = userRepository.getUserByNo(userNo);
+
+		if (user.getSuspendLevel() == 3)
+			return true;
+
+		if ("post".equals(actionType) && (user.getSuspendLevel() == 1 || user.getSuspendLevel() == 2)) {
+			return user.getSuspendUntil() != null
+					&& user.getSuspendUntil().after(new Timestamp(System.currentTimeMillis()));
+		}
+		return false;
 	}
 
 }
