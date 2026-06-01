@@ -17,4 +17,14 @@ public interface ReportService {
 	boolean isDuplicate(int reporterNo, String targetType, int targetNo);
 
 	List<Report> getReportsByStatus(String status);
+	
+	void submitAppeal(int reportNo, int userNo, String appealContent);
+	
+	Report getReportByNoAndAccused(int reportNo, int userNo);
+	
+	List<Report> getReportsByAccused(int accusedUserNo);
+	
+	Report getReportByNo(int reportNo);
+	
+	void updateAppealStatus(int reportNo, String appealStatus);
 }

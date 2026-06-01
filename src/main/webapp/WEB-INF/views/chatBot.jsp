@@ -90,6 +90,10 @@ function sendMessage() {
                     var text = reply.replace('||NEED_ADMIN', '');
                     appendBotMessage(text);
                     showAdminRequestBtn();
+                } else if (reply.includes('||NEED_APPEAL')) {
+                    var text = reply.replace('||NEED_APPEAL', '');
+                    appendBotMessage(text);
+                    showAppealBtn();
                 } else {
                     appendBotMessage(reply);
                 }
@@ -128,6 +132,14 @@ function showAdminRequestBtn() {
     }
     document.getElementById('adminRequestArea').innerHTML =
         '<button class="admin-request-btn" onclick="requestAdmin()">관리자 상담 요청하기</button>';
+}
+
+function showAppealBtn() {
+    document.getElementById('adminRequestArea').innerHTML =
+        '<div style="padding: 8px 16px; display: flex; flex-direction: column; gap: 6px;">' +
+        '<a href="${ctx}/mypage" class="admin-request-btn" style="text-align:center; text-decoration:none;">마이페이지에서 소명 작성하기</a>' +
+        '<a href="https://open.kakao.com/o/minimarket" target="_blank" class="admin-request-btn" style="text-align:center; text-decoration:none; border-color:#FEE500; color:#3C1E1E; background:#FEE500;">카카오 오픈채팅 상담</a>' +
+        '</div>';
 }
 
 function requestAdmin() {

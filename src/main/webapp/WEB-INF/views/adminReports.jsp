@@ -145,11 +145,12 @@
 					<th>신고일</th>
 					<th>신고 유형</th>
 					<th>신고 대상</th>
-					<th>신고자</th>
+					<th>피신고자</th>
 					<th>신고 사유</th>
 					<th>위험 점수</th>
 					<th>누적 점수</th>
 					<th>위험 등급</th>
+					<th>소명</th>
 					<th>상태</th>
 					<th>처리</th>
 				</tr>
@@ -158,7 +159,7 @@
 				<c:choose>
 					<c:when test="${empty reports}">
 						<tr>
-							<td colspan="11" class="empty-msg">신고 내역이 없습니다.</td>
+							<td colspan="12" class="empty-msg">신고 내역이 없습니다.</td>
 						</tr>
 					</c:when>
 					<c:otherwise>
@@ -184,7 +185,7 @@
 										</c:when>
 										<c:otherwise>${r.targetName}</c:otherwise>
 									</c:choose></td>
-								<td>${r.reporterNickname}</td>
+								<td>${r.accusedNickname}</td>
 								<td>
 									<div>
 										<c:choose>
@@ -242,10 +243,21 @@
 											<span class="ai-clean">안전</span>
 										</c:otherwise>
 									</c:choose></td>
+								<td><c:choose>
+										<c:when test="${empty r.appealContent}">
+											<span style="color: #bbb; font-size: 12px;">미제출</span>
+										</c:when>
+										<c:otherwise>
+											<a href="${ctx}/admin/reports/${r.reportNo}/appeal"
+												style="font-size: 13px; color: #3498db;">소명 보기</a>
+											<br>
+											<span style="font-size: 11px; color: #888;">${r.appealStatus}</span>
+										</c:otherwise>
+									</c:choose></td>
 								<td><span
 									class="status-badge ${r.status == '대기' ? 'status-pending' : 'status-done'}">
 										${r.status} </span></td>
-								
+
 								<td><c:if test="${r.status == '대기'}">
 										<form action="${ctx}/admin/reports/${r.reportNo}/process"
 											method="post" style="margin: 0;">

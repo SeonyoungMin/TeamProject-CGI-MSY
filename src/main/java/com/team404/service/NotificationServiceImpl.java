@@ -14,7 +14,7 @@ public class NotificationServiceImpl implements NotificationService {
 
 	@Autowired
 	private NotificationRepository notificationRepository;
-	
+
 	@Autowired
 	private UserService userService;
 
@@ -263,9 +263,9 @@ public class NotificationServiceImpl implements NotificationService {
 		n.setLinkUrl(CTX + "/order/transfer/form?productNo=" + productNo);
 		notificationRepository.insert(n);
 	}
-	
+
 	@Override
-	public void notifyReport(int reporterNo, String targetType, String targetName) {
+	public void notifyReport(int reporterNo, String targetType, String targetName, int accusedUserNo) {
 		List<User> admins = userService.findAdmins();
 		for (User admin : admins) {
 			Notification n = new Notification();
@@ -276,20 +276,29 @@ public class NotificationServiceImpl implements NotificationService {
 			n.setLinkUrl(CTX + "/admin/reports");
 			notificationRepository.insert(n);
 		}
-		
+		// 피신고자 알림
+		if (accusedUserNo > 0) {
+			Notification n = new Notification();
+			n.setReceiverNo(accusedUserNo);
+			n.setSenderNo(reporterNo);
+			n.setNotiType("report");
+			n.setMessage("[신고알림] 회원님이 신고되었습니다. 소명이 필요하시면 마이페이지를 확인해주세요.");
+			n.setLinkUrl(CTX + "/mypage");
+			notificationRepository.insert(n);
+		}
 	}
-	
+
 	@Override
 	public void notifyChat(int userNo, String userNickname) {
-	    List<User> admins = userService.findAdmins();
-	    for (User admin : admins) {
-	        Notification n = new Notification();
-	        n.setReceiverNo(admin.getUserNo());
-	        n.setSenderNo(userNo);
-	        n.setNotiType("report");
-	        n.setMessage("[상담 요청] " + userNickname + "님이 상담을 요청했습니다.");
-	        n.setLinkUrl(CTX + "/admin/chat");
-	        notificationRepository.insert(n);
-	    }
+		List<User> admins = userService.findAdmins();
+		for (User admin : admins) {
+			Notification n = new Notification();
+			n.setReceiverNo(admin.getUserNo());
+			n.setSenderNo(userNo);
+			n.setNotiType("report");
+			n.setMessage("[상담 요청] " + userNickname + "님이 상담을 요청했습니다.");
+			n.setLinkUrl(CTX + "/admin/chat");
+			notificationRepository.insert(n);
+		}
 	}
 }

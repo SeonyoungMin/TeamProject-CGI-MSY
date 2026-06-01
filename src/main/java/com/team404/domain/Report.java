@@ -27,6 +27,9 @@ public class Report {
     private String accusedNickname;
     
     private double userRiskScore;
+    
+    private String appealContent;
+    private String appealStatus;
 
 	public int getReportNo() {
 		return reportNo;
@@ -146,6 +149,22 @@ public class Report {
 
 	public void setUserRiskScore(double userRiskScore) {
 		this.userRiskScore = userRiskScore;
+	}
+
+	public String getAppealContent() {
+		return appealContent;
+	}
+
+	public void setAppealContent(String appealContent) {
+		this.appealContent = appealContent;
+	}
+
+	public String getAppealStatus() {
+		return appealStatus;
+	}
+
+	public void setAppealStatus(String appealStatus) {
+		this.appealStatus = appealStatus;
 	}
 	
 	

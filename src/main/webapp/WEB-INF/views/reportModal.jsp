@@ -76,7 +76,9 @@
 			<label class="form-label">첨부 이미지 (선택)</label> <input type="file"
 				name="evidenceFile" accept="image/*" multiple
 				style="font-size: 13px; margin-bottom: 12px;">
-
+			<div id="reportErrorMsg"
+				style="display: none; color: #e74c3c; font-size: 13px; margin-bottom: 10px;">
+				이미 신고한 대상입니다.</div>
 			<div class="report-modal-footer">
 				<button type="button" class="btn" onclick="closeReportModal()">취소</button>
 				<button type="submit" class="btn btn-danger">신고 접수</button>
@@ -116,4 +118,19 @@
 				if (e.target === this)
 					closeReportModal();
 			});
+
+	document.getElementById('reportForm').addEventListener('submit', function(e) {
+	    e.preventDefault();
+	    
+	    var targetType = document.getElementById('reportTargetType').value;
+	    var targetNo = document.getElementById('reportTargetNo').value;
+	    
+	    $.get('${ctx}/report/check-duplicate', { targetType: targetType, targetNo: targetNo }, function(result) {
+	        if (result === 'duplicate') {
+	            document.getElementById('reportErrorMsg').style.display = 'block';
+	        } else {
+	            document.getElementById('reportForm').submit();
+	        }
+	    });
+	});
 </script>

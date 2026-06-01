@@ -33,6 +33,7 @@ import com.team404.domain.BoardListDto;
 import com.team404.domain.Image;
 import com.team404.domain.ProductListDto;
 import com.team404.domain.Rangking;
+import com.team404.domain.Report;
 import com.team404.domain.ReviewDto;
 import com.team404.domain.SearchDTO;
 import com.team404.domain.User;
@@ -45,6 +46,7 @@ import com.team404.service.KakaoService;
 import com.team404.service.OrderService;
 import com.team404.service.ProductService;
 import com.team404.service.RankingService;
+import com.team404.service.ReportService;
 import com.team404.service.ReviewService;
 import com.team404.service.UserService;
 
@@ -78,6 +80,9 @@ public class UserController {
 
 	@Autowired
 	private OrderService orderService;
+	
+	@Autowired
+	private ReportService reportService;	
 
 	@Autowired
 	private KakaoService kakaoService;
@@ -250,7 +255,9 @@ public class UserController {
 
 		// 내가 참여 중(예약중)인 직거래 — 구매자/판매자 모두
 		List<com.team404.domain.Order> myReservedDirects = orderService.findMyReservedDirects(userNo);
-
+		 // 내 신고 내역 (피신고자 기준)
+		List<Report> myReports = reportService.getReportsByAccused(userNo);
+		
 		model.addAttribute("boughtList", boughtList);
 		model.addAttribute("totalBought", totalBought);
 		model.addAttribute("user", loginUser);
@@ -260,6 +267,7 @@ public class UserController {
 		model.addAttribute("myReviews", recentMyReviews);
 		model.addAttribute("totalMyReviews", totalMyReviews);
 		model.addAttribute("myReservedDirects", myReservedDirects);
+		model.addAttribute("myReports", myReports);
 		return "myPage";
 	}
 

@@ -74,8 +74,9 @@ public interface NotificationService {
 	// cancelledBySeller=true 면 receiver=구매자, false 면 receiver=판매자
 	void notifyTransferCancelled(int receiverNo, int productNo, String productName, boolean cancelledBySeller);
 	
-	// 신고 접수 관리자 알림
-	void notifyReport(int reporterNo, String targetType, String targetName);
+	// 신고 접수 관리자, 피신고자 알림
+	void notifyReport(int reporterNo, String targetType, String targetName, int accusedUserNo);
 	
 	void notifyChat(int userNo, String userNickname);
+
 }

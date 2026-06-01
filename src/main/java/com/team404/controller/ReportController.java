@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.team404.domain.BoardDetailDto;
@@ -70,12 +71,23 @@ public class ReportController {
 		User loginUser = (User) session.getAttribute("loginUser");
 		if (loginUser == null) return "redirect:/login";
 
+		/*
+		 * // 중복 신고 확인 if (reportService.isDuplicate(loginUser.getUserNo(), targetType,
+		 * targetNo)) { if ("user".equals(targetType)) return "redirect:/users/search/"
+		 * + targetNo + "?error=duplicate"; if ("product".equals(targetType)) return
+		 * "redirect:/product/" + targetNo + "?error=duplicate"; if
+		 * ("board".equals(targetType)) return "redirect:/boardList/" + targetNo +
+		 * "?error=duplicate"; return "redirect:/home"; }
+		 */
+		
 		// 중복 신고 확인
-		if (reportService.isDuplicate(loginUser.getUserNo(), targetType, targetNo)) {
-			if ("user".equals(targetType)) return "redirect:/users/search/" + targetNo + "?error=duplicate";
-			if ("product".equals(targetType)) return "redirect:/product/" + targetNo + "?error=duplicate";
-			if ("board".equals(targetType)) return "redirect:/boardList/" + targetNo + "?error=duplicate";
-			return "redirect:/home";
+		boolean dup = reportService.isDuplicate(loginUser.getUserNo(), targetType, targetNo);
+		System.out.println("중복 체크: " + dup + ", reporterNo=" + loginUser.getUserNo() + ", targetType=" + targetType + ", targetNo=" + targetNo);
+		if (dup) {
+		    if ("user".equals(targetType)) return "redirect:/users/search/" + targetNo + "?error=duplicate";
+		    if ("product".equals(targetType)) return "redirect:/product/" + targetNo + "?error=duplicate";
+		    if ("board".equals(targetType)) return "redirect:/boardList/" + targetNo + "?error=duplicate";
+		    return "redirect:/home";
 		}
 
 		Report report = new Report();
@@ -154,5 +166,60 @@ public class ReportController {
 		return type != null ? "redirect:/admin/reports?type=" + type : "redirect:/admin/reports";
 	}
 	
+	// 소명 폼 페이지
+	@GetMapping("/appeal/{reportNo}")
+	public String appealForm(@PathVariable("reportNo") int reportNo, HttpSession session, Model model) {
+		
+		User loginUser = (User) session.getAttribute("loginUser");
+		if (loginUser == null) return "redirect:/login";
+		
+		Report report = reportService.getReportByNoAndAccused(reportNo, loginUser.getUserNo());
+		if (report == null) return "redirect:/home";
+		
+		model.addAttribute("report", report);
+		return "appeal";
+	}
 	
+	// 소명 제출
+	@PostMapping("/appeal/{reportNo}")
+	public String submitAppeal(@PathVariable("reportNo") int reportNo, @RequestParam("appealContent") String appealContent, HttpSession session) {
+		User loginUser = (User) session.getAttribute("loginUser");
+		if (loginUser == null) return "redirect:/login";
+		
+		reportService.submitAppeal(reportNo, loginUser.getUserNo(), appealContent);
+		return "redirect:/mypage";
+	}
+	
+	//중복 체크 엔드포인트
+	@GetMapping("/report/check-duplicate")
+	@ResponseBody
+	public String checkDuplicate(@RequestParam("targetType") String targetType,
+	        @RequestParam("targetNo") int targetNo,
+	        HttpSession session) {
+	    User loginUser = (User) session.getAttribute("loginUser");
+	    if (loginUser == null) return "login";
+	    
+	    return reportService.isDuplicate(loginUser.getUserNo(), targetType, targetNo) ? "duplicate" : "ok";
+	}
+	
+	@GetMapping("/admin/reports/{reportNo}/appeal")
+	public String viewAppeal(@PathVariable("reportNo") int reportNo, HttpSession session, Model model) {
+	    User loginUser = (User) session.getAttribute("loginUser");
+	    if (loginUser == null) return "redirect:/login";
+	    if (!"ROLE_ADMIN".equals(loginUser.getUserRole())) return "redirect:/home";
+	    
+	    model.addAttribute("report", reportService.getReportByNo(reportNo));
+	    return "adminAppeal";
+	}
+
+	@PostMapping("/admin/reports/{reportNo}/appeal/done")
+	public String doneAppeal(@PathVariable("reportNo") int reportNo, HttpSession session) {
+	    User loginUser = (User) session.getAttribute("loginUser");
+	    if (loginUser == null) return "redirect:/login";
+	    if (!"ROLE_ADMIN".equals(loginUser.getUserRole())) return "redirect:/home";
+	    
+	    reportService.updateAppealStatus(reportNo, "처리완료");
+	    return "redirect:/admin/reports";
+	}
 }
+	

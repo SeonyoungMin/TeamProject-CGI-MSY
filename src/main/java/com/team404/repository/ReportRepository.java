@@ -24,4 +24,16 @@ public interface ReportRepository {
     // 신고 처리 상태 드롭다운
     List<Report> findByStatus(String status);
 
+    // 소명 제출
+    void updateAppeal(int reportNo, String appealContent);
+    
+    // 피신고자 본인 신고내역 조회
+    Report findByReportNoAndAccused(int reportNo, int userNo);
+    
+    // 본인 신고내역 조회 (신고당한건)
+    List<Report> findByAccusedUserNo(int accusedUserNo);
+
+    Report findByReportNo(int reportNo);
+    
+    void updateAppealStatus(int reportNo, String appealStatus);
 }

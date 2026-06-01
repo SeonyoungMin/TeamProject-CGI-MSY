@@ -58,7 +58,7 @@ public class ReportServiceImpl implements ReportService {
 
 		String targetTypeName = "user".equals(report.getTargetType()) ? "유저"
 				: "product".equals(report.getTargetType()) ? "상품" : "게시글";
-		notificationService.notifyReport(report.getReporterNo(), targetTypeName, report.getTargetType());
+		notificationService.notifyReport(report.getReporterNo(), targetTypeName, report.getTargetType(), report.getAccusedUserNo());
 
 		if (report.getAccusedUserNo() > 0) {
 			userService.updateRiskScore(report.getAccusedUserNo(), score);
@@ -191,5 +191,32 @@ public class ReportServiceImpl implements ReportService {
 	@Override
 	public List<Report> getReportsByStatus(String status) {
 		return reportRepository.findByStatus(status);
+	}
+	
+	@Override
+	public void submitAppeal(int reportNo, int userNo, String appealContent) {
+	    Report report = reportRepository.findByReportNoAndAccused(reportNo, userNo);
+	    if (report == null) throw new IllegalArgumentException("소명 권한이 없습니다.");
+	    reportRepository.updateAppeal(reportNo, appealContent);
+	}
+
+	@Override
+	public Report getReportByNoAndAccused(int reportNo, int userNo) {
+	    return reportRepository.findByReportNoAndAccused(reportNo, userNo);
+	}
+	
+	@Override
+	public List<Report> getReportsByAccused(int accusedUserNo) {
+	    return reportRepository.findByAccusedUserNo(accusedUserNo);
+	}
+	
+	@Override
+	public Report getReportByNo(int reportNo) {
+	    return reportRepository.findByReportNo(reportNo);
+	}
+	
+	@Override
+	public void updateAppealStatus(int reportNo, String appealStatus) {
+	    reportRepository.updateAppealStatus(reportNo, appealStatus);
 	}
 }

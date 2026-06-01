@@ -338,6 +338,63 @@
 
 			</c:otherwise>
 		</c:choose>
+		<%-- 신고 내역 섹션 --%>
+		<c:if test="${not empty myReports}">
+			<div class="card" style="margin-top: 20px;">
+				<h3 class="section-title">내 신고 내역</h3>
+				<table
+					style="width: 100%; border-collapse: collapse; font-size: 14px;">
+					<thead>
+						<tr style="background: #f5f5f5;">
+							<th
+								style="padding: 10px; border-bottom: 2px solid #ddd; text-align: center;">신고번호</th>
+							<th
+								style="padding: 10px; border-bottom: 2px solid #ddd; text-align: center;">신고유형</th>
+							<th
+								style="padding: 10px; border-bottom: 2px solid #ddd; text-align: center;">신고사유</th>
+							<th
+								style="padding: 10px; border-bottom: 2px solid #ddd; text-align: center;">상태</th>
+							<th
+								style="padding: 10px; border-bottom: 2px solid #ddd; text-align: center;">소명상태</th>
+							<th
+								style="padding: 10px; border-bottom: 2px solid #ddd; text-align: center;">소명</th>
+						</tr>
+					</thead>
+					<tbody>
+						<c:forEach var="r" items="${myReports}">
+							<tr style="border-bottom: 1px solid #eee;">
+								<td style="padding: 10px; text-align: center;">${r.reportNo}</td>
+								<td style="padding: 10px; text-align: center;">${r.targetType}</td>
+								<td style="padding: 10px; text-align: center;">${r.reasonType}</td>
+								<td style="padding: 10px; text-align: center;">${r.status}</td>
+								<td style="padding: 10px; text-align: center;"><c:choose>
+										<c:when
+											test="${empty r.appealStatus || r.appealStatus == '미제출'}">
+											<span style="color: #e74c3c;">미제출</span>
+										</c:when>
+										<c:when test="${r.appealStatus == '검토중'}">
+											<span style="color: #f39c12;">검토중</span>
+										</c:when>
+										<c:otherwise>
+											<span style="color: #27ae60;">처리완료</span>
+										</c:otherwise>
+									</c:choose></td>
+								<td style="padding: 10px; text-align: center;"><c:choose>
+										<c:when test="${empty r.appealContent}">
+											<a href="${ctx}/appeal/${r.reportNo}" class="btn btn-primary"
+												style="font-size: 12px; padding: 4px 10px;">소명 작성</a>
+										</c:when>
+										<c:otherwise>
+											<a href="${ctx}/appeal/${r.reportNo}" class="btn btn-line"
+												style="font-size: 12px; padding: 4px 10px;">소명 확인</a>
+										</c:otherwise>
+									</c:choose></td>
+							</tr>
+						</c:forEach>
+					</tbody>
+				</table>
+			</div>
+		</c:if>
 
 	</div>
 	<script>
