@@ -1,21 +1,4 @@
 <%@ page contentType="text/html;charset=UTF-8"%>
-<html>
-<head>
-<title>MINIMARKET</title>
-</head>
+<%-- 컨텍스트 루트 진입 시 곧바로 홈으로 이동 --%>
+<% response.sendRedirect(request.getContextPath() + "/home"); %>
 
-<body>
-
-<h1>MINIMARKET</h1>
-
-<p>환영합니다</p>
-
-<hr>
-
-<!-- 게시글 목록으로 이동 -->
-<a href="${pageContext.request.contextPath}/home">
-    홈으로
-</a>
-
-</body>
-</html>
