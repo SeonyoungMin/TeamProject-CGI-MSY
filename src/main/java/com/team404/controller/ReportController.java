@@ -20,6 +20,7 @@ import com.team404.service.BoardService;
 import com.team404.service.ImageService;
 import com.team404.service.ProductService;
 import com.team404.service.ReportService;
+import com.team404.service.UserService;
 
 import jakarta.servlet.http.HttpSession;
 
@@ -28,6 +29,9 @@ public class ReportController {
 
 	@Autowired
 	private ReportService reportService;
+
+	@Autowired
+	private UserService userService;
 
 	@Autowired
 	private ImageService imageService;
@@ -108,6 +112,10 @@ public class ReportController {
 
 		reportService.submitReport(report);
 
+		if (report.getAccusedUserNo() > 0) {
+			userService.processReport(report.getAccusedUserNo(), report.getAiScore(), session);
+		}
+
 		// 증거 이미지 저장
 		if (evidenceFiles != null && !evidenceFiles.isEmpty()) {
 			for (MultipartFile file : evidenceFiles) {
@@ -129,22 +137,33 @@ public class ReportController {
 	public String adminReports(
 	        @RequestParam(value = "type", required = false) String type,
 	        @RequestParam(value = "status", required = false) String status,
+	        @RequestParam(value = "page", defaultValue = "1") int page,
 	        HttpSession session, Model model) {
 
 	    User loginUser = (User) session.getAttribute("loginUser");
 	    if (loginUser == null) return "redirect:/login";
 	    if (!"ROLE_ADMIN".equals(loginUser.getUserRole())) return "redirect:/home";
 
-	    List<Report> reports;
+	    List<Report> allReports;
 	    if (status != null && !status.isEmpty()) {
-	        reports = reportService.getReportsByStatus(status);
+	        allReports = reportService.getReportsByStatus(status);
 	    } else if (type != null && !type.isEmpty()) {
-	        reports = reportService.getReportsByType(type);
+	        allReports = reportService.getReportsByType(type);
 	    } else {
-	        reports = reportService.getAllReports();
+	        allReports = reportService.getAllReports();
 	    }
 
+	    int pageSize = 10;
+	    int totalPages = (allReports.size() + pageSize - 1) / pageSize;
+	    if (page < 1) page = 1;
+	    if (page > totalPages && totalPages > 0) page = totalPages;
+	    int start = (page - 1) * pageSize;
+	    int end = Math.min(start + pageSize, allReports.size());
+	    List<Report> reports = allReports.subList(start, end);
+
 	    model.addAttribute("reports", reports);
+	    model.addAttribute("currentPage", page);
+	    model.addAttribute("totalPages", totalPages);
 	    model.addAttribute("selectedType", type);
 	    model.addAttribute("selectedStatus", status);
 	    return "adminReports";
@@ -155,13 +174,18 @@ public class ReportController {
 	public String processReport(
 			@PathVariable("reportNo") int reportNo,
 			@RequestParam(value = "type", required = false) String type,
+			@RequestParam(value = "revert", required = false) String revert,
 			HttpSession session) {
 
 		User loginUser = (User) session.getAttribute("loginUser");
 		if (loginUser == null) return "redirect:/login";
 		if (!"ROLE_ADMIN".equals(loginUser.getUserRole())) return "redirect:/home";
 
-		reportService.processReport(reportNo);
+		if ("true".equals(revert)) {
+			reportService.revertReport(reportNo);
+		} else {
+			reportService.processReport(reportNo);
+		}
 
 		return type != null ? "redirect:/admin/reports?type=" + type : "redirect:/admin/reports";
 	}
@@ -177,16 +201,40 @@ public class ReportController {
 		if (report == null) return "redirect:/home";
 		
 		model.addAttribute("report", report);
+		model.addAttribute("appealImages", imageService.getImages("appeal", reportNo));
 		return "appeal";
 	}
 	
 	// 소명 제출
 	@PostMapping("/appeal/{reportNo}")
-	public String submitAppeal(@PathVariable("reportNo") int reportNo, @RequestParam("appealContent") String appealContent, HttpSession session) {
+	public String submitAppeal(
+			@PathVariable("reportNo") int reportNo,
+			@RequestParam("appealContent") String appealContent,
+			@RequestParam(value = "appealFiles", required = false) List<MultipartFile> appealFiles,
+			HttpSession session) {
 		User loginUser = (User) session.getAttribute("loginUser");
 		if (loginUser == null) return "redirect:/login";
-		
+
+		Report check = reportService.getReportByNoAndAccused(reportNo, loginUser.getUserNo());
+		if (check == null || check.isAppealExpired()) {
+			return "redirect:/mypage";
+		}
+
 		reportService.submitAppeal(reportNo, loginUser.getUserNo(), appealContent);
+
+		// 소명 증빙 이미지 저장
+		if (appealFiles != null && !appealFiles.isEmpty()) {
+			System.out.println("[submitAppeal] 이미지 업로드 시작 - 파일수=" + appealFiles.size() + ", reportNo=" + reportNo);
+			for (MultipartFile file : appealFiles) {
+				if (!file.isEmpty()) {
+					System.out.println("[submitAppeal] 파일: " + file.getOriginalFilename() + ", size=" + file.getSize());
+					imageService.upload(List.of(file), "appeal", reportNo);
+				}
+			}
+		} else {
+			System.out.println("[submitAppeal] 첨부파일 없음");
+		}
+
 		return "redirect:/mypage";
 	}
 	
@@ -207,18 +255,42 @@ public class ReportController {
 	    User loginUser = (User) session.getAttribute("loginUser");
 	    if (loginUser == null) return "redirect:/login";
 	    if (!"ROLE_ADMIN".equals(loginUser.getUserRole())) return "redirect:/home";
-	    
+
 	    model.addAttribute("report", reportService.getReportByNo(reportNo));
+
+	    List<com.team404.domain.Image> appealImages = imageService.getImages("appeal", reportNo);
+	    System.out.println("[viewAppeal] reportNo=" + reportNo + ", appealImages 개수=" + (appealImages == null ? "null" : appealImages.size()));
+	    if (appealImages != null) {
+	        for (com.team404.domain.Image img : appealImages) {
+	            System.out.println("[viewAppeal] imageNo=" + img.getImageNo() + ", filePath=" + img.getFilePath());
+	        }
+	    }
+	    model.addAttribute("appealImages", appealImages);
 	    return "adminAppeal";
 	}
 
 	@PostMapping("/admin/reports/{reportNo}/appeal/done")
-	public String doneAppeal(@PathVariable("reportNo") int reportNo, HttpSession session) {
+	public String doneAppeal(@PathVariable("reportNo") int reportNo,
+	        @RequestParam("result") String result, HttpSession session) {
 	    User loginUser = (User) session.getAttribute("loginUser");
 	    if (loginUser == null) return "redirect:/login";
 	    if (!"ROLE_ADMIN".equals(loginUser.getUserRole())) return "redirect:/home";
-	    
-	    reportService.updateAppealStatus(reportNo, "처리완료");
+
+	    System.out.println("[doneAppeal] reportNo=" + reportNo + ", result=" + result);
+
+	    if ("approve".equals(result)) {
+	        Report report = reportService.getReportByNo(reportNo);
+	        if (report != null) {
+	            double score = report.getAiScore();
+	            int accusedNo = report.getAccusedUserNo();
+	            System.out.println("[doneAppeal] 승인 처리 - accusedUserNo=" + accusedNo + ", aiScore=" + score + ", 차감값=" + (-score));
+	            userService.updateRiskScore(accusedNo, -score);
+	        }
+	    }
+
+	    String appealStatus = "approve".equals(result) ? "승인" : "거절";
+	    reportService.updateAppealStatus(reportNo, appealStatus);
+	    reportService.processReport(reportNo);
 	    return "redirect:/admin/reports";
 	}
 }

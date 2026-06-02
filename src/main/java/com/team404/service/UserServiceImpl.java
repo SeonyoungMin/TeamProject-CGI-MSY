@@ -218,6 +218,7 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	public void updateRiskScore(int userNo, double score) {
+		System.out.println("[updateRiskScore] userNo=" + userNo + ", score=" + score);
 		userRepository.updateRiskScore(userNo, score);
 	}
 
@@ -232,11 +233,8 @@ public class UserServiceImpl implements UserService {
 		userRepository.addRiskScore(userNo, scoreAdded);
 
 		Double currentScore = userRepository.getRiskScore(userNo);
-		String alertMsg = "신고가 접수 되었습니다. 현재 누적 점수: " + currentScore + "점. "
-				+ "제재 기준 3(게시글 7일 업로드 금지), 5점(30일 금지), 8점(전체 활동 제재).";
 
-		session.setAttribute("reportAlert", alertMsg);
-		session.setAttribute("saddedScore", scoreAdded);
+		session.setAttribute("reportAlert", "신고가 정상적으로 접수되었습니다.");
 
 		if (currentScore >= 10) {
 			userRepository.setDeleteUser(userNo);
@@ -268,6 +266,36 @@ public class UserServiceImpl implements UserService {
 					&& user.getSuspendUntil().after(new Timestamp(System.currentTimeMillis()));
 		}
 		return false;
+	}
+
+	@Override
+	public String getRestrictMessage(int userNo) {
+		User user = userRepository.getUserByNo(userNo);
+		double score = user.getRiskScore();
+		int level = user.getSuspendLevel();
+		Timestamp until = user.getSuspendUntil();
+
+		StringBuilder msg = new StringBuilder();
+		msg.append("현재 누적 점수: ").append(String.format("%.1f", score)).append("점\\n");
+
+		if (level == 3) {
+			msg.append("제재 등급: 영구 제한 (8점 이상)\\n");
+			msg.append("모든 게시글/상품 등록이 영구 제한됩니다.");
+		} else if (level == 2) {
+			msg.append("제재 등급: 30일 제한 (5점 이상)\\n");
+			if (until != null) {
+				long remain = (until.getTime() - System.currentTimeMillis()) / (1000 * 60 * 60 * 24);
+				msg.append("제한 해제까지 약 ").append(Math.max(remain, 1)).append("일 남았습니다.");
+			}
+		} else if (level == 1) {
+			msg.append("제재 등급: 7일 제한 (3점 이상)\\n");
+			if (until != null) {
+				long remain = (until.getTime() - System.currentTimeMillis()) / (1000 * 60 * 60 * 24);
+				msg.append("제한 해제까지 약 ").append(Math.max(remain, 1)).append("일 남았습니다.");
+			}
+		}
+
+		return msg.toString();
 	}
 
 }

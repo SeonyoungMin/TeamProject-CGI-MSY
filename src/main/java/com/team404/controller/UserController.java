@@ -110,15 +110,22 @@ public class UserController {
 			@RequestParam(value = "pageNum", defaultValue = "1") int pageNum, HttpSession session, // 1. 세션 파라미터 추가
 			Model model) {
 
-		Boolean isReported = (Boolean) session.getAttribute("reportAlert");
-		if (isReported != null && isReported) {
-			
-			model.addAttribute("showReportModal", true);
-			model.addAttribute("msg", "신고가 접수되었습니다. 누적 점수가 변경되었습니다.");
-			session.removeAttribute("reportAlert");
+		User loginUser = (User) session.getAttribute("loginUser");
+
+		String reportAlert = (String) session.getAttribute("reportAlert");
+		if (reportAlert != null) {
+			model.addAttribute("showReportAlert", reportAlert);
 		}
 
-		User loginUser = (User) session.getAttribute("loginUser");
+		if (loginUser != null) {
+			List<Report> pendingReports = reportService.getReportsByAccused(loginUser.getUserNo());
+			if (!pendingReports.isEmpty()) {
+				Report latestReport = pendingReports.get(0);
+				if (latestReport.getAppealContent() == null) {
+					model.addAttribute("pendingReportNo", latestReport.getReportNo());
+				}
+			}
+		}
 
 		int loginUserNo = (loginUser != null) ? loginUser.getUserNo() : 0;
 		int limit = 9;
@@ -245,6 +252,8 @@ public class UserController {
 		}
 
 		int userNo = loginUser.getUserNo();
+		loginUser = userService.getUserByNo(userNo);
+		session.setAttribute("loginUser", loginUser);
 
 		List<ProductListDto> myProducts = productService.findBySeller(userNo, 0, 5);
 
@@ -372,6 +381,29 @@ public class UserController {
 		model.addAttribute("currentPage", page);
 		model.addAttribute("totalPages", totalPages);
 		return "myReviews";
+	}
+
+	// 내 신고 내역 전체보기
+	@GetMapping("/mypage/reports")
+	public String myReportsPage(@RequestParam(value = "page", defaultValue = "1") int page, HttpSession session, Model model) {
+		User loginUser = (User) session.getAttribute("loginUser");
+		if (loginUser == null) return "redirect:/login";
+
+		List<Report> all = reportService.getReportsByAccused(loginUser.getUserNo());
+		int pageSize = 10;
+		int total = all.size();
+		int totalPages = (total + pageSize - 1) / pageSize;
+		if (page < 1) page = 1;
+		if (totalPages > 0 && page > totalPages) page = totalPages;
+		int start = (page - 1) * pageSize;
+		int end = Math.min(start + pageSize, total);
+		List<Report> paged = (start < total) ? all.subList(start, end) : new java.util.ArrayList<>();
+
+		model.addAttribute("reports", paged);
+		model.addAttribute("totalReports", total);
+		model.addAttribute("currentPage", page);
+		model.addAttribute("totalPages", totalPages);
+		return "myReportList";
 	}
 
 	// 유저 페이지

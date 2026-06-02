@@ -27,4 +27,6 @@ public interface ReportService {
 	Report getReportByNo(int reportNo);
 	
 	void updateAppealStatus(int reportNo, String appealStatus);
+
+	void revertReport(int reportNo);
 }

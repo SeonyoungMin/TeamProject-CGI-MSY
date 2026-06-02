@@ -60,15 +60,6 @@ public class ReportServiceImpl implements ReportService {
 				: "product".equals(report.getTargetType()) ? "상품" : "게시글";
 		notificationService.notifyReport(report.getReporterNo(), targetTypeName, report.getTargetType(), report.getAccusedUserNo());
 
-		if (report.getAccusedUserNo() > 0) {
-			userService.updateRiskScore(report.getAccusedUserNo(), score);
-		}
-
-		// 피신고 유저 누적 점수 업데이트
-		if (report.getAccusedUserNo() > 0) {
-			userService.updateRiskScore(report.getAccusedUserNo(), score);
-		}
-
 		// 사기계좌 처리
 		if ("ACCOUNT".equals(report.getTargetType()) && score >= 0.8) {
 			User seller = userService.getUserByNo(report.getTargetNo());
@@ -218,5 +209,14 @@ public class ReportServiceImpl implements ReportService {
 	@Override
 	public void updateAppealStatus(int reportNo, String appealStatus) {
 	    reportRepository.updateAppealStatus(reportNo, appealStatus);
+	}
+
+	@Override
+	public void revertReport(int reportNo) {
+	    reportRepository.updateStatus(reportNo, "대기");
+	    Report report = reportRepository.findByReportNo(reportNo);
+	    if (report != null && report.getAppealContent() != null) {
+	        reportRepository.updateAppealStatus(reportNo, "검토중");
+	    }
 	}
 }

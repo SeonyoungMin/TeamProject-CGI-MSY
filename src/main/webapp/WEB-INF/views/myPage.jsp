@@ -20,6 +20,20 @@
 
 		<h2 class="section-title">마이페이지</h2>
 
+		<c:if test="${not empty sessionScope.restrictMsg}">
+			<script>alert("${sessionScope.restrictMsg}");</script>
+			<% session.removeAttribute("restrictMsg"); %>
+		</c:if>
+
+		<c:if test="${user.riskScore > 0}">
+			<div class="card" style="margin-bottom: 15px; padding: 12px 16px; border: 1px solid #ddd;">
+				<strong>누적 신고 점수:</strong> <fmt:formatNumber value="${user.riskScore}" pattern="0.0"/>점
+				<span style="font-size: 12px; color: #888; margin-left: 10px;">
+					(3점: 7일 제한 / 5점: 30일 제한 / 8점: 전체 제한 / 10점: 자동 탈퇴)
+				</span>
+			</div>
+		</c:if>
+
 		<div class="card">
 
 			<!-- 프로필 사진 -->
@@ -338,63 +352,66 @@
 
 			</c:otherwise>
 		</c:choose>
-		<%-- 신고 내역 섹션 --%>
-		<c:if test="${not empty myReports}">
-			<div class="card" style="margin-top: 20px;">
-				<h3 class="section-title">내 신고 내역</h3>
-				<table
-					style="width: 100%; border-collapse: collapse; font-size: 14px;">
-					<thead>
-						<tr style="background: #f5f5f5;">
-							<th
-								style="padding: 10px; border-bottom: 2px solid #ddd; text-align: center;">신고번호</th>
-							<th
-								style="padding: 10px; border-bottom: 2px solid #ddd; text-align: center;">신고유형</th>
-							<th
-								style="padding: 10px; border-bottom: 2px solid #ddd; text-align: center;">신고사유</th>
-							<th
-								style="padding: 10px; border-bottom: 2px solid #ddd; text-align: center;">상태</th>
-							<th
-								style="padding: 10px; border-bottom: 2px solid #ddd; text-align: center;">소명상태</th>
-							<th
-								style="padding: 10px; border-bottom: 2px solid #ddd; text-align: center;">소명</th>
-						</tr>
-					</thead>
-					<tbody>
-						<c:forEach var="r" items="${myReports}">
-							<tr style="border-bottom: 1px solid #eee;">
-								<td style="padding: 10px; text-align: center;">${r.reportNo}</td>
-								<td style="padding: 10px; text-align: center;">${r.targetType}</td>
-								<td style="padding: 10px; text-align: center;">${r.reasonType}</td>
-								<td style="padding: 10px; text-align: center;">${r.status}</td>
-								<td style="padding: 10px; text-align: center;"><c:choose>
-										<c:when
-											test="${empty r.appealStatus || r.appealStatus == '미제출'}">
-											<span style="color: #e74c3c;">미제출</span>
-										</c:when>
-										<c:when test="${r.appealStatus == '검토중'}">
-											<span style="color: #f39c12;">검토중</span>
-										</c:when>
-										<c:otherwise>
-											<span style="color: #27ae60;">처리완료</span>
-										</c:otherwise>
-									</c:choose></td>
-								<td style="padding: 10px; text-align: center;"><c:choose>
-										<c:when test="${empty r.appealContent}">
-											<a href="${ctx}/appeal/${r.reportNo}" class="btn btn-primary"
-												style="font-size: 12px; padding: 4px 10px;">소명 작성</a>
-										</c:when>
-										<c:otherwise>
-											<a href="${ctx}/appeal/${r.reportNo}" class="btn btn-line"
-												style="font-size: 12px; padding: 4px 10px;">소명 확인</a>
-										</c:otherwise>
-									</c:choose></td>
+		<%-- 신고 내역 섹션 (최근 5건) --%>
+		<div
+			style="display: flex; justify-content: space-between; align-items: center; margin-top: 40px; border-bottom: 2px solid #121212; padding-bottom: 10px; margin-bottom: 20px;">
+			<h3 class="section-title" style="margin: 0; border-bottom: none;">
+				내 신고 내역 <span style="font-size: 13px; color: #999; font-weight: normal;">(${fn:length(myReports)})</span>
+			</h3>
+			<a href="${ctx}/mypage/reports" style="font-size: 14px; color: #666;">전체보기 &gt;</a>
+		</div>
+		<c:choose>
+			<c:when test="${empty myReports}">
+				<div class="card" style="text-align: center; color: #888;">신고 내역이 없습니다.</div>
+			</c:when>
+			<c:otherwise>
+				<div class="card">
+					<table style="width: 100%; border-collapse: collapse; font-size: 14px;">
+						<thead>
+							<tr style="background: #f5f5f5;">
+								<th style="padding: 10px; border-bottom: 2px solid #ddd; text-align: center;">신고번호</th>
+								<th style="padding: 10px; border-bottom: 2px solid #ddd; text-align: center;">신고유형</th>
+								<th style="padding: 10px; border-bottom: 2px solid #ddd; text-align: center;">신고사유</th>
+								<th style="padding: 10px; border-bottom: 2px solid #ddd; text-align: center;">상태</th>
+								<th style="padding: 10px; border-bottom: 2px solid #ddd; text-align: center;">소명상태</th>
+								<th style="padding: 10px; border-bottom: 2px solid #ddd; text-align: center;">소명</th>
 							</tr>
-						</c:forEach>
-					</tbody>
-				</table>
-			</div>
-		</c:if>
+						</thead>
+						<tbody>
+							<c:forEach var="r" items="${myReports}" end="4">
+								<tr style="border-bottom: 1px solid #eee;">
+									<td style="padding: 10px; text-align: center;">${r.reportNo}</td>
+									<td style="padding: 10px; text-align: center;">${r.targetType}</td>
+									<td style="padding: 10px; text-align: center;">${r.reasonType}</td>
+									<td style="padding: 10px; text-align: center;">${r.status}</td>
+									<td style="padding: 10px; text-align: center;"><c:choose>
+											<c:when test="${empty r.appealStatus || r.appealStatus == '미제출'}">
+												<span style="color: #e74c3c;">미제출</span>
+											</c:when>
+											<c:when test="${r.appealStatus == '검토중'}">
+												<span style="color: #f39c12;">검토중</span>
+											</c:when>
+											<c:otherwise>
+												<span style="color: #27ae60;">${r.appealStatus}</span>
+											</c:otherwise>
+										</c:choose></td>
+									<td style="padding: 10px; text-align: center;"><c:choose>
+											<c:when test="${empty r.appealContent}">
+												<a href="${ctx}/appeal/${r.reportNo}" class="btn btn-primary"
+													style="font-size: 12px; padding: 4px 10px;">소명 작성</a>
+											</c:when>
+											<c:otherwise>
+												<a href="${ctx}/appeal/${r.reportNo}" class="btn btn-line"
+													style="font-size: 12px; padding: 4px 10px;">소명 확인</a>
+											</c:otherwise>
+										</c:choose></td>
+								</tr>
+							</c:forEach>
+						</tbody>
+					</table>
+				</div>
+			</c:otherwise>
+		</c:choose>
 
 	</div>
 	<script>

@@ -419,11 +419,21 @@
 </style>
 </head>
 <body>
-<c:if test="${not empty sessionScope.reportAlert}">
+<c:if test="${not empty showReportAlert}">
     <script>
-        alert("${sessionScope.reportAlert}");
-        
-        <c:remove var="reportAlert" scope="session" />
+        alert("${showReportAlert}");
+    </script>
+    <% session.removeAttribute("reportAlert"); %>
+</c:if>
+<c:if test="${not empty pendingReportNo}">
+    <script>
+        var reportKey = "dismissedReport_${pendingReportNo}";
+        if (!sessionStorage.getItem(reportKey)) {
+            sessionStorage.setItem(reportKey, "true");
+            if (confirm("신고가 접수되었습니다. 소명하시겠습니까?")) {
+                location.href = "${ctx}/appeal/${pendingReportNo}";
+            }
+        }
     </script>
 </c:if>
 

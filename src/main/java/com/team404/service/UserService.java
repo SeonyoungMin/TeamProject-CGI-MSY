@@ -78,4 +78,7 @@ public interface UserService {
 
 	// 제재 상태 체크
 	boolean isRestricted(int userNo, String actionType);
+
+	// 제재 안내 메시지
+	String getRestrictMessage(int userNo);
 }
