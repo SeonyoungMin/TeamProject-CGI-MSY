@@ -251,7 +251,7 @@ public class UserRepositoryImpl implements UserRepository {
 	public void updateRiskScore(int userNo, double score) {
 		String sql = "UPDATE users SET risk_score = GREATEST(LEAST(risk_score + ?, 10), 0) WHERE user_no = ?";
 		int rows = template.update(sql, score, userNo);
-		System.out.println("[updateRiskScore] SQL 실행완료 - userNo=" + userNo + ", score=" + score + ", affected rows=" + rows);
+		System.out.println("updateRiskScore SQL 실행완료 - userNo=" + userNo + ", score=" + score + ", affected rows=" + rows);
 	}
 
 	@Override

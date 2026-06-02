@@ -217,12 +217,6 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public void updateRiskScore(int userNo, double score) {
-		System.out.println("[updateRiskScore] userNo=" + userNo + ", score=" + score);
-		userRepository.updateRiskScore(userNo, score);
-	}
-
-	@Override
 	public List<User> findAdmins() {
 		return userRepository.findAdmins();
 	}
@@ -296,6 +290,49 @@ public class UserServiceImpl implements UserService {
 		}
 
 		return msg.toString();
+	}
+
+	/**
+	 * 위험 점수를 가산/차감(scoreDelta)한 뒤, 갱신된 점수에 맞춰 제재 상태를 동기화하는 단일 진입점.
+	 * 점수 업데이트 관련 로직은 이 메서드로 일원화한다(중복 메서드 금지).
+	 *
+	 * 1) addRiskScore 로 점수를 반영(DB 에서 [0,10] 범위로 클램프)
+	 * 2) 갱신된 최신 점수를 다시 읽어 제재 등급 산정
+	 * 3) updateSuspension 으로 상태 갱신 — 3점 미만이면 suspend_level 을 반드시 0 으로 강제하여 제재 해제
+	 *
+	 * 세 단계가 하나의 트랜잭션으로 묶여 원자적으로 처리된다.
+	 */
+	@Override
+	@Transactional
+	public void updateRiskScoreAndSyncStatus(int userNo, double scoreDelta) {
+
+		// 1) 점수 반영
+		userRepository.addRiskScore(userNo, scoreDelta);
+
+		// 2) 반영된 최신 점수 조회 (이미지 로딩이 따라오는 getUserByNo 대신 점수만 조회)
+		double currentScore = userRepository.getRiskScore(userNo);
+
+		// 3) 점수 구간에 따른 제재 등급/기간 산정
+		int newLevel;
+		Timestamp newUntil;
+
+		if (currentScore >= 8) {
+			newLevel = 3;            // 영구 제한
+			newUntil = null;
+		} else if (currentScore >= 5) {
+			newLevel = 2;            // 30일 제한
+			newUntil = addDays(30);
+		} else if (currentScore >= 3) {
+			newLevel = 1;            // 7일 제한
+			newUntil = addDays(7);
+		} else {
+			newLevel = 0;            // 3점 미만 → 제재 완전 해제(레벨 0 강제)
+			newUntil = null;
+		}
+
+		// suspend_until / suspend_level / appeal_deadline 을 항상 덮어쓰므로,
+		// 레벨 0 일 때 suspend_until 과 appeal_deadline 이 모두 초기화되어 제재가 풀린다.
+		userRepository.updateSuspension(userNo, newUntil, newLevel, null);
 	}
 
 }
