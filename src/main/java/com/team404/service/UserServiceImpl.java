@@ -95,13 +95,11 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	public List<User> getUserByAddress(String userAddress) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public List<User> getUserByGrade(String userGrade) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
@@ -123,28 +121,6 @@ public class UserServiceImpl implements UserService {
 		return userBySellCount;
 	}
 
-//	@Override
-//	public void uploadFile(User user) {
-//		
-//		MultipartFile userImageFile = user.getUserImageFile();
-//		
-//		if (userImageFile != null && !userImageFile.isEmpty()) {
-//			String saveName = UUID.randomUUID().toString() + "_" + userImageFile.getOriginalFilename();
-//			String savePath = "C:\\team404_upload\\profileImg";
-//			File saveFile = new File(savePath, saveName);
-//			
-//			try {
-//				userImageFile.transferTo(saveFile);
-//				user.setUserImageName(saveName);
-//				user.setUserImagePath(savePath);
-//				System.out.println("이미지 파일 업로드 성공: [" + saveFile.getPath() + "]");
-//			} catch (Exception e) {
-//				throw new RuntimeException("이미지 파일 업로드 실패", e);
-//			}
-//		}
-//	}
-	// UserServiceImpl.java (상대방 파일)
-
 	@Override
 	public void setNewUser(User newUser) {
 
@@ -163,12 +139,10 @@ public class UserServiceImpl implements UserService {
 	public void setEditUser(User editUser) {
 		User userOriginByNo = userRepository.getUserByNo(editUser.getUserNo());
 
-		// 비밀번호 유지 로직
 		if (editUser.getUserPw() == null || editUser.getUserPw().isEmpty()) {
 			editUser.setUserPw(userOriginByNo.getUserPw());
 		}
 
-		// 2. 이미지 처리
 		if (editUser.getUserImageFile() != null && !editUser.getUserImageFile().isEmpty()) {
 
 			List<Image> oldImages = image.getImages("user", editUser.getUserNo());
@@ -176,7 +150,6 @@ public class UserServiceImpl implements UserService {
 				image.delete(oldImg.getImageNo());
 			}
 
-			// 새 이미지 업로드
 			List<MultipartFile> imageList = Collections.singletonList(editUser.getUserImageFile());
 			image.upload(imageList, "user", editUser.getUserNo());
 		}
@@ -186,18 +159,12 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	public void setDeleteUser(int userNo) {
-		// 1. 해당 유저의 이미지 리스트를 가져옴
 		List<Image> userImages = image.getImages("user", userNo);
 
-		// 2. 반복문(for)을 사용해서 하나씩 삭제 처리
 		for (Image img : userImages) {
-			image.delete(img.getImageNo()); // 이제 img 변수를 인식합니다.
+			image.delete(img.getImageNo());
 		}
 
-		// 3. (선택) 찜 목록 등 추가 연동 삭제
-		// favoriteService.deleteByUser(userNo);
-
-		// 4. 마지막으로 유저 삭제
 		userRepository.setDeleteUser(userNo);
 	}
 
@@ -242,12 +209,10 @@ public class UserServiceImpl implements UserService {
 
 	}
 
-	// 현재 시간 + n 일후의 Timestamp 반환
 	private Timestamp addDays(int days) {
 		return new Timestamp(System.currentTimeMillis() + (long) days * 24 * 60 * 60 * 1000L);
 	}
 
-	// 제재 상태 체크
 	@Override
 	public boolean isRestricted(int userNo, String actionType) {
 		User user = userRepository.getUserByNo(userNo);
@@ -292,46 +257,31 @@ public class UserServiceImpl implements UserService {
 		return msg.toString();
 	}
 
-	/**
-	 * 위험 점수를 가산/차감(scoreDelta)한 뒤, 갱신된 점수에 맞춰 제재 상태를 동기화하는 단일 진입점.
-	 * 점수 업데이트 관련 로직은 이 메서드로 일원화한다(중복 메서드 금지).
-	 *
-	 * 1) addRiskScore 로 점수를 반영(DB 에서 [0,10] 범위로 클램프)
-	 * 2) 갱신된 최신 점수를 다시 읽어 제재 등급 산정
-	 * 3) updateSuspension 으로 상태 갱신 — 3점 미만이면 suspend_level 을 반드시 0 으로 강제하여 제재 해제
-	 *
-	 * 세 단계가 하나의 트랜잭션으로 묶여 원자적으로 처리된다.
-	 */
 	@Override
 	@Transactional
 	public void updateRiskScoreAndSyncStatus(int userNo, double scoreDelta) {
 
-		// 1) 점수 반영
 		userRepository.addRiskScore(userNo, scoreDelta);
 
-		// 2) 반영된 최신 점수 조회 (이미지 로딩이 따라오는 getUserByNo 대신 점수만 조회)
 		double currentScore = userRepository.getRiskScore(userNo);
 
-		// 3) 점수 구간에 따른 제재 등급/기간 산정
 		int newLevel;
 		Timestamp newUntil;
 
 		if (currentScore >= 8) {
-			newLevel = 3;            // 영구 제한
+			newLevel = 3;
 			newUntil = null;
 		} else if (currentScore >= 5) {
-			newLevel = 2;            // 30일 제한
+			newLevel = 2;
 			newUntil = addDays(30);
 		} else if (currentScore >= 3) {
-			newLevel = 1;            // 7일 제한
+			newLevel = 1;
 			newUntil = addDays(7);
 		} else {
-			newLevel = 0;            // 3점 미만 → 제재 완전 해제(레벨 0 강제)
+			newLevel = 0;
 			newUntil = null;
 		}
 
-		// suspend_until / suspend_level / appeal_deadline 을 항상 덮어쓰므로,
-		// 레벨 0 일 때 suspend_until 과 appeal_deadline 이 모두 초기화되어 제재가 풀린다.
 		userRepository.updateSuspension(userNo, newUntil, newLevel, null);
 	}
 
