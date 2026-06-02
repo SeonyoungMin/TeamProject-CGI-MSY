@@ -162,7 +162,12 @@ public class ReportController {
 		if (!"ROLE_ADMIN".equals(loginUser.getUserRole())) return "redirect:/home";
 
 		reportService.processReport(reportNo);
-
+		
+		Report report = reportService.getReportByNo(reportNo);
+		if (report != null && report.getAppealContent() != null) {
+			reportService.updateAppealStatus(reportNo, "처리완료");
+		}
+ 
 		return type != null ? "redirect:/admin/reports?type=" + type : "redirect:/admin/reports";
 	}
 	
@@ -214,6 +219,7 @@ public class ReportController {
 
 	@PostMapping("/admin/reports/{reportNo}/appeal/done")
 	public String doneAppeal(@PathVariable("reportNo") int reportNo, HttpSession session) {
+		System.out.println("소명 처리완료 호출: " + reportNo);
 	    User loginUser = (User) session.getAttribute("loginUser");
 	    if (loginUser == null) return "redirect:/login";
 	    if (!"ROLE_ADMIN".equals(loginUser.getUserRole())) return "redirect:/home";

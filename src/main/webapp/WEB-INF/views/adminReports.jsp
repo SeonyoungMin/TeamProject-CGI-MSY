@@ -250,8 +250,9 @@
 										<c:otherwise>
 											<a href="${ctx}/admin/reports/${r.reportNo}/appeal"
 												style="font-size: 13px; color: #3498db;">소명 보기</a>
-											<br>
-											<span style="font-size: 11px; color: #888;">${r.appealStatus}</span>
+											<c:if test="${r.appealStatus == '검토중'}">
+												<br><span style="font-size: 11px; color: #f39c12;">검토중</span>
+											</c:if>
 										</c:otherwise>
 									</c:choose></td>
 								<td><span

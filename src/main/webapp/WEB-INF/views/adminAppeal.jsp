@@ -1,6 +1,6 @@
 <%@ page contentType="text/html; charset=UTF-8" language="java"%>
 <%@ taglib prefix="c" uri="jakarta.tags.core"%>
-<c:set var="ctx" value="${pageContext.request.contextPath}" />
+
 
 <!DOCTYPE html>
 <html>
@@ -10,8 +10,8 @@
 </head>
 <body>
     <%@ include file="/WEB-INF/views/header.jsp"%>
-
-    <div class="app-container">
+	<c:set var="ctx" value="${pageContext.request.contextPath}" />
+	<div class="app-container">
         <div class="card">
             <h2 class="section-title">소명 내용</h2>
 
@@ -21,6 +21,7 @@
                 <div><strong>신고 유형:</strong> ${report.targetType}</div>
                 <div><strong>신고 사유:</strong> ${report.reasonType}</div>
                 <div><strong>상태:</strong> ${report.status}</div>
+                <div>소명상태: ${report.appealStatus}</div>
             </div>
 
             <div style="padding: 16px; background: #f0f8ff; border-radius: 8px; border: 1px solid #cce5ff; font-size: 14px; margin-bottom: 20px;">
