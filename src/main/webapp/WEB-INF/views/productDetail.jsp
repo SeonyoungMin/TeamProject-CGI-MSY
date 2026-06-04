@@ -637,7 +637,8 @@
 	<%@ include file="/WEB-INF/views/footer.jsp"%>
 	<%@ include file="/WEB-INF/views/reportModal.jsp"%>
 
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
     var ctx = "${ctx}";
     var productNo = parseInt("${product.productNo}") || 0;
@@ -690,28 +691,13 @@
     function toggleWaitlist() {
         var btn = document.getElementById('waitlistBtn');
         if (!btn) return;
-        var waiting = btn.classList.contains('waiting');
-        var url = waiting ? ctx + '/waitlist/remove' : ctx + '/waitlist/add';
+        var url = btn.classList.contains('waiting') ? ctx + '/waitlist/remove' : ctx + '/waitlist/add';
 
         $.post(url, { productNo : productNo }, function(result) {
-            if (result === 'login') {
-                alert('로그인이 필요합니다.');
-                location.href = ctx + '/login';
-                return;
-            }
-            if (result === 'self') {
-                alert('본인 상품에는 대기 신청할 수 없습니다.');
-                return;
-            }
-            if (result === 'notreserved') {
-                alert('예약중 상품에만 대기 신청할 수 있습니다.');
-                location.reload();
-                return;
-            }
-            if (result === 'notfound') {
-                alert('상품을 찾을 수 없습니다.');
-                return;
-            }
+            if (result === 'login') { alert('로그인이 필요합니다.'); location.href = ctx + '/login'; return; }
+            if (result === 'self') { alert('본인 상품에는 대기 신청할 수 없습니다.'); return; }
+            if (result === 'notreserved') { alert('예약중 상품에만 대기 신청할 수 있습니다.'); location.reload(); return; }
+            if (result === 'notfound') { alert('상품을 찾을 수 없습니다.'); return; }
 
             var countEl = document.getElementById('waitlistCount');
             var count = parseInt(countEl.textContent) || 0;
@@ -806,13 +792,11 @@
                     $("#btnAiAnalyze").prop("disabled", false).html('<i class="fa-solid fa-arrows-rotate"></i> AI 품질 재분석하기');
 
                 } catch (jsonError) {
-                    console.error("JSON 파싱 에러:", jsonError);
                     $("#aiLoading").html('<p style="color: #e74c3c; font-size: 14px; padding: 10px 0;">AI 데이터를 화면에 표시하는 중 오류가 발생했습니다.</p>');
                     $("#btnAiAnalyze").prop("disabled", false).text("AI 품질 비교·분석 시작");
                 }
             },
             error : function(xhr, status, error) {
-                console.error("HTTP Ajax 요청 실패:", error);
                 $("#aiLoading").html('<p style="color: #e74c3c; font-size: 14px; padding: 10px 0;">서버 응답 에러가 발생했습니다. (Status: ' + xhr.status + ')</p>');
                 $("#btnAiAnalyze").prop("disabled", false).text("AI 품질 비교·분석 시작");
             }

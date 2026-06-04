@@ -67,9 +67,6 @@ public interface UserService {
 	// 계좌 정보 등록/수정
 	void updateAccount(int userNo, String bankName, String accountNumber, String accountHolder);
 
-	// 유저 신고 누적 점수
-	void updateRiskScore(int userNo, double score);
-
 	// 관리자 신고 알림
 	List<User> findAdmins();
 
@@ -78,4 +75,11 @@ public interface UserService {
 
 	// 제재 상태 체크
 	boolean isRestricted(int userNo, String actionType);
+
+	// 제재 안내 메시지
+	String getRestrictMessage(int userNo);
+
+	// 점수 차감 후에 게시글 기능 해제
+	void updateRiskScoreAndSyncStatus(int userNo, double scoreDelta);
+
 }

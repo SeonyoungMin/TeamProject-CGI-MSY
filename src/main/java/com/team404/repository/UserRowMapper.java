@@ -22,7 +22,6 @@ public class UserRowMapper implements RowMapper<User> {
 		user.setUserPhone(rs.getString("phone"));
 		user.setUserRole(rs.getString("role"));
 		user.setUserGrade(rs.getString("grade"));
-		// DB datetime 속성값을 LocalDateTime 클래스로 변환하는 방법
 		user.setUserCreatedTime(rs.getTimestamp("created_time").toLocalDateTime());
 		user.setUserSellCount(rs.getInt("sell_count"));
 		user.setUserBuyCount(rs.getInt("buy_count"));
@@ -37,7 +36,14 @@ public class UserRowMapper implements RowMapper<User> {
 			user.setUserAccountNumber(rs.getString("account_number"));
 			user.setUserAccountHolder(rs.getString("account_holder"));
 		} catch (SQLException ignore) {
-			// 계좌 컬럼이 아직 추가되지 않은 환경에서도 안 깨지도록
+		}
+
+		try {
+			user.setRiskScore(rs.getDouble("risk_score"));
+			user.setSuspendUntil(rs.getTimestamp("suspend_until"));
+			user.setSuspendLevel(rs.getInt("suspend_level"));
+			user.setAppealDeadline(rs.getTimestamp("appeal_deadline"));
+		} catch (SQLException ignore) {
 		}
 		return user;
 	}

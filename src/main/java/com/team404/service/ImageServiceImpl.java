@@ -51,9 +51,9 @@ public class ImageServiceImpl implements ImageService {
 				System.out.println("[ImageService] DB 저장 완료: " + cloudUrl);
 
 			} catch (Exception e) {
-				System.err.println("[ImageService] ImgBB 업로드 실패 - " + e.getClass().getSimpleName()
+				System.out.println("[ImageService] 업로드/DB저장 실패 - " + e.getClass().getSimpleName()
 						+ ": " + e.getMessage());
-				e.printStackTrace();
+				e.printStackTrace(System.out);
 			}
 		}
 	}
@@ -67,8 +67,7 @@ public class ImageServiceImpl implements ImageService {
 	// 이미지 단건 삭제
 	@Override
 	public void delete(int imageNo) {
-		// ImgBB 무료 API는 API를 통한 삭제를 지원하지 않거나 별도의 Delete Key가 필요합니다.
-		// 따라서 여기서는 DB 데이터만 삭제하도록 처리합니다.
+
 		imageRepository.delete(imageNo);
 	}
 

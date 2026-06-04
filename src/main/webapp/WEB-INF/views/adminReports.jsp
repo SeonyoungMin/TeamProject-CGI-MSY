@@ -259,23 +259,54 @@
 									class="status-badge ${r.status == '대기' ? 'status-pending' : 'status-done'}">
 										${r.status} </span></td>
 
-								<td><c:if test="${r.status == '대기'}">
-										<form action="${ctx}/admin/reports/${r.reportNo}/process"
-											method="post" style="margin: 0;">
-											<c:if test="${not empty selectedType}">
-												<input type="hidden" name="type" value="${selectedType}">
-											</c:if>
-											<button type="submit" class="btn btn-primary"
-												style="font-size: 12px; padding: 4px 10px;"
-												onclick="return confirm('처리완료로 변경하시겠습니까?')">처리완료</button>
-										</form>
-									</c:if></td>
+								<td><c:choose>
+										<c:when test="${r.status == '대기' and not empty r.appealContent and r.appealStatus == '검토중'}">
+											<a href="${ctx}/admin/reports/${r.reportNo}/appeal"
+												class="btn btn-primary" style="font-size: 12px; padding: 4px 10px;">소명 확인</a>
+										</c:when>
+										<c:otherwise>
+											<form action="${ctx}/admin/reports/${r.reportNo}/process"
+												method="post" style="margin: 0;">
+												<c:if test="${not empty selectedType}">
+													<input type="hidden" name="type" value="${selectedType}">
+												</c:if>
+												<c:choose>
+													<c:when test="${r.status == '대기'}">
+														<button type="submit" class="btn btn-primary"
+															style="font-size: 12px; padding: 4px 10px;"
+															onclick="return confirm('처리완료로 변경하시겠습니까?')">처리완료</button>
+													</c:when>
+													<c:otherwise>
+														<input type="hidden" name="revert" value="true" />
+														<button type="submit" class="btn"
+															style="font-size: 12px; padding: 4px 10px;"
+															onclick="return confirm('대기 상태로 되돌리시겠습니까?')">대기로 변경</button>
+													</c:otherwise>
+												</c:choose>
+											</form>
+										</c:otherwise>
+									</c:choose></td>
 							</tr>
 						</c:forEach>
 					</c:otherwise>
 				</c:choose>
 			</tbody>
 		</table>
+
+		<c:if test="${totalPages > 1}">
+			<div style="display: flex; justify-content: center; gap: 6px; margin-top: 20px;">
+				<c:if test="${currentPage > 1}">
+					<a href="${ctx}/admin/reports?page=${currentPage - 1}${not empty selectedType ? '&type='.concat(selectedType) : ''}${not empty selectedStatus ? '&status='.concat(selectedStatus) : ''}" class="btn" style="padding: 6px 12px; font-size: 13px;">이전</a>
+				</c:if>
+				<c:forEach var="i" begin="1" end="${totalPages}">
+					<a href="${ctx}/admin/reports?page=${i}${not empty selectedType ? '&type='.concat(selectedType) : ''}${not empty selectedStatus ? '&status='.concat(selectedStatus) : ''}"
+						class="btn" style="padding: 6px 12px; font-size: 13px; ${i == currentPage ? 'background:#121212; color:#fff;' : ''}">${i}</a>
+				</c:forEach>
+				<c:if test="${currentPage < totalPages}">
+					<a href="${ctx}/admin/reports?page=${currentPage + 1}${not empty selectedType ? '&type='.concat(selectedType) : ''}${not empty selectedStatus ? '&status='.concat(selectedStatus) : ''}" class="btn" style="padding: 6px 12px; font-size: 13px;">다음</a>
+				</c:if>
+			</div>
+		</c:if>
 	</div>
 
 	<%@ include file="/WEB-INF/views/footer.jsp"%>

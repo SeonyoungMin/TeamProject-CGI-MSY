@@ -249,8 +249,9 @@ public class UserRepositoryImpl implements UserRepository {
 
 	@Override
 	public void updateRiskScore(int userNo, double score) {
-		String sql = "UPDATE users SET risk_score = risk_score + ? WHERE user_no = ?";
-		template.update(sql, score, userNo);
+		String sql = "UPDATE users SET risk_score = GREATEST(LEAST(risk_score + ?, 10), 0) WHERE user_no = ?";
+		int rows = template.update(sql, score, userNo);
+		System.out.println("updateRiskScore SQL 실행완료 - userNo=" + userNo + ", score=" + score + ", affected rows=" + rows);
 	}
 
 	@Override
@@ -259,11 +260,10 @@ public class UserRepositoryImpl implements UserRepository {
 		return template.query(SQL, new UserRowMapper());
 	}
 
-	// 신고 점수 증가
 	@Override
 	public void addRiskScore(int userNo, double delta) {
-		String SQL = "UPDATE users SET risk_score = risk_score + ? WHERE user_no = ?";
-		template.update(SQL, delta, userNo); // delta(점수), userNo(유저번호) 순서
+		String SQL = "UPDATE users SET risk_score = GREATEST(LEAST(risk_score + ?, 10), 0) WHERE user_no = ?";
+		template.update(SQL, delta, userNo);
 	}
 
 	// 제재 상태 업데이트

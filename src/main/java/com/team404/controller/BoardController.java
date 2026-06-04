@@ -21,6 +21,7 @@ import com.team404.domain.User;
 import com.team404.service.BoardService;
 import com.team404.service.CommentService;
 import com.team404.service.NotificationService;
+import com.team404.service.UserService;
 
 import jakarta.servlet.http.HttpSession;
 
@@ -35,6 +36,9 @@ public class BoardController {
 
 	@Autowired
 	private NotificationService notificationService;
+
+	@Autowired
+	private UserService userService;
 
 	// 전체 게시글 목록 (문의 + 자유, 공지 제외)
 	@GetMapping("/board/all")
@@ -109,6 +113,10 @@ public class BoardController {
 		if (loginUser == null) {
 			return "redirect:/login";
 		}
+		if (userService.isRestricted(loginUser.getUserNo(), "post")) {
+			session.setAttribute("restrictMsg", userService.getRestrictMessage(loginUser.getUserNo()));
+			return "redirect:/mypage";
+		}
 		model.addAttribute("authorNo", loginUser.getUserNo());
 		model.addAttribute("authorNickname", loginUser.getUserNickName());
 		model.addAttribute("boardType", "free");
@@ -125,6 +133,10 @@ public class BoardController {
 		if (loginUser == null) {
 			return "redirect:/login";
 		}
+		if (userService.isRestricted(loginUser.getUserNo(), "post")) {
+			session.setAttribute("restrictMsg", userService.getRestrictMessage(loginUser.getUserNo()));
+			return "redirect:/mypage";
+		}
 		model.addAttribute("authorNo", loginUser.getUserNo());
 		model.addAttribute("authorNickname", loginUser.getUserNickName());
 		model.addAttribute("boardTitle", "게시글");
@@ -140,6 +152,10 @@ public class BoardController {
 		User loginUser = (User) session.getAttribute("loginUser");
 		if (loginUser == null) {
 			return "redirect:/login";
+		}
+		if (userService.isRestricted(loginUser.getUserNo(), "post")) {
+			session.setAttribute("restrictMsg", userService.getRestrictMessage(loginUser.getUserNo()));
+			return "redirect:/mypage";
 		}
 		boolean isAdmin = "ROLE_ADMIN".equals(loginUser.getUserRole());
 		String type = board.getBoardType();
@@ -217,6 +233,11 @@ public class BoardController {
 		if (loginUser == null) {
 			return "redirect:/login";
 		}
+		if (userService.isRestricted(loginUser.getUserNo(), "post")) {
+			session.setAttribute("restrictMsg", userService.getRestrictMessage(loginUser.getUserNo()));
+			return "redirect:/mypage";
+		}
+
 		model.addAttribute("authorNo", loginUser.getUserNo());
 		model.addAttribute("authorNickname", loginUser.getUserNickName());
 		model.addAttribute("boardType", "inquiry");
@@ -234,6 +255,11 @@ public class BoardController {
 		if (loginUser == null) {
 			return "redirect:/login";
 		}
+		if (userService.isRestricted(loginUser.getUserNo(), "post")) {
+			session.setAttribute("restrictMsg", userService.getRestrictMessage(loginUser.getUserNo()));
+			return "redirect:/mypage";
+		}
+
 		board.setAuthorNo(loginUser.getUserNo());
 		int newBoardNo = boardService.registerBoard(board, loginUser.getUserNo());
 

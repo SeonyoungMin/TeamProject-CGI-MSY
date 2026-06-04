@@ -199,6 +199,11 @@ public class ProductController {
 		if (loginUser == null) {
 			return "redirect:/login";
 		}
+		if (userService.isRestricted(loginUser.getUserNo(), "post")) {
+			session.setAttribute("restrictMsg", userService.getRestrictMessage(loginUser.getUserNo()));
+			return "redirect:/mypage";
+		}
+
 		model.addAttribute("loginUser", loginUser);
 		return "productAddForm";
 	}
@@ -213,6 +218,10 @@ public class ProductController {
 		User loginUser = (User) session.getAttribute("loginUser");
 		if (loginUser == null) {
 			return "redirect:/login";
+		}
+		if (userService.isRestricted(loginUser.getUserNo(), "post")) {
+			session.setAttribute("restrictMsg", userService.getRestrictMessage(loginUser.getUserNo()));
+			return "redirect:/mypage";
 		}
 
 		Product product = new Product();

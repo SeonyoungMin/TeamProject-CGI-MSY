@@ -1,8 +1,25 @@
 package com.team404.domain;
 
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 
 public class Report {
+
+	public LocalDateTime getAppealDeadline() {
+		if (createdTime == null) return null;
+		return createdTime.plusDays(7);
+	}
+
+	public long getAppealDaysLeft() {
+		if (createdTime == null) return 0;
+		long days = ChronoUnit.DAYS.between(LocalDateTime.now(), createdTime.plusDays(7));
+		return Math.max(days, 0);
+	}
+
+	public boolean isAppealExpired() {
+		if (createdTime == null) return true;
+		return LocalDateTime.now().isAfter(createdTime.plusDays(7));
+	}
 
 	private int reportNo;
 	private int reporterNo;
