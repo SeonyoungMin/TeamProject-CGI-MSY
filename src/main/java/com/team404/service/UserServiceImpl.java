@@ -57,16 +57,11 @@ public class UserServiceImpl implements UserService {
 			return userBySearch;
 		}
 
-		switch (searchDTO.getSearchMode()) {
-		case "info":
+		if ("info".equals(searchDTO.getSearchMode())) {
 			userBySearch = userRepository.searchUserByInfo(searchDTO, startNumber, limit);
 			searchDTO.setTotalRows(userRepository.countForInfo(searchDTO));
-			break;
-		case "condition":
-			userBySearch = userRepository.searchUserByCondition(searchDTO, startNumber, limit);
-			searchDTO.setTotalRows(userRepository.countForCondition(searchDTO));
-			break;
 		}
+
 		return userBySearch;
 	}
 
@@ -101,24 +96,6 @@ public class UserServiceImpl implements UserService {
 	@Override
 	public List<User> getUserByGrade(String userGrade) {
 		return null;
-	}
-
-	@Override
-	public List<User> getUserByCreatedTime(LocalDateTime startTime, LocalDateTime endTime) {
-		List<User> userByCreatedTime = userRepository.getUserByCreatedTime(startTime, endTime);
-		return userByCreatedTime;
-	}
-
-	@Override
-	public List<User> getUserByBuyCount(int minCount, int maxCount) {
-		List<User> userByBuyCount = userRepository.getUserByBuyCount(minCount, maxCount);
-		return userByBuyCount;
-	}
-
-	@Override
-	public List<User> getUserBySellCount(int minCount, int maxCount) {
-		List<User> userBySellCount = userRepository.getUserBySellCount(minCount, maxCount);
-		return userBySellCount;
 	}
 
 	@Override

@@ -182,14 +182,12 @@ public class UserController {
 	@ResponseBody
 	public String reverseGeocode(@RequestParam("lat") double lat, @RequestParam("lng") double lng) {
 
-		String apiKey = kakaoApiKey;
-
 		String url = "https://dapi.kakao.com/v2/local/geo/coord2regioncode.json?x=" + lng + "&y=" + lat;
 
 		RestTemplate rest = new RestTemplate();
 
 		HttpHeaders headers = new HttpHeaders();
-		headers.set("Authorization", "KakaoAK " + apiKey);
+		headers.set("Authorization", "KakaoAK " + kakaoApiKey);
 
 		HttpEntity<String> entity = new HttpEntity<>(headers);
 
@@ -385,16 +383,20 @@ public class UserController {
 
 	// 내 신고 내역 전체보기
 	@GetMapping("/mypage/reports")
-	public String myReportsPage(@RequestParam(value = "page", defaultValue = "1") int page, HttpSession session, Model model) {
+	public String myReportsPage(@RequestParam(value = "page", defaultValue = "1") int page, HttpSession session,
+			Model model) {
 		User loginUser = (User) session.getAttribute("loginUser");
-		if (loginUser == null) return "redirect:/login";
+		if (loginUser == null)
+			return "redirect:/login";
 
 		List<Report> all = reportService.getReportsByAccused(loginUser.getUserNo());
 		int pageSize = 10;
 		int total = all.size();
 		int totalPages = (total + pageSize - 1) / pageSize;
-		if (page < 1) page = 1;
-		if (totalPages > 0 && page > totalPages) page = totalPages;
+		if (page < 1)
+			page = 1;
+		if (totalPages > 0 && page > totalPages)
+			page = totalPages;
 		int start = (page - 1) * pageSize;
 		int end = Math.min(start + pageSize, total);
 		List<Report> paged = (start < total) ? all.subList(start, end) : new java.util.ArrayList<>();
