@@ -48,6 +48,8 @@ public class BoardController {
 		int startNum = (pageNum - 1) * limit;
 		List<BoardListDto> list = boardService.findRecentAll(startNum, limit);
 		int totalCount = boardService.countRecentAll();
+		
+		//Math.ceil은 소수점 무조건 올림 , double은 소수점 계산 정수 X
 		int totalPages = (int) Math.ceil((double) totalCount / limit);
 
 		model.addAttribute("list", list);
@@ -61,6 +63,7 @@ public class BoardController {
 	}
 
 	// 문의 게시판 목록
+	//setBoardListModel 하위
 	@GetMapping("/boardList")
 	public String getBoardList(@RequestParam(value = "pageNum", defaultValue = "1") int pageNum,
 			@RequestParam(value = "limit", defaultValue = "10") int limit, Model model) {
@@ -69,6 +72,7 @@ public class BoardController {
 	}
 
 	// 공지사항 목록
+	// setBoardListModel 하위 
 	@GetMapping("/notice")
 	public String getNoticeList(@RequestParam(value = "pageNum", defaultValue = "1") int pageNum,
 			@RequestParam(value = "limit", defaultValue = "10") int limit, HttpSession session, Model model) {
@@ -79,6 +83,7 @@ public class BoardController {
 	}
 
 	// 자유 게시판 목록
+	//setBoardListModel 하위
 	@GetMapping("/freeBoard")
 	public String getFreeBoardList(@RequestParam(value = "pageNum", defaultValue = "1") int pageNum,
 			@RequestParam(value = "limit", defaultValue = "10") int limit, HttpSession session, Model model) {
@@ -94,6 +99,8 @@ public class BoardController {
 		if (loginUser == null) {
 			return "redirect:/login";
 		}
+		
+		//관리자만 권한 접근
 		if (!"ROLE_ADMIN".equals(loginUser.getUserRole())) {
 			return "redirect:/notice";
 		}

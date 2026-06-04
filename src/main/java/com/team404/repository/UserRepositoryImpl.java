@@ -36,14 +36,6 @@ public class UserRepositoryImpl implements UserRepository {
 	}
 
 	@Override
-	public int countForCondition(SearchDTO searchDTO) {
-		StringBuilder SQL = new StringBuilder("SELECT COUNT(*) FROM users WHERE 1=1");
-		List<Object> params = new ArrayList<>();
-		appendConditionFilters(SQL, params, searchDTO);
-		return template.queryForObject(SQL.toString(), Integer.class, params.toArray());
-	}
-
-	@Override
 	public List<User> getAllUsers(int startNumber, int limit) {
 		String SQL = "SELECT * FROM users ORDER BY user_no LIMIT ?, ?";
 		return template.query(SQL, new UserRowMapper(), startNumber, limit);
@@ -64,19 +56,6 @@ public class UserRepositoryImpl implements UserRepository {
 		StringBuilder SQL = new StringBuilder("SELECT * FROM users WHERE 1=1");
 		List<Object> params = new ArrayList<>();
 		appendInfoFilters(SQL, params, searchDTO);
-
-		SQL.append(" ORDER BY user_no LIMIT ?, ?");
-		params.add(startNumber);
-		params.add(limit);
-
-		return template.query(SQL.toString(), new UserRowMapper(), params.toArray());
-	}
-
-	@Override
-	public List<User> searchUserByCondition(SearchDTO searchDTO, int startNumber, int limit) {
-		StringBuilder SQL = new StringBuilder("SELECT * FROM users WHERE 1=1");
-		List<Object> params = new ArrayList<>();
-		appendConditionFilters(SQL, params, searchDTO);
 
 		SQL.append(" ORDER BY user_no LIMIT ?, ?");
 		params.add(startNumber);
@@ -106,25 +85,6 @@ public class UserRepositoryImpl implements UserRepository {
 		if (searchDTO.getUserRole() != null && !searchDTO.getUserRole().isEmpty()) {
 			SQL.append(" AND role = ? ");
 			params.add(searchDTO.getUserRole());
-		}
-	}
-
-	// condition 모드 필터 (createdTime/buyCount/sellCount)
-	private void appendConditionFilters(StringBuilder SQL, List<Object> params, SearchDTO searchDTO) {
-		if (searchDTO.getStartTime() != null && searchDTO.getEndTime() != null) {
-			SQL.append(" AND created_time BETWEEN ? AND ? ");
-			params.add(searchDTO.getStartTime());
-			params.add(searchDTO.getEndTime());
-		}
-		if (searchDTO.getMinBuyCount() != null && searchDTO.getMaxBuyCount() != null) {
-			SQL.append(" AND buy_count BETWEEN ? AND ? ");
-			params.add(searchDTO.getMinBuyCount());
-			params.add(searchDTO.getMaxBuyCount());
-		}
-		if (searchDTO.getMinSellCount() != null && searchDTO.getMaxSellCount() != null) {
-			SQL.append(" AND sell_count BETWEEN ? AND ? ");
-			params.add(searchDTO.getMinSellCount());
-			params.add(searchDTO.getMaxSellCount());
 		}
 	}
 
@@ -164,24 +124,6 @@ public class UserRepositoryImpl implements UserRepository {
 	public List<User> getUserByGrade(String userGrade) {
 		String SQL = "SELECT * FROM users WHERE grade = ?";
 		return template.query(SQL, new UserRowMapper(), userGrade);
-	}
-
-	@Override
-	public List<User> getUserByCreatedTime(LocalDateTime startTime, LocalDateTime endTime) {
-		String SQL = "SELECT * FROM users WHERE created_time BETWEEN ?, ?";
-		return template.query(SQL, new UserRowMapper(), startTime, endTime);
-	}
-
-	@Override
-	public List<User> getUserByBuyCount(int minCount, int maxCount) {
-		String SQL = "SELECT * FROM users WHERE buy_count BETWEEN ? and ?";
-		return template.query(SQL, new UserRowMapper(), minCount, maxCount);
-	}
-
-	@Override
-	public List<User> getUserBySellCount(int minCount, int maxCount) {
-		String SQL = "SELECT * FROM users WHERE sell_count BETWEEN ? and ?";
-		return template.query(SQL, new UserRowMapper(), minCount, maxCount);
 	}
 
 	// 동네 인증까지
@@ -251,7 +193,8 @@ public class UserRepositoryImpl implements UserRepository {
 	public void updateRiskScore(int userNo, double score) {
 		String sql = "UPDATE users SET risk_score = GREATEST(LEAST(risk_score + ?, 10), 0) WHERE user_no = ?";
 		int rows = template.update(sql, score, userNo);
-		System.out.println("updateRiskScore SQL 실행완료 - userNo=" + userNo + ", score=" + score + ", affected rows=" + rows);
+		System.out.println(
+				"updateRiskScore SQL 실행완료 - userNo=" + userNo + ", score=" + score + ", affected rows=" + rows);
 	}
 
 	@Override

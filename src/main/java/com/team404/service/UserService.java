@@ -1,6 +1,5 @@
 package com.team404.service;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 import com.team404.domain.SearchDTO;
@@ -36,15 +35,6 @@ public interface UserService {
 
 	// 유저 등급으로 조회
 	List<User> getUserByGrade(String userGrade);
-
-	// 유저계정 생성 시간으로 조회
-	List<User> getUserByCreatedTime(LocalDateTime startTime, LocalDateTime endTime);
-
-	// 유저 구매 횟수로 조회
-	List<User> getUserByBuyCount(int minCount, int maxCount);
-
-	// 유저 판매 횟수로 조회
-	List<User> getUserBySellCount(int minCount, int maxCount);
 
 	// 파일 업로드
 //	void uploadFile(User user);
