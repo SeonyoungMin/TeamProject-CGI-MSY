@@ -20,15 +20,18 @@
 			<div class="top-bar-group">
 				<a href="${ctx}/notice" class="notice-link">공지사항</a>
 				<span class="top-bar-divider">|</span>
-				<span>TEAM 404</span>
+				<span>MOGU</span>
 			</div>
 		</div>
 	</div>
 
 	<div class="main-header">
 		<div class="header-inner">
-			<a href="${ctx}/home" class="logo">team404</a>
-
+			<a href="${ctx}/home" class="logo">
+			<div class="logo-main">MOGU</div>
+			<div class="logo-sub">모든 구매가 이루어지는 곳. 모구!</div>
+			</a>
+			
 			<form class="search-container" id="searchForm"
 				action="${ctx}/product/search" method="get"
 				onsubmit="return validateSearch()">

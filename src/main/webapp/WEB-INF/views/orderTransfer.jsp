@@ -144,7 +144,6 @@
 									target="_blank" class="copy-btn is-orderTransfer-15"> 사기계좌 조회
 								</a>
 								<button type="button" class="copy-btn"
-									style="background: #4f46e5; color: #fff; border: none;"
 									onclick="openVerifyModal()">실명 인증</button>
 							</div>
 							<div class="card">

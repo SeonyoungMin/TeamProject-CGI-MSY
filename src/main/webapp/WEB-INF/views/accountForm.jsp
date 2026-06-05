@@ -42,7 +42,7 @@
 					value="${user.userAccountHolder}" placeholder="실명" required>
 
 				<hr>
-				<button type="button" onclick="verifyAccount()">계좌 인증하기</button>
+				<button type="button" class="btn" onclick="verifyAccount()">계좌 인증하기</button>
 			</div>
 
 			<div class="btn-group">

@@ -156,11 +156,26 @@ label.form-label {
 }
 
 .logo {
-	flex: 0 0 110px;
-	font-size: 22px;
-	font-weight: bold;
-	color: #000;
-	white-space: nowrap;
+    flex: 0 0 auto;
+    display: flex;
+    flex-direction: column;
+    text-decoration: none;
+    color: #000;
+    white-space: nowrap;
+}
+
+.logo-main {
+    font-size: 27px;
+    font-weight: 900;
+    line-height: 1;
+    letter-spacing: 2px;
+}
+
+.logo-sub {
+    font-size: 12px;
+    font-weight: 300;
+    margin-top: 2px;
+    letter-spacing: 0.5px;
 }
 
 .search-container {
