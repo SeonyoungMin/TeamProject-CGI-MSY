@@ -9,164 +9,14 @@
 <meta charset="UTF-8">
 <title>게시글 상세</title>
 
-<style>
-body {
-	margin: 0;
-	font-family: Arial, sans-serif;
-	background: #f6f7f9;
-}
-
-.container {
-	max-width: 900px;
-	margin: 40px auto;
-	background: #fff;
-	padding: 30px;
-	border-radius: 12px;
-}
-
-.post-title {
-	font-size: 24px;
-	font-weight: bold;
-	margin-bottom: 10px;
-}
-
-.post-meta {
-	color: #888;
-	font-size: 13px;
-	margin-bottom: 20px;
-	display: flex;
-	justify-content: space-between;
-}
-
-.post-content {
-	line-height: 1.7;
-	white-space: pre-wrap;
-	padding: 20px 0;
-	border-top: 1px solid #eee;
-	border-bottom: 1px solid #eee;
-}
-
-.comment-section {
-	margin-top: 40px;
-}
-
-.comment-title {
-	font-size: 18px;
-	font-weight: bold;
-	margin-bottom: 15px;
-}
-
-.comment-form {
-	display: flex;
-	gap: 10px;
-	margin-bottom: 20px;
-	align-items: center;
-}
-
-.comment-form input[type="text"] {
-	flex: 1;
-	padding: 10px;
-	border: 1px solid #ddd;
-	border-radius: 8px;
-}
-
-.comment-form button[type="submit"] {
-	padding: 10px 16px;
-	border: none;
-	background: #000;
-	color: #fff;
-	border-radius: 8px;
-	cursor: pointer;
-	white-space: nowrap;
-}
-
-.comment-item {
-	padding: 12px 0;
-	border-bottom: 1px solid #eee;
-}
-
-.reply-item {
-	margin-left: 30px;
-	padding-left: 12px;
-	border-left: 3px solid #eee;
-	background: #fafafa;
-}
-
-.comment-top {
-	display: flex;
-	justify-content: space-between;
-	font-size: 12px;
-	color: #777;
-	margin-bottom: 5px;
-}
-
-.comment-author {
-	font-weight: bold;
-	color: #333;
-}
-
-.comment-content {
-	font-size: 14px;
-	color: #222;
-}
-
-.comment-actions {
-	margin-top: 6px;
-	font-size: 12px;
-	display: flex;
-	gap: 10px;
-	align-items: center;
-}
-
-.comment-actions form {
-	margin: 0;
-}
-
-.comment-actions button {
-	background: none;
-	border: none;
-	color: red;
-	cursor: pointer;
-	font-size: 12px;
-	padding: 0;
-}
-
-.reply-btn {
-	background: none;
-	border: none;
-	color: #3498db;
-	cursor: pointer;
-	font-size: 12px;
-	padding: 0;
-}
-
-.edit-btn {
-	background: none;
-	border: none;
-	color: #888;
-	cursor: pointer;
-	font-size: 12px;
-	padding: 0;
-}
-
-.reply-form, .comment-edit-form {
-	display: none;
-	margin-top: 10px;
-}
-
-.empty {
-	color: #999;
-	padding: 20px 0;
-	text-align: center;
-}
-</style>
+<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/boardDetail.css">
 </head>
 
 <body>
 	<%@ include file="/WEB-INF/views/header.jsp"%>
 
 	<div class="container">
-		<div style="display: flex; justify-content: space-between;">
+		<div class="is-boardDetail-1">
 			<a href="${ctx}/home">< 메인으로 </a>
 			<%-- 신고 버튼 (본인 게시글 제외) --%>
 			<c:if
@@ -191,8 +41,7 @@ body {
 					style="color: #c0392b; margin-right: 6px;"></i>
 			</c:if>
 			<c:if test="${isNotice}">
-				<span
-					style="background: #fdecec; color: #c0392b; font-size: 12px; padding: 2px 6px; border-radius: 3px; margin-right: 6px; font-weight: 600; vertical-align: middle;">공지</span>
+				<span class="is-boardDetail-2">공지</span>
 			</c:if>
 			${board.title}
 		</div>
@@ -209,8 +58,7 @@ body {
 					<a href="${ctx}/boardList/${board.boardNo}/edit" class="btn">수정</a>
 				</c:if>
 				<c:if test="${canDelete}">
-					<form action="${ctx}/boardList/${board.boardNo}" method="post"
-						style="display: inline;">
+					<form action="${ctx}/boardList/${board.boardNo}" method="post" class="is-boardDetail-3">
 						<input type="hidden" name="_method" value="DELETE">
 						<button type="submit" onclick="return confirm('삭제하시겠습니까?')">삭제</button>
 					</form>
@@ -235,15 +83,12 @@ body {
 							type="hidden" name="returnTo" value="board"> <input
 							type="hidden" name="parentCommentNo" value="0"> <input
 							type="text" name="content"
-							style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; margin-bottom: 8px;"
-							placeholder="댓글을 입력하세요" required>
-						<div
-							style="display: flex; justify-content: space-between; align-items: center;">
-							<label style="font-size: 13px; color: #555; cursor: pointer;">
+							placeholder="댓글을 입력하세요" required class="is-boardDetail-4">
+						<div class="is-boardDetail-5">
+							<label class="is-boardDetail-6">
 								<input type="checkbox" name="isSecret" value="1"> 비밀댓글
 							</label>
-							<button type="submit"
-								style="padding: 10px 16px; border: none; background: #000; color: #fff; border-radius: 8px; cursor: pointer;">등록</button>
+							<button type="submit" class="is-boardDetail-7">등록</button>
 						</div>
 					</form>
 				</c:otherwise>
@@ -262,14 +107,14 @@ body {
 							<div class="comment-top">
 								<div class="comment-author">
 									<c:if test="${c.parentCommentNo > 0}">
-										<span style="color: #aaa; margin-right: 4px;">↳</span>
+										<span class="is-boardDetail-8">↳</span>
 									</c:if>
 									<c:choose>
 										<c:when test="${empty c.nickname}">익명</c:when>
 										<c:otherwise>${c.nickname}</c:otherwise>
 									</c:choose>
 									<c:if test="${c.isSecret == 1}">
-										<span style="font-size: 11px; color: #888; margin-left: 4px;">🔒
+										<span class="is-boardDetail-9">🔒
 											비밀댓글</span>
 									</c:if>
 								</div>
@@ -279,8 +124,7 @@ body {
 							<c:choose>
 								<c:when
 									test="${c.isSecret == 1 && loginUser.userNo != c.authorNo && loginUser.userNo != board.authorNo && loginUser.userRole != 'ROLE_ADMIN'}">
-									<div class="comment-content"
-										style="color: #aaa; font-style: italic;">비밀 댓글입니다.</div>
+									<div class="comment-content is-boardDetail-10">비밀 댓글입니다.</div>
 								</c:when>
 								<c:otherwise>
 									<div class="comment-content">${c.content}</div>
@@ -295,15 +139,11 @@ body {
 										<input type="hidden" name="boardNo" value="${board.boardNo}">
 										<input type="hidden" name="returnTo" value="board"> <input
 											type="text" name="content" value="${c.content}"
-											style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; font-size: 13px;"
-											required>
-										<div
-											style="display: flex; justify-content: flex-end; gap: 6px; margin-top: 6px;">
-											<button type="button" class="edit-btn"
-												style="padding: 8px 12px; background: #eee; color: #333; border-radius: 8px; font-size: 13px;"
+											required class="is-boardDetail-11">
+										<div class="is-boardDetail-12">
+											<button type="button" class="edit-btn is-boardDetail-13"
 												onclick="toggleEditForm(${c.commentNo})">취소</button>
-											<button type="submit"
-												style="padding: 8px 12px; background: #000; color: #fff; border: none; border-radius: 8px; cursor: pointer; font-size: 13px;">저장</button>
+											<button type="submit" class="is-boardDetail-14">저장</button>
 										</div>
 									</form>
 								</div>
@@ -339,16 +179,13 @@ body {
 										<input type="hidden" name="returnTo" value="board"> <input
 											type="hidden" name="parentCommentNo" value="${c.commentNo}">
 										<input type="text" name="content"
-											style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; font-size: 13px;"
-											placeholder="답글을 입력하세요" required>
-										<div
-											style="display: flex; justify-content: space-between; align-items: center; margin-top: 6px;">
-											<label style="font-size: 12px; color: #555; cursor: pointer;">
+											placeholder="답글을 입력하세요" required class="is-boardDetail-15">
+										<div class="is-boardDetail-16">
+											<label class="is-boardDetail-17">
 												<input type="checkbox" name="isSecret" value="1">
 												비밀답글
 											</label>
-											<button type="submit"
-												style="padding: 8px 12px; background: #000; color: #fff; border: none; border-radius: 8px; cursor: pointer; font-size: 13px;">등록</button>
+											<button type="submit" class="is-boardDetail-18">등록</button>
 										</div>
 									</form>
 								</div>

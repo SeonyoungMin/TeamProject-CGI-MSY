@@ -1,3 +1,4 @@
+<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/header.css">
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="jakarta.tags.core"%>
@@ -79,7 +80,7 @@
 							</div>
 						</c:if>
 
-						<form action="${ctx}/logout" method="post" style="margin: 0;">
+						<form action="${ctx}/logout" method="post" class="is-header-1">
 							<button type="submit" class="btn">로그아웃</button>
 						</form>
 					</c:otherwise>

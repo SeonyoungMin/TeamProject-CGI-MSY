@@ -8,47 +8,7 @@
 <meta charset="UTF-8">
 <title>거래 요청</title>
 
-<style>
-.container {
-	max-width: 600px;
-	margin: 80px auto;
-	padding: 40px;
-	text-align: center;
-	background: #fff;
-	border-radius: 12px;
-}
-
-.product-name {
-	font-size: 20px;
-	font-weight: bold;
-	margin-bottom: 10px;
-}
-
-.desc {
-	color: #666;
-	line-height: 1.6;
-	margin-bottom: 30px;
-}
-
-.btn {
-	padding: 14px 24px;
-	border: none;
-	border-radius: 8px;
-	cursor: pointer;
-	font-weight: bold;
-}
-
-.btn-submit {
-	background: black;
-	color: white;
-}
-
-.btn-cancel {
-	background: #eee;
-	color: #333;
-	margin-left: 8px;
-}
-</style>
+<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/tradeRequest.css">
 </head>
 <body>
 

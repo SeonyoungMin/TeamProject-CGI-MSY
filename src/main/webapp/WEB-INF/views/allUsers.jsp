@@ -10,80 +10,8 @@
 <meta charset="UTF-8">
 <title>관리자 페이지 [전체 사용자 목록]</title>
 
-<style>
-body {
-	margin: 0;
-	font-family: Arial, sans-serif;
-	background: #f8f9fa;
-}
 
-.container {
-	max-width: 1100px;
-	margin: 40px auto;
-	padding: 30px;
-	background: white;
-	border-radius: 12px;
-}
-
-h3 {
-	text-align: center;
-	margin-bottom: 20px;
-}
-
-.top-link {
-	display: block;
-	text-align: right;
-	margin-bottom: 25px;
-	text-decoration: none;
-	color: gray;
-	font-weight: bold;
-}
-
-.user-card {
-	width: 100%;
-	box-sizing: border-box;
-	padding: 18px;
-	margin-bottom: 20px;
-	border: 1px solid #eee;
-	border-radius: 10px;
-	background: #fff;
-}
-
-.user-card a {
-	color: gray;
-	text-decoration: none;
-	font-weight: bold;
-}
-
-.user-card a:hover, .top-link:hover {
-	color: black;
-}
-
-.pagination {
-	text-align: center;
-	margin-top: 25px;
-}
-
-.pagination a, .pagination strong {
-	margin: 0 6px;
-	padding: 8px 14px;
-	border-radius: 8px;
-	text-decoration: none;
-	border: 1px solid #ddd;
-	color: black;
-}
-
-.pagination a:hover {
-	background: #f1f1f1;
-}
-
-.pagination strong {
-	background: black;
-	color: white;
-	border-color: black;
-}
-</style>
-
+<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/allUsers.css">
 </head>
 <body>
 

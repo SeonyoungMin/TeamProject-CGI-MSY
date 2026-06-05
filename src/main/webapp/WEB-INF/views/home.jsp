@@ -8,415 +8,7 @@
 <head>
 <meta charset="UTF-8">
 <title>홈</title>
-<style>
-/* ===== 카테고리 메뉴 ===== */
-.category-bar {
-	display: flex;
-	justify-content: center;
-	gap: 4px;
-	padding: 14px 20px;
-	border-bottom: 1px solid #eee;
-	background: #fff;
-}
-
-.category-bar a {
-	padding: 6px 14px;
-	font-size: 14px;
-	color: #555;
-	border-radius: 16px;
-}
-
-.category-bar a:hover {
-	background: #f5f5f5;
-	color: #111;
-}
-
-/* ===== 메인 배너 ===== */
-.hero {
-	text-align: center;
-	padding: 80px 20px;
-	background: #EDEBE7;
-}
-
-/* ===== 이달의 왕 배너 ===== */
-.king-banner {
-	display: flex;
-	gap: 16px;
-	justify-content: center;
-	padding: 20px;
-	background: #FAF8F4;
-	border-bottom: 1px solid #eee;
-}
-
-.king-card {
-	flex: 1;
-	max-width: 420px;
-	background: #fff;
-	border: 1px solid #ececec;
-	border-radius: 8px;
-	padding: 14px 18px;
-}
-
-.king-card h3 {
-	margin: 0 0 10px;
-	font-size: 15px;
-	color: #333;
-}
-
-.king-list {
-	list-style: none;
-	margin: 0;
-	padding: 0;
-}
-
-.king-list li {
-	display: flex;
-	justify-content: space-between;
-	padding: 4px 0;
-	font-size: 13px;
-	color: #444;
-}
-
-.king-rank {
-	display: inline-block;
-	width: 20px;
-	color: #c0392b;
-	font-weight: bold;
-}
-
-.king-empty {
-	font-size: 12px;
-	color: #999;
-	text-align: center;
-	padding: 6px 0;
-}
-
-.hero h1 {
-	font-size: 44px;
-	margin: 0 0 24px;
-	letter-spacing: -1px;
-}
-
-.hero .btn {
-	font-size: 16px;
-	padding: 12px 24px;
-}
-
-/* ===== 섹션 제목 ===== */
-.section-head {
-	display: flex;
-	justify-content: space-between;
-	align-items: center;
-	margin: 24px 0 14px;
-}
-
-.section-head h2 {
-	font-size: 20px;
-	margin: 0;
-}
-
-.more-link {
-	font-size: 14px;
-	color: #666;
-}
-
-.section-divider {
-	border: 0;
-	border-top: 1px solid #ddd;
-	margin: 30px 0 0;
-}
-
-/* ===== 상품 그리드 ===== */
-.product-grid {
-	display: grid;
-	grid-template-columns: repeat(3, 1fr);
-	gap: 15px;
-}
-
-.product-grid.popular {
-	grid-template-columns: repeat(5, 1fr);
-	gap: 10px;
-	justify-content: start;
-}
-
-.product-grid.popular .card {
-	height: 240px;
-	overflow: hidden;
-}
-
-.card {
-	display: block;
-	text-decoration: none;
-	color: inherit;
-	border: 1px solid #eee;
-	padding: 10px;
-	border-radius: 8px;
-	position: relative;
-}
-
-.thumb {
-	height: 180px;
-	background: #f0f0f0;
-	border-radius: 4px;
-	overflow: hidden;
-	position: relative;
-}
-
-.thumb img {
-	width: 100%;
-	height: 100%;
-	object-fit: cover;
-}
-
-.product-grid.popular .thumb {
-	height: 130px;
-}
-
-.product-name {
-	font-size: 15px;
-	font-weight: 600;
-	white-space: nowrap;
-	overflow: hidden;
-	text-overflow: ellipsis;
-	margin-top: 6px;
-}
-
-.product-seller {
-	font-size: 12px;
-	color: #888;
-	margin-top: 2px;
-}
-
-.product-price {
-	font-weight: bold;
-	margin-top: 4px;
-}
-
-.product-grid.popular .product-name {
-	font-size: 13px;
-}
-
-.product-grid.popular .product-seller {
-	font-size: 11px;
-}
-
-.product-grid.popular .product-price {
-	font-size: 13px;
-}
-
-.product-date {
-	font-size: 11px;
-	color: #999;
-	margin-top: 6px;
-}
-
-/* ===== 썸네일 위 배지 (조회수, 찜) ===== */
-.view-badge {
-	position: absolute;
-	bottom: 8px;
-	left: 8px;
-	background: rgba(0, 0, 0, 0.55);
-	color: #fff;
-	font-size: 11px;
-	padding: 2px 6px;
-	border-radius: 10px;
-}
-
-.fav-btn {
-	position: absolute;
-	bottom: 8px;
-	right: 8px;
-	display: inline-flex;
-	align-items: center;
-	gap: 4px;
-	padding: 3px 8px;
-	background: rgba(255, 255, 255, 0.85);
-	border-radius: 14px;
-	cursor: pointer;
-	user-select: none;
-}
-
-.fav-btn:hover {
-	background: #fff;
-}
-
-.fav-btn .fav-icon {
-	color: #ff4d4d;
-	font-size: 15px;
-}
-
-.fav-btn .fav-count {
-	font-size: 12px;
-	font-weight: bold;
-	color: #111;
-}
-
-/* ===== 본문 + 사이드 레이아웃 ===== */
-.home-layout {
-	display: flex;
-	gap: 24px;
-	align-items: stretch;
-}
-
-.home-main {
-	flex: 1;
-	min-width: 0;
-}
-
-/* ===== 사이드 게시판 ===== */
-.board-side {
-	flex: 0 0 220px;
-	display: flex;
-	flex-direction: column;
-	padding: 12px 14px;
-	border: 1px solid #f0f0f0;
-	background: #fff;
-	font-size: 12px;
-}
-
-.board-side-header {
-	display: flex;
-	justify-content: space-between;
-	align-items: baseline;
-	margin-bottom: 8px;
-	padding-bottom: 6px;
-	border-bottom: 1px solid #f5f5f5;
-}
-
-.board-side-header h3 {
-	margin: 0;
-	font-size: 14px;
-}
-
-.board-side-more {
-	font-size: 11px;
-	color: #888;
-}
-
-.board-side-write {
-	display: block;
-	text-align: center;
-	padding: 6px;
-	font-size: 12px;
-	border: 1px solid #ececec;
-	color: #555;
-	margin-bottom: 10px;
-}
-
-.board-side-write:hover {
-	background: #fafafa;
-}
-
-.board-side-list {
-	list-style: none;
-	margin: 0;
-	padding: 0;
-	flex: 1;
-}
-
-.board-side-list li {
-	padding: 6px 0;
-	border-bottom: 1px solid #f5f5f5;
-}
-
-.board-side-list li:last-child {
-	border-bottom: none;
-}
-
-.board-side-list li a {
-	display: block;
-	color: #222;
-	white-space: nowrap;
-	overflow: hidden;
-	text-overflow: ellipsis;
-}
-
-.board-side-list li a:hover {
-	text-decoration: underline;
-}
-
-.board-side-meta {
-	color: #999;
-	font-size: 10px;
-	margin-top: 2px;
-}
-
-.board-side-empty {
-	padding: 10px 0;
-	text-align: center;
-	color: #888;
-}
-
-/* ===== 게시글 타입 태그, 핀 ===== */
-.tag {
-	display: inline-block;
-	font-size: 10px;
-	padding: 1px 5px;
-	margin-right: 4px;
-	border-radius: 2px;
-	font-weight: 600;
-	vertical-align: middle;
-}
-
-.tag-notice {
-	background: #fdecec;
-	color: #c0392b;
-}
-
-.tag-inquiry {
-	background: #eef3fb;
-	color: #2c6ab1;
-}
-
-.tag-free {
-	background: #f1f5ee;
-	color: #5a7a3a;
-}
-
-.pin {
-	font-size: 11px;
-	margin-right: 4px;
-	color: #c0392b;
-}
-
-/* ===== 반응형 ===== */
-@media ( max-width : 900px) {
-	.home-layout {
-		flex-direction: column;
-	}
-	.board-side {
-		flex: none;
-		max-width: 480px;
-		margin: 20px auto;
-	}
-	.hero h1 {
-		font-size: 32px;
-	}
-}
-
-/* 예약 중 상품 썸네일 표시 */
-.reserved-overlay {
-	position: absolute;
-	top: 0;
-	left: 0;
-	width: 100%;
-	height: 100%;
-	background: rgba(0, 0, 0, 0.45);
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	border-radius: 10px 10px 0 0;
-}
-
-.reserved-badge {
-	background: #fff;
-	color: #333;
-	font-size: 13px;
-	font-weight: bold;
-	padding: 6px 14px;
-	border-radius: 20px;
-}
-</style>
+<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/home.css">
 </head>
 <body>
 <c:if test="${not empty showReportAlert}">
@@ -453,27 +45,24 @@
 	<section class="hero">
 		<c:choose>
 			<c:when test="${not empty loginUser}">
-				<div style="margin-bottom: 15px; font-size: 16px; color: #555;">
+				<div class="is-home-1">
 					<i class="fa-solid fa-location-dot"></i>
 					<c:choose>
 						<c:when test="${not empty loginUser.verifiedArea}">
                         현재 인증된 동네: <strong>${loginUser.verifiedArea}</strong>
 						</c:when>
 						<c:otherwise>
-							<strong style="color: #e74c3c;">아직 동네인증을 하지 않은 유저입니다.</strong>
+							<strong class="is-home-2">아직 동네인증을 하지 않은 유저입니다.</strong>
 
-							<a href="${pageContext.request.contextPath}/mypage"
-								style="font-size: 13px; color: #007bff; margin-left: 10px; text-decoration: underline;">
+							<a href="${pageContext.request.contextPath}/mypage" class="is-home-3">
 								인증하기</a>
 						</c:otherwise>
 					</c:choose>
 				</div>
 				<h1>근처에서 상품찾기</h1>
-				<a href="${ctx}/productList"
-					style="background-color: #121212; color: #ffffff; padding: 12px 24px; border-radius: 6px; text-decoration: none; font-weight: 600; font-size: 14px; display: inline-block; text-align: center; border: 1px solid #121212;">
+				<a href="${ctx}/productList" class="is-home-4">
 					상품 둘러보기 </a>
-				<a href="${ctx}/product/new"
-					style="background-color: #ffffff; color: #121212; padding: 12px 24px; border-radius: 6px; text-decoration: none; font-weight: 600; font-size: 14px; display: inline-block; text-align: center; border: 1px solid #121212;">
+				<a href="${ctx}/product/new" class="is-home-5">
 					글쓰기 </a>
 
 			</c:when>
@@ -538,7 +127,7 @@
 			</div>
 
 			<c:if test="${empty popularList}">
-				<div class="card" style="text-align: center; color: #888;">인기상품이
+				<div class="card is-home-6">인기상품이
 					없습니다.</div>
 			</c:if>
 
@@ -583,7 +172,7 @@
 			</div>
 
 			<c:if test="${empty productList}">
-				<div class="card" style="text-align: center; color: #888;">등록된
+				<div class="card is-home-7">등록된
 					상품이 없습니다.</div>
 			</c:if>
 

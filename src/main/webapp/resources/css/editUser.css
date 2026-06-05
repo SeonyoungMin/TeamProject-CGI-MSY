@@ -1,0 +1,143 @@
+body {
+	margin: 0;
+	font-family: 'Arial', sans-serif;
+	background: #f8f9fa;
+	color: #333;
+}
+
+.container {
+	width: 550px;
+	margin: 40px auto;
+	background: white;
+	padding: 40px;
+	border-radius: 12px;
+	box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+}
+
+h3 {
+	text-align: center;
+	margin-bottom: 30px;
+	font-size: 24px;
+	color: #222;
+}
+
+.form-group {
+	margin-bottom: 18px;
+}
+
+label {
+	display: block;
+	font-weight: bold;
+	margin-bottom: 8px;
+	font-size: 14px;
+}
+
+input {
+	width: 100%;
+	padding: 12px;
+	border: 1px solid #ddd;
+	border-radius: 8px;
+	box-sizing: border-box;
+	font-size: 15px;
+}
+
+input:focus {
+	border-color: #007bff;
+	outline: none;
+	box-shadow: 0 0 5px rgba(0, 123, 255, 0.2);
+}
+
+/* 동네 인증 박스 스타일 */
+.auth-box {
+	background: #fdfdfd;
+	padding: 20px;
+	border-radius: 10px;
+	border: 1px solid #e9ecef;
+	margin: 25px 0;
+}
+
+.auth-title {
+	font-weight: bold;
+	margin-bottom: 12px;
+	display: block;
+}
+
+.btn {
+	width: 100%;
+	padding: 14px;
+	border: none;
+	border-radius: 8px;
+	cursor: pointer;
+	font-weight: bold;
+	font-size: 16px;
+	transition: 0.3s;
+}
+
+.btn-submit {
+	background: #007bff;
+	color: white;
+	margin-top: 10px;
+}
+
+.btn-submit:hover {
+	background: #0056b3;
+}
+
+.btn-auth {
+	background: #28a745;
+	color: white;
+	width: 130px;
+	padding: 10px;
+	font-size: 14px;
+	margin-top: 0;
+}
+
+.btn-auth:hover {
+	background: #218838;
+}
+
+.top-link {
+	display: block;
+	text-align: right;
+	margin-bottom: 15px;
+	text-decoration: none;
+	color: #666;
+	font-size: 13px;
+}
+
+.info-text {
+	font-size: 12px;
+	color: #888;
+	margin-top: 8px;
+	line-height: 1.4;
+}
+
+.readonly-input {
+	background: #f1f3f5;
+	color: #495057;
+	cursor: not-allowed;
+}
+
+.is-editUser-1 {
+    display: flex; gap: 15px;
+}
+
+.is-editUser-2 {
+    flex: 1;
+}
+
+.is-editUser-3 {
+    flex: 2;
+}
+
+.is-editUser-4 {
+    border: 0; border-top: 1px solid #eee; margin: 25px 0;
+}
+
+.is-editUser-5 {
+    display: flex; gap: 10px;
+}
+
+.is-editUser-6 {
+    flex: 1; background: #fff;
+}

@@ -1,0 +1,23 @@
+.is-chatBot-1 {
+    text-align:center; padding: 8px; font-size:12px; color:#888;
+}
+
+.is-chatBot-2 {
+    padding: 8px 16px; display: flex; flex-direction: column; gap: 6px;
+}
+
+.is-chatBot-3 {
+    text-align:center; text-decoration:none;
+}
+
+.is-chatBot-4 {
+    text-align:center; text-decoration:none; border-color:#FEE500; color:#3C1E1E; background:#FEE500;
+}
+
+.is-chatBot-5 {
+    text-align:center; padding: 8px; font-size:12px; color:#888;
+}
+
+.is-chatBot-6 {
+    border-color: #e74c3c !important; color: #e74c3c !important;
+}

@@ -10,141 +10,24 @@
 <meta charset="UTF-8">
 <title>알림 - team404</title>
 <%@ include file="header.jsp"%>
-<style>
-/* ===== 알림 페이지 전용 스타일 ===== */
-.noti-toolbar {
-	display: flex;
-	justify-content: space-between;
-	align-items: center;
-	margin-bottom: 16px;
-}
-
-.noti-toolbar-actions {
-	display: flex;
-	gap: 8px;
-}
-
-.noti-list {
-	list-style: none;
-	margin: 0;
-	padding: 0;
-}
-
-.noti-item {
-	display: flex;
-	align-items: flex-start;
-	gap: 14px;
-	padding: 16px 20px;
-	border-bottom: 1px solid #f0f0f0;
-	background: #fff;
-	transition: background 0.1s;
-	cursor: pointer;
-	position: relative;
-}
-
-.noti-item:hover {
-	background: #f9f9f9;
-}
-
-/* 읽지 않은 항목 강조 */
-.noti-item.unread {
-	background: #fffbf0;
-	border-left: 3px solid #f39c12;
-}
-
-.noti-item.unread:hover {
-	background: #fff8e6;
-}
-
-/* 아이콘 원 */
-.noti-icon {
-	flex-shrink: 0;
-	width: 40px;
-	height: 40px;
-	border-radius: 50%;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	font-size: 17px;
-	color: #fff;
-}
-
-.noti-icon.favorite { background: #e74c3c; }
-.noti-icon.comment  { background: #3498db; }
-.noti-icon.review   { background: #9b59b6; }
-.noti-icon.sold     { background: #27ae60; }
-.noti-icon.bought   { background: #2980b9; }
-.noti-icon.default  { background: #aaa; }
-
-/* 내용 영역 */
-.noti-body {
-	flex: 1;
-	min-width: 0;
-}
-
-.noti-message {
-	font-size: 14px;
-	color: #222;
-	line-height: 1.5;
-	white-space: pre-line;
-	word-break: break-word;
-}
-
-.noti-meta {
-	font-size: 12px;
-	color: #999;
-	margin-top: 4px;
-}
-
-/* 삭제 버튼 */
-.noti-delete-btn {
-	flex-shrink: 0;
-	background: none;
-	border: none;
-	color: #ccc;
-	font-size: 16px;
-	cursor: pointer;
-	padding: 4px;
-	border-radius: 4px;
-	transition: color 0.15s;
-}
-
-.noti-delete-btn:hover {
-	color: #e74c3c;
-}
-
-/* 빈 상태 */
-.noti-empty {
-	text-align: center;
-	padding: 60px 20px;
-	color: #aaa;
-	font-size: 15px;
-}
-
-.noti-empty i {
-	font-size: 48px;
-	display: block;
-	margin-bottom: 16px;
-	color: #ddd;
-}
-</style>
+<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/notification.css">
 </head>
 
 <body style="background: #fafafa; font-family: 'Malgun Gothic', sans-serif;">
 
 <div class="app-container">
 	<div class="noti-toolbar">
-		<h2 class="section-title" style="margin: 0; border: none;">알림</h2>
+		<h2 class="section-title is-notification-1">알림</h2>
 		<div class="noti-toolbar-actions">
 			<%-- 읽지 않은 알림이 있을 때만 전체 읽음 버튼 표시 --%>
 			<c:if test="${not empty notifications}">
-				<form action="${ctx}/notification/read-all" method="post" style="margin:0;">
-					<button type="submit" class="btn" style="font-size:13px; padding: 7px 14px;">
+				<form action="${ctx}/notification/read-all" method="post" class="is-notification-2">
+					<button type="submit" class="btn is-notification-3">
 						<i class="fa-solid fa-check-double"></i> 전체 읽음
 					</button>
 				</form>
-				<form action="${ctx}/notification/delete-read" method="post" style="margin:0;">
-					<button type="submit" class="btn btn-danger" style="font-size:13px; padding: 7px 14px;"
+				<form action="${ctx}/notification/delete-read" method="post" class="is-notification-4">
+					<button type="submit" class="btn btn-danger is-notification-5"
 						onclick="return confirm('읽은 알림을 모두 삭제할까요?')">
 						<i class="fa-solid fa-trash"></i> 읽은 알림 삭제
 					</button>
@@ -153,7 +36,7 @@
 		</div>
 	</div>
 
-	<div class="card" style="padding: 0; overflow: hidden;">
+	<div class="card is-notification-6">
 		<c:choose>
 			<c:when test="${empty notifications}">
 				<div class="noti-empty">
@@ -209,14 +92,13 @@
 									</c:if>
 									<fmt:formatDate value="${n.createdTime}" pattern="yyyy.MM.dd HH:mm" />
 									<c:if test="${!n.read}">
-										<span style="color:#f39c12; font-weight:bold; margin-left:6px;">NEW</span>
+										<span class="is-notification-7">NEW</span>
 									</c:if>
 								</div>
 							</div>
 
 							<%-- 단건 삭제 버튼 (li 클릭 이벤트와 분리) --%>
-							<form action="${ctx}/notification/delete" method="post"
-								style="margin:0;" onclick="event.stopPropagation();">
+							<form action="${ctx}/notification/delete" method="post" onclick="event.stopPropagation();" class="is-notification-8">
 								<input type="hidden" name="no" value="${n.notificationNo}">
 								<button type="submit" class="noti-delete-btn" title="삭제">
 									<i class="fa-solid fa-xmark"></i>

@@ -1,0 +1,107 @@
+.order-container {
+	max-width: 720px;
+	margin: 30px auto;
+	padding: 20px;
+	font-family: 'Pretendard', sans-serif;
+}
+
+h2 {
+	font-size: 22px;
+	margin: 0 0 20px;
+}
+
+.section {
+	margin-bottom: 24px;
+}
+
+.section-title {
+	font-size: 15px;
+	font-weight: bold;
+	margin: 0 0 10px;
+}
+
+.card {
+	background: #fff;
+	border: 1px solid #eee;
+	border-radius: 12px;
+	padding: 16px 20px;
+}
+
+.product-summary {
+	display: flex;
+	gap: 14px;
+	align-items: center;
+}
+
+.product-name {
+	font-weight: bold;
+}
+
+.product-price {
+	color: #ff8a3d;
+	font-weight: bold;
+	margin-top: 4px;
+}
+
+.field-row {
+	display: flex;
+	align-items: center;
+	padding: 10px 0;
+	border-bottom: 1px solid #f3f3f3;
+}
+
+.field-row:last-child {
+	border-bottom: none;
+}
+
+.field-label {
+	width: 110px;
+	color: #555;
+	font-size: 14px;
+}
+
+.field-input, .field-textarea {
+	flex: 1;
+	padding: 8px 10px;
+	border: 1px solid #ddd;
+	border-radius: 6px;
+	font-size: 14px;
+	font-family: inherit;
+}
+
+.field-textarea {
+	resize: vertical;
+	min-height: 80px;
+}
+
+.btn-group {
+	display: flex;
+	gap: 10px;
+	margin-top: 20px;
+}
+
+.btn {
+	flex: 1;
+	padding: 14px;
+	border: none;
+	border-radius: 8px;
+	font-size: 15px;
+	font-weight: bold;
+	cursor: pointer;
+}
+
+.btn-primary {
+	background: #121212;
+	color: #fff;
+}
+
+.btn-cancel {
+	background: #f0f0f0;
+	color: #333;
+}
+
+.guide {
+	color: #888;
+	font-size: 13px;
+	margin-top: 6px;
+}

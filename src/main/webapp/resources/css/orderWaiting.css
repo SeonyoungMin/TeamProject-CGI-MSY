@@ -1,0 +1,161 @@
+.waiting-container {
+	max-width: 600px;
+	margin: 40px auto;
+	padding: 20px;
+	font-family: 'Pretendard', sans-serif;
+}
+
+.status-icon {
+	width: 64px;
+	height: 64px;
+	border-radius: 50%;
+	background: #fef3c7;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	margin: 0 auto 16px;
+	font-size: 32px;
+	color: #92400e;
+}
+
+.status-title {
+	text-align: center;
+	font-size: 22px;
+	font-weight: bold;
+	margin: 0 0 8px;
+}
+
+.status-desc {
+	text-align: center;
+	color: #666;
+	line-height: 1.6;
+	margin: 0 0 30px;
+}
+
+.info-card {
+	background: #fff;
+	border: 1px solid #eee;
+	border-radius: 12px;
+	padding: 20px;
+	margin-bottom: 16px;
+}
+
+.info-row {
+	display: flex;
+	justify-content: space-between;
+	padding: 8px 0;
+	font-size: 14px;
+	border-bottom: 1px solid #f5f5f5;
+}
+
+.info-row:last-child {
+	border-bottom: none;
+}
+
+.info-label {
+	color: #888;
+}
+
+.info-value {
+	font-weight: 500;
+}
+
+.account-box {
+	background: #f8f9fa;
+	border-radius: 12px;
+	padding: 16px 20px;
+	margin-bottom: 16px;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+}
+
+.copy-btn {
+	padding: 6px 12px;
+	background: #fff;
+	border: 1px solid #ddd;
+	border-radius: 6px;
+	cursor: pointer;
+	font-size: 13px;
+}
+
+.notice-box {
+	background: #e6f1fb;
+	border-radius: 12px;
+	padding: 14px 18px;
+	margin-bottom: 24px;
+	color: #0c447c;
+	font-size: 13px;
+	line-height: 1.6;
+}
+
+.btn-group {
+	display: flex;
+	gap: 10px;
+}
+
+.btn {
+	flex: 1;
+	padding: 14px;
+	border: none;
+	border-radius: 8px;
+	font-size: 15px;
+	font-weight: bold;
+	cursor: pointer;
+	text-align: center;
+	text-decoration: none;
+}
+
+.btn-line {
+	background: #f0f0f0;
+	color: #555;
+}
+
+.btn-dark {
+	background: #121212;
+	color: #fff;
+}
+
+.is-orderWaiting-1 {
+    font-size: 12px; color: #666; margin-bottom: 4px;
+}
+
+.is-orderWaiting-2 {
+    font-weight: bold; font-size: 15px;
+}
+
+.is-orderWaiting-3 {
+    font-size: 13px; color: #666; margin-top: 2px;
+}
+
+.is-orderWaiting-4 {
+    font-size: 13px; color: #666; margin-bottom: 8px;
+}
+
+.is-orderWaiting-5 {
+    font-weight: 500; margin-bottom: 4px;
+}
+
+.is-orderWaiting-6 {
+    font-size: 13px; color: #666;
+}
+
+.is-orderWaiting-7 {
+    font-size: 13px; color: #666; margin-top: 6px;
+}
+
+.is-orderWaiting-8 {
+    color: #222;
+}
+
+.is-orderWaiting-9 {
+    background: #dcfce7; color: #166534;
+}
+
+.is-orderWaiting-10 {
+    margin: 0 0 10px;
+}
+
+.is-orderWaiting-11 {
+    width: 100% !important;
+}

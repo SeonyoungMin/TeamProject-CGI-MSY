@@ -8,235 +8,7 @@
 <head>
 <meta charset="UTF-8">
 <title>${product.productName}</title>
-<style>
-.detail-container {
-	max-width: 1100px;
-	margin: 30px auto;
-	padding: 20px;
-	font-family: 'Pretendard', sans-serif;
-}
-
-.detail-top {
-	display: flex;
-	gap: 30px;
-	align-items: flex-start;
-}
-
-.detail-image {
-	flex: 1;
-}
-
-.detail-info {
-	flex: 1;
-}
-
-.main-image {
-	width: 100%;
-	height: 400px;
-	background: #f3f3f3;
-	border: 1px solid #eee;
-	border-radius: 8px;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	overflow: hidden;
-}
-
-.main-image img {
-	width: 100%;
-	height: 100%;
-	object-fit: cover;
-}
-
-.thumb-list-wrap {
-	position: relative;
-	margin-top: 10px;
-	display: flex;
-	align-items: center;
-	justify-content: space-between;
-}
-
-.thumb-list {
-	width: 382px;
-	flex-shrink: 0;
-	display: flex;
-	gap: 8px;
-	overflow: hidden;
-	margin: 0 auto;
-}
-
-.thumb-list img {
-	width: 70px;
-	height: 70px;
-	object-fit: cover;
-	border: 1px solid #ddd;
-	border-radius: 4px;
-	cursor: pointer;
-	flex-shrink: 0;
-	transition: 0.2s;
-}
-
-.thumb-list img:hover {
-	opacity: 0.8;
-	border-color: #121212;
-}
-
-.thumb-slide-btn {
-	flex-shrink: 0;
-	width: 28px;
-	height: 70px;
-	cursor: pointer;
-	font-size: 20px;
-	background: none;
-	border: none;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	padding: 0;
-	z-index: 1;
-}
-
-.product-status {
-	display: inline-block;
-	padding: 4px 10px;
-	background: #121212;
-	color: #fff;
-	border-radius: 4px;
-	font-size: 12px;
-}
-
-.product-title {
-	font-size: 24px;
-	font-weight: bold;
-	margin: 10px 0;
-}
-
-.product-price {
-	font-size: 28px;
-	font-weight: bold;
-	margin: 20px 0;
-	align-items: center;
-	display: flex;
-	justify-content: space-between;
-}
-
-.product-meta {
-	color: #666;
-	font-size: 14px;
-	line-height: 1.8;
-	margin-bottom: 20px;
-	width: 100%;
-}
-
-.seller-profile-box {
-	display: flex;
-	align-items: center;
-	justify-content: space-between;
-	padding: 15px 0;
-	border-top: 1px solid #eee;
-	border-bottom: 1px solid #eee;
-	margin: 20px 0;
-}
-
-.seller-info-left {
-	display: flex;
-	align-items: center;
-	gap: 12px;
-}
-
-.seller-name-link {
-	text-decoration: none;
-	color: #121212;
-	font-weight: bold;
-	font-size: 16px;
-}
-
-.seller-name-link:hover {
-	text-decoration: underline;
-}
-
-.btn-order {
-	display: inline-flex;
-	align-items: center;
-	padding: 10px 20px;
-	background-color: #ff9800;
-	color: white !important;
-	text-decoration: none;
-	border-radius: 5px;
-	font-weight: bold;
-	font-size: 14px;
-	box-sizing: border-box;
-}
-
-.btn-order:hover {
-	background-color: #e68a00;
-}
-
-.btn-waitlist {
-	display: inline-flex;
-	align-items: center;
-	gap: 6px;
-	padding: 10px 20px;
-	background-color: #fff;
-	color: #ff9800;
-	border: 1px solid #ff9800;
-	border-radius: 5px;
-	font-weight: bold;
-	font-size: 14px;
-	cursor: pointer;
-	box-sizing: border-box;
-}
-
-.btn-waitlist:hover {
-	background-color: #fff7eb;
-}
-
-.btn-waitlist.waiting {
-	background-color: #ff9800;
-	color: #fff;
-}
-
-.btn-waitlist.waiting:hover {
-	background-color: #e68a00;
-}
-
-.waitlist-count {
-	font-size: 12px;
-	color: #888;
-	margin-left: 6px;
-}
-
-.status-msg {
-	color: #888;
-	font-size: 14px;
-}
-
-#favBtn {
-	padding: 10px 10px;
-	border-radius: 5px;
-	font-size: 14px;
-	box-sizing: border-box;
-	gap: 4px;
-}
-
-.fav-area {
-	margin-top: 20px;
-	display: flex;
-	align-items: center;
-	gap: 10px;
-}
-
-.comment-edit-form {
-	display: none;
-	margin-top: 8px;
-}
-
-.report-line {
-	display: flex;
-	justify-content: space-between;
-	align-items: center;
-}
-</style>
+<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/productDetail.css">
 </head>
 <body>
 
@@ -251,7 +23,7 @@
 							<img id="mainImage" src="${product.imgPath}">
 						</c:if>
 						<c:if test="${empty product.imgPath}">
-							<span style="color: #999;">이미지 없음</span>
+							<span class="is-productDetail-1">이미지 없음</span>
 						</c:if>
 					</div>
 					<c:if test="${not empty product.images}">
@@ -273,8 +45,7 @@
 					<div class="report-line">
 						<div class="product-status">${product.tradeStatus == '판매중' ? '판매중' : product.tradeStatus == '예약중' ? '예약중' : '판매완료'}</div>
 						<c:if test="${not empty reserverNickname}">
-							<span
-								style="font-size: 13px; font-weight: bold; color: #1e40af; margin-left: 6px;">예약자: ${reserverNickname}</span>
+							<span class="is-productDetail-2">예약자: ${reserverNickname}</span>
 						</c:if>
 						<c:if
 							test="${not empty loginUser && loginUser.userNo != product.sellerNo}">
@@ -290,17 +61,16 @@
 
 					<div class="seller-profile-box">
 						<div class="seller-info-left">
-							<div style="display: flex; flex-direction: column;">
+							<div class="is-productDetail-3">
 								<a href="${ctx}/users/search/${product.sellerNo}"
-									class="seller-name-link"> ${product.sellerNickname} </a> <span
-									style="font-size: 12px; color: #888;">판매자 프로필 보기</span>
+									class="seller-name-link"> ${product.sellerNickname} </a> <span class="is-productDetail-4">판매자 프로필 보기</span>
 
 								<c:choose>
 									<c:when test="${not empty seller.verifiedArea}">
-										<span style="font-size: 13px; color: #555; margin-top: 2px;">${seller.verifiedArea}</span>
+										<span class="is-productDetail-5">${seller.verifiedArea}</span>
 									</c:when>
 									<c:otherwise>
-										<span style="font-size: 13px; color: #ccc; margin-top: 2px;">동네
+										<span class="is-productDetail-6">동네
 											미인증</span>
 									</c:otherwise>
 								</c:choose>
@@ -319,7 +89,7 @@
 								<%-- 본인 상품 --%>
 								<c:when
 									test="${not empty loginUser && product.sellerNo == loginUser.userNo}">
-									<span style="color: #e74c3c; font-size: 14px;">본인 상품은
+									<span class="is-productDetail-7">본인 상품은
 										구매할 수 없습니다.</span>
 								</c:when>
 
@@ -391,11 +161,11 @@
 
 						<c:if
 							test="${not empty loginUser && (loginUser.userNo == product.sellerNo || loginUser.userRole == 'ROLE_ADMIN')}">
-							<div style="margin-top: 10px; display: flex; gap: 10px;">
+							<div class="is-productDetail-8">
 								<a class="btn btn-line"
 									href="${ctx}/product/${product.productNo}/edit">수정</a>
 								<form action="${ctx}/product/${product.productNo}/delete"
-									method="post" style="margin: 0; display: contents;">
+									method="post" class="is-productDetail-9">
 									<button type="submit" class="btn btn-danger"
 										onclick="return confirm('삭제하시겠습니까?')">삭제</button>
 								</form>
@@ -404,127 +174,106 @@
 					</div>
 				</div>
 			</div>
-			<div class="card"
-				style="margin-top: 40px; border: 1px solid #e0e0e0; background: #fafafa; padding: 20px; border-radius: 8px;">
+			<div class="card is-productDetail-10">
 
-				<div
-					style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-					<h3 class="section-title"
-						style="color: #121212; display: flex; align-items: center; gap: 8px; margin: 0;">
+				<div class="is-productDetail-11">
+					<h3 class="section-title is-productDetail-12">
 						AI 품질 검증 및 시세 비교</h3>
-					<button type="button" class="btn btn-primary" id="btnAiAnalyze"
-						onclick="startAiAnalysis()"
-						style="border: none; padding: 8px 16px; font-weight: bold;">
+					<button type="button" class="btn btn-primary is-productDetail-13" id="btnAiAnalyze"
+						onclick="startAiAnalysis()">
 						AI 품질 비교·분석 시작</button>
 				</div>
 
-				<div id="aiLoading"
-					style="display: none; text-align: center; padding: 20px 0;">
+				<div id="aiLoading" class="is-productDetail-14">
 					<div class="spinner"></div>
-					<p style="color: #666; font-size: 14px; margin-top: 10px;">AI가
+					<p class="is-productDetail-15">AI가
 						실시간으로 이미지 상태, 본문 신뢰도, 시장 시세를 분석 중입니다...</p>
 				</div>
 
-				<div id="aiResultArea" style="display: none; padding: 10px 0;">
-					<table
-						style="width: 100%; border-collapse: collapse; background: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);">
-						<tr
-							style="background: #121212; color: #ffffff; text-align: center;">
-							<th style="padding: 12px; width: 33%;">외관 상태 등급</th>
-							<th style="padding: 12px; width: 33%;">리스크 탐지</th>
-							<th style="padding: 12px; width: 34%;">재판매 가치</th>
+				<div id="aiResultArea" class="is-productDetail-16">
+					<table class="is-productDetail-17">
+						<tr class="is-productDetail-18">
+							<th class="is-productDetail-19">외관 상태 등급</th>
+							<th class="is-productDetail-20">리스크 탐지</th>
+							<th class="is-productDetail-21">재판매 가치</th>
 						</tr>
-						<tr style="text-align: center; font-size: 15px; color: #333;">
-							<td style="padding: 20px; border-right: 1px solid #eee;"><span
-								id="resGrade"
-								style="font-size: 22px; font-weight: bold; color: #2ecc71;">-</span>
+						<tr class="is-productDetail-22">
+							<td class="is-productDetail-23"><span
+								id="resGrade" class="is-productDetail-24">-</span>
 							</td>
-							<td
-								style="padding: 20px; border-right: 1px solid #eee; text-align: left; font-size: 13px; line-height: 1.5;">
-								<span id="resRisk" style="color: #e74c3c; font-weight: 500;">-</span>
+							<td class="is-productDetail-25">
+								<span id="resRisk" class="is-productDetail-26">-</span>
 							</td>
-							<td
-								style="padding: 20px; font-size: 14px; font-weight: bold; color: #34495e;">
+							<td class="is-productDetail-27">
 								<span id="resValue">-</span>
 							</td>
 						</tr>
 					</table>
 
-					<div
-						style="display: flex; gap: 12px; margin-top: 15px; flex-wrap: wrap;">
+					<div class="is-productDetail-28">
 
-						<div
-							style="flex: 1; min-width: 220px; background: #fff; padding: 15px; border-radius: 6px; border: 1px solid #eee; font-size: 13px; line-height: 1.7;">
-							<strong style="color: #121212;">이미지 분석</strong>
-							<div style="margin-top: 8px; color: #555;">
+						<div class="is-productDetail-29">
+							<strong class="is-productDetail-30">이미지 분석</strong>
+							<div class="is-productDetail-31">
 								상태 설명 : <span id="resImgCondition">-</span><br> 훼손/스크래치 : <span
 									id="resImgDamage">-</span><br> 외관 등급 : <span
-									id="resImgGrade" style="font-weight: bold; color: #2ecc71;">-</span>
+									id="resImgGrade" class="is-productDetail-32">-</span>
 							</div>
 						</div>
 
-						<div
-							style="flex: 1; min-width: 220px; background: #fff; padding: 15px; border-radius: 6px; border: 1px solid #eee; font-size: 13px; line-height: 1.7;">
-							<strong style="color: #121212;">텍스트 분석</strong>
-							<div style="margin-top: 8px; color: #555;">
+						<div class="is-productDetail-33">
+							<strong class="is-productDetail-34">텍스트 분석</strong>
+							<div class="is-productDetail-35">
 								과장 여부 : <span id="resTxtExag">-</span><br> 신뢰도 : <span
-									id="resTxtTrust" style="font-weight: bold;">-</span><br>
+									id="resTxtTrust" class="is-productDetail-36">-</span><br>
 								도용 가능성 : <span id="resTxtPlag">-</span>
 							</div>
 						</div>
 
-						<div
-							style="flex: 1; min-width: 220px; background: #fff; padding: 15px; border-radius: 6px; border: 1px solid #eee; font-size: 13px; line-height: 1.7;">
-							<strong style="color: #121212;">시세 비교 (네이버 쇼핑 기반)</strong>
-							<div id="resSimList"
-								style="margin-top: 8px; color: #555; word-break: break-all; overflow-wrap: anywhere;">-</div>
+						<div class="is-productDetail-37">
+							<strong class="is-productDetail-38">시세 비교 (네이버 쇼핑 기반)</strong>
+							<div id="resSimList" class="is-productDetail-39">-</div>
 						</div>
 					</div>
 
-					<div
-						style="margin-top: 15px; background: #fff; padding: 15px; border-radius: 6px; border: 1px solid #eee; font-size: 13.5px; line-height: 1.6; color: #555;">
+					<div class="is-productDetail-40">
 						<strong> AI 분석 총평 :</strong> <span id="resComment">-</span>
 					</div>
 				</div>
 			</div>
-			<div class="card" id="commentSection" style="margin-top: 40px;">
+			<div class="card is-productDetail-41" id="commentSection">
 				<h3 class="section-title">댓글</h3>
 
 				<%-- 댓글 목록 --%>
 				<div id="commentList">
 					<c:choose>
 						<c:when test="${empty comments}">
-							<div style="color: #999; padding: 10px 0;">아직 댓글이 없습니다.</div>
+							<div class="is-productDetail-42">아직 댓글이 없습니다.</div>
 						</c:when>
 						<c:otherwise>
 							<c:forEach var="c" items="${comments}">
-								<div class="comment-item"
-									style="border-bottom: 1px solid #eee; padding: 10px 0;
-									${c.parentCommentNo > 0 ? 'margin-left: 30px; background: #fafafa; padding-left: 12px; border-left: 3px solid #eee;' : ''}">
+								<div class="comment-item is-productDetail-43">
 
 									<c:if test="${c.parentCommentNo > 0}">
-										<span style="color: #aaa; font-size: 13px; margin-right: 4px;">↳</span>
+										<span class="is-productDetail-44">↳</span>
 									</c:if>
 
-									<span class="comment-author"
-										style="font-weight: bold; font-size: 14px;"> ${empty c.nickname ? '익명' : c.nickname}
+									<span class="comment-author is-productDetail-45"> ${empty c.nickname ? '익명' : c.nickname}
 									</span>
 									<c:if test="${c.isSecret == 1}">
-										<span style="font-size: 11px; color: #888; margin-left: 4px;">🔒
+										<span class="is-productDetail-46">🔒
 											비밀댓글</span>
 									</c:if>
-									<span class="comment-date"
-										style="font-size: 12px; color: #999; margin-left: 8px;">${c.createdTime}</span>
+									<span class="comment-date is-productDetail-47">${c.createdTime}</span>
 
 									<c:choose>
 										<c:when
 											test="${c.isSecret == 1 && loginUser.userNo != c.authorNo && loginUser.userNo != product.sellerNo && loginUser.userRole != 'ROLE_ADMIN'}">
-											<div class="comment-content"
-												style="margin: 5px 0; color: #aaa; font-style: italic;">비밀
+											<div class="comment-content is-productDetail-48">비밀
 												댓글입니다.</div>
 										</c:when>
 										<c:otherwise>
-											<div class="comment-content" style="margin: 5px 0;">${c.content}</div>
+											<div class="comment-content is-productDetail-49">${c.content}</div>
 										</c:otherwise>
 									</c:choose>
 									<c:if test="${c.authorNo == loginUser.userNo}">
@@ -533,68 +282,56 @@
 												method="post">
 												<input type="hidden" name="boardNo"
 													value="${product.productNo}">
-												<div
-													style="display: flex; gap: 6px; align-items: flex-start;">
-													<textarea name="content" class="form-input"
-														style="flex: 1; height: 60px; margin: 0; font-size: 13px;"
+												<div class="is-productDetail-50">
+													<textarea name="content" class="form-input is-productDetail-51"
 														required>${c.content}</textarea>
-													<button type="submit" class="btn btn-primary"
-														style="padding: 6px 12px; font-size: 13px; white-space: nowrap;">저장</button>
-													<button type="button" class="btn"
-														style="padding: 6px 12px; font-size: 13px; white-space: nowrap;"
+													<button type="submit" class="btn btn-primary is-productDetail-52">저장</button>
+													<button type="button" class="btn is-productDetail-53"
 														onclick="toggleEditForm(${c.commentNo})">취소</button>
 												</div>
 											</form>
 										</div>
 									</c:if>
 
-									<div style="display: flex; gap: 8px; margin-top: 4px;">
+									<div class="is-productDetail-54">
 										<c:if
 											test="${c.authorNo == loginUser.userNo || loginUser.userRole == 'ROLE_ADMIN'}">
 											<c:if test="${c.authorNo == loginUser.userNo}">
 												<button type="button"
-													style="font-size: 12px; background: none; border: none; color: #888; cursor: pointer; padding: 0;"
-													onclick="toggleEditForm(${c.commentNo})">수정</button>
+													onclick="toggleEditForm(${c.commentNo})" class="is-productDetail-55">수정</button>
 											</c:if>
 											<form
 												action="${ctx}/comment/${c.commentNo}/delete#commentSection"
-												method="post" style="margin: 0;">
+												method="post" class="is-productDetail-56">
 												<input type="hidden" name="boardNo"
 													value="${product.productNo}">
 												<button type="submit"
-													style="font-size: 12px; background: none; border: none; color: #e74c3c; cursor: pointer; padding: 0;"
-													onclick="return confirm('삭제하시겠습니까?')">삭제</button>
+													onclick="return confirm('삭제하시겠습니까?')" class="is-productDetail-57">삭제</button>
 											</form>
 										</c:if>
 
 										<c:if test="${not empty loginUser && c.parentCommentNo == 0}">
 											<button type="button"
-												style="font-size: 12px; background: none; border: none; color: #3498db; cursor: pointer; padding: 0;"
-												onclick="toggleReplyForm(${c.commentNo})">답글</button>
+												onclick="toggleReplyForm(${c.commentNo})" class="is-productDetail-58">답글</button>
 										</c:if>
 									</div>
 
 									<c:if test="${not empty loginUser && c.parentCommentNo == 0}">
-										<div id="replyForm_${c.commentNo}"
-											style="display: none; margin-top: 10px;">
+										<div id="replyForm_${c.commentNo}" class="is-productDetail-59">
 											<form action="${ctx}/comment/add#commentSection"
 												method="post">
 												<input type="hidden" name="boardNo"
 													value="${product.productNo}"> <input type="hidden"
 													name="targetType" value="PRODUCT"> <input
 													type="hidden" name="parentCommentNo" value="${c.commentNo}">
-												<textarea name="content" class="form-input"
-													style="flex: 1; height: 60px; margin: 0; font-size: 13px;"
+												<textarea name="content" class="form-input is-productDetail-60"
 													placeholder="답글을 입력하세요" required></textarea>
 
-												<div
-													style="display: flex; gap: 6px; align-items: flex-start; justify-content: space-between;">
-													<label
-														style="font-size: 12px; color: #555; cursor: pointer; white-space: nowrap;">
+												<div class="is-productDetail-61">
+													<label class="is-productDetail-62">
 														<input type="checkbox" name="isSecret" value="1">비밀답글
 													</label>
-													<button type="submit" class="btn btn-primary"
-														style="padding: 6px 12px; font-size: 13px; white-space: nowrap;">등록</button>
+													<button type="submit" class="btn btn-primary is-productDetail-63">등록</button>
 												</div>
 											</form>
 										</div>
@@ -607,22 +344,19 @@
 
 				<c:choose>
 					<c:when test="${empty loginUser}">
-						<div style="color: #888; margin-top: 16px;">
+						<div class="is-productDetail-64">
 							<a href="${ctx}/login">댓글을 작성하려면 로그인이 필요합니다.</a>
 						</div>
 					</c:when>
 					<c:otherwise>
-						<form action="${ctx}/comment/add#commentSection" method="post"
-							style="margin-top: 20px;">
+						<form action="${ctx}/comment/add#commentSection" method="post" class="is-productDetail-65">
 							<input type="hidden" name="boardNo" value="${product.productNo}">
 							<input type="hidden" name="targetType" value="PRODUCT"> <input
 								type="hidden" name="parentCommentNo" value="0">
-							<textarea class="form-input" name="content"
-								style="width: 100%; height: 80px; margin-bottom: 8px;"
+							<textarea class="form-input is-productDetail-66" name="content"
 								placeholder="댓글을 입력하세요" required></textarea>
-							<div
-								style="display: flex; justify-content: space-between; align-items: center;">
-								<label style="font-size: 13px; color: #555; cursor: pointer;">
+							<div class="is-productDetail-67">
+								<label class="is-productDetail-68">
 									<input type="checkbox" name="isSecret" value="1"> 비밀댓글
 								</label>
 								<button type="submit" class="btn btn-primary">댓글 등록</button>
@@ -727,7 +461,7 @@
         $("#aiResultArea").hide();
         $("#aiLoading").html(
             '<div class="spinner"></div>' +
-            '<p style="color: #666; font-size: 14px; margin-top: 10px;">AI가 실시간으로 이미지 상태, 본문 신뢰도, 시장 시세를 분석 중입니다...</p>'
+            '<p class="is-productDetail-69">AI가 실시간으로 이미지 상태, 본문 신뢰도, 시장 시세를 분석 중입니다...</p>'
         ).fadeIn(300);
 
         $.ajax({
@@ -778,10 +512,10 @@
                         $("#resSimList").text("유사 상품을 찾지 못했습니다.");
                     } else {
                         simList.forEach(function(p) {
-                            var row = $('<div style="margin-bottom: 6px;"></div>');
-                            var a = $('<a target="_blank" rel="noopener" style="color: #2962ff; text-decoration: none;"></a>')
+                            var row = $('<div class="is-productDetail-70"></div>');
+                            var a = $('<a target="_blank" rel="noopener" class="is-productDetail-71"></a>')
                                 .attr("href", p.link || "#").text(p.name || "상품");
-                            var price = $('<span style="font-weight: bold; color: #ff9800;"></span>').text(won(p.price));
+                            var price = $('<span class="is-productDetail-72"></span>').text(won(p.price));
                             row.append(a).append("<br>").append(price).append(" 원");
                             $("#resSimList").append(row);
                         });
@@ -792,12 +526,12 @@
                     $("#btnAiAnalyze").prop("disabled", false).html('<i class="fa-solid fa-arrows-rotate"></i> AI 품질 재분석하기');
 
                 } catch (jsonError) {
-                    $("#aiLoading").html('<p style="color: #e74c3c; font-size: 14px; padding: 10px 0;">AI 데이터를 화면에 표시하는 중 오류가 발생했습니다.</p>');
+                    $("#aiLoading").html('<p class="is-productDetail-73">AI 데이터를 화면에 표시하는 중 오류가 발생했습니다.</p>');
                     $("#btnAiAnalyze").prop("disabled", false).text("AI 품질 비교·분석 시작");
                 }
             },
             error : function(xhr, status, error) {
-                $("#aiLoading").html('<p style="color: #e74c3c; font-size: 14px; padding: 10px 0;">서버 응답 에러가 발생했습니다. (Status: ' + xhr.status + ')</p>');
+                $("#aiLoading").html('<p class="is-productDetail-74">서버 응답 에러가 발생했습니다. (Status: ' + xhr.status + ')</p>');
                 $("#btnAiAnalyze").prop("disabled", false).text("AI 품질 비교·분석 시작");
             }
         });

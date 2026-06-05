@@ -1,0 +1,19 @@
+.is-login-1 {
+    max-width: 480px;
+}
+
+.is-login-2 {
+    margin-top: 15px; text-align: center; font-size: 13px;
+}
+
+.is-login-3 {
+    font-weight: bold;
+}
+
+.is-login-4 {
+    display: block; padding: 10px; background: #4285f4; color: #fff; text-align: center; border-radius: 4px; margin-top: 10px;
+}
+
+.is-login-5 {
+    display: block; padding: 10px; background: #FEE500; color: #000; text-align: center; border-radius: 4px; margin-top: 10px; font-weight: bold;
+}

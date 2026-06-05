@@ -7,6 +7,7 @@
 <head>
 <meta charset="UTF-8">
 <title>가계부</title>
+<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/accountList.css">
 </head>
 <body>
 	<%@ include file="/WEB-INF/views/header.jsp"%>
@@ -16,39 +17,33 @@
 
 		<c:choose>
 			<c:when test="${empty list}">
-				<div class="card" style="text-align: center; color: #888;">구매
+				<div class="card is-accountList-1">구매
 					완료된 내역이 없습니다.</div>
 			</c:when>
 			<c:otherwise>
 				<c:forEach var="a" items="${list}">
-					<div class="card"
-						style="display: flex; justify-content: space-between; align-items: center; gap: 15px;">
-						<div
-							style="display: flex; align-items: center; gap: 8px; flex: 1;">
-							<div style="font-weight: 600;">${a.productName}</div>
-							<span style="color: #ddd;">|</span>
-							<div style="font-weight: bold;">${a.price}원</div>
+					<div class="card is-accountList-2">
+						<div class="is-accountList-3">
+							<div class="is-accountList-4">${a.productName}</div>
+							<span class="is-accountList-5">|</span>
+							<div class="is-accountList-6">${a.price}원</div>
 							<c:if test="${not empty a.memo}">
-								<span style="color: #ddd;">|</span>
-								<div style="font-size: 13px; color: #555;"
-									class="memo-text-preview">${a.memo}</div>
+								<span class="is-accountList-7">|</span>
+								<div
+									class="memo-text-preview is-accountList-8">${a.memo}</div>
 							</c:if>
-							<div style="font-size: 12px; color: #888; margin-left: auto;">${a.createdTime}</div>
+							<div class="is-accountList-9">${a.createdTime}</div>
 						</div>
 
-						<div class="memo-wrap" data-order-no="${a.orderNo}"
-							style="display: flex; align-items: center; gap: 5px;">
+						<div class="memo-wrap is-accountList-10" data-order-no="${a.orderNo}">
 							<c:choose>
 								<c:when test="${not empty a.memo}">
-									<button type="button" class="btn memo-edit-btn"
-										style="padding: 5px 14px; font-size: 13px;">수정</button>
+									<button type="button" class="btn memo-edit-btn is-accountList-11">수정</button>
 								</c:when>
 								<c:otherwise>
-									<input type="text" class="form-input memo-input"
-										placeholder="메모를 입력하세요"
-										style="margin: 0; font-size: 13px; min-width: 200px;">
-									<button type="button" class="btn memo-save-btn"
-										style="padding: 5px 14px; font-size: 13px;">저장</button>
+									<input type="text" class="form-input memo-input is-accountList-12"
+										placeholder="메모를 입력하세요">
+									<button type="button" class="btn memo-save-btn is-accountList-13">저장</button>
 								</c:otherwise>
 							</c:choose>
 						</div>
@@ -59,17 +54,15 @@
 
 		<!-- 페이징 -->
 		<c:if test="${not empty totalPage and totalPage > 0}">
-			<div
-				style="text-align: center; margin-top: 20px; display: flex; justify-content: center; gap: 8px;">
+			<div class="is-accountList-14">
 				<c:forEach var="i" begin="1" end="${totalPage}">
 					<c:choose>
 						<c:when test="${i == currentPage}">
-							<strong
-								style="padding: 5px 12px; background: #121212; color: #fff; border-radius: 4px;">${i}</strong>
+							<strong class="is-accountList-15">${i}</strong>
 						</c:when>
 						<c:otherwise>
 							<a href="<c:url value='/accountList?pageNum=${i}'/>"
-								style="padding: 5px 12px; border: 1px solid #ddd; text-decoration: none; color: #333; border-radius: 4px;">${i}</a>
+								class="is-accountList-21">${i}</a>
 						</c:otherwise>
 					</c:choose>
 				</c:forEach>
@@ -89,9 +82,9 @@
 							var currentMemo = $wrap.find('.memo-text').text();
 
 							$wrap
-									.html('<input type="text" class="form-input memo-input" value="' + currentMemo + '" ' +
-        'style="margin: 0; font-size: 13px; min-width: 200px;">'
-											+ '<button type="button" class="btn memo-save-btn" style="padding: 5px 14px; font-size: 13px;">저장</button>');
+									.html('<input type="text" class="form-input memo-input is-accountList-16" value="' + currentMemo + '" ' +
+        '>'
+											+ '<button type="button" class="btn memo-save-btn is-accountList-17">저장</button>');
 							$wrap.find('.memo-input').focus();
 						});
 
@@ -120,7 +113,7 @@
 										    if (res === 'success') {
 										        // 기존 코드 지우고 이걸로 교체
 										        $wrap.html(
-										            '<button type="button" class="btn memo-edit-btn" style="padding: 5px 14px; font-size: 13px;">수정</button>'
+										            '<button type="button" class="btn memo-edit-btn is-accountList-18">수정</button>'
 										        );
 										        var $card = $wrap.closest('.card');
 										        var $preview = $card.find('.memo-text-preview');
@@ -128,7 +121,7 @@
 										            $preview.text(memo);
 										        } else {
 										            $card.find('[style*="font-weight: bold"]').first()
-										                .after('<span style="color: #ddd;">|</span><div style="font-size: 13px; color: #555;" class="memo-text-preview">' + memo + '</div>');
+										                .after('<span class="is-accountList-19">|</span><div class="memo-text-preview is-accountList-20">' + memo + '</div>');
 										        }
 										    },
 										error : function() {

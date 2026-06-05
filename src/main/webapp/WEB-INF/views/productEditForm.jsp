@@ -7,12 +7,13 @@
 <head>
 <meta charset="UTF-8">
 <title>상품 수정</title>
+<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/productEditForm.css">
 </head>
 <body>
 
 	<%@ include file="/WEB-INF/views/header.jsp"%>
 
-	<div class="app-container" style="max-width: 700px;">
+	<div class="app-container is-productEditForm-1">
 
 		<h2 class="section-title">상품 수정</h2>
 
@@ -57,40 +58,32 @@
 			<!-- 등록된 이미지 목록 -->
 			<c:if test="${not empty product.images}">
 				<h3 class="section-title">등록된 이미지</h3>
-				<div
-					style="display: flex; gap: 15px; flex-wrap: wrap; margin-bottom: 20px;">
+				<div class="is-productEditForm-2">
 					<c:forEach var="img" items="${product.images}">
-						<div style="text-align: center; width: 120px; flex: 0 0 auto;">
-							<img src="	${img.filePath}"
-								style="width: 120px; height: 120px; object-fit: cover; border: 1px solid #ddd; border-radius: 4px;">
-							<div
-								style="margin-top: 6px; display: flex; flex-direction: column; gap: 4px; align-items: center;">
+						<div class="is-productEditForm-3">
+							<img src="	${img.filePath}" class="is-productEditForm-4">
+							<div class="is-productEditForm-5">
 
 								<c:if test="${img.thumbnail}">
-									<span
-										style="font-size: 12px; color: #121212; font-weight: bold;">★
+									<span class="is-productEditForm-6">★
 										대표 이미지</span>
-									<button type="button" class="btn"
-										style="font-size: 12px; padding: 4px 10px;"
+									<button type="button" class="btn is-productEditForm-7"
 										onclick="alert('대표 이미지는 삭제할 수 없습니다.')">삭제</button>
 								</c:if>
 
 								<c:if test="${not img.thumbnail}">
 									<form action="${ctx}/product/${product.productNo}/thumbnail"
-										method="post" style="margin: 0;">
+										method="post" class="is-productEditForm-8">
 										<input type="hidden" name="imageNo" value="${img.imageNo}">
-										<button type="submit" class="btn"
-											style="font-size: 12px; padding: 4px 10px;">대표로 지정</button>
+										<button type="submit" class="btn is-productEditForm-9">대표로 지정</button>
 									</form>
 									<form id="deleteSection"
-										action="${ctx}/images/delete#deleteSection" method="post"
-										style="margin: 0;">
+										action="${ctx}/images/delete#deleteSection" method="post" class="is-productEditForm-10">
 										<input type="hidden" name="imageNo" value="${img.imageNo}">
 										<input type="hidden" name="entityType" value="product">
 										<input type="hidden" name="entityId"
 											value="${product.productNo}">
-										<button type="submit" class="btn btn-danger"
-											style="font-size: 12px; padding: 4px 10px;"
+										<button type="submit" class="btn btn-danger is-productEditForm-11"
 											onclick="return confirm('이미지를 삭제하시겠습니까?')">삭제</button>
 									</form>
 								</c:if>
@@ -102,28 +95,26 @@
 			</c:if>
 
 			<!-- 이미지 추가 form -->
-			<hr style="margin: 20px 0;">
+			<hr class="is-productEditForm-12">
 			<div id="imgSection"></div>
 			<form
 				action="${ctx}/product/${product.productNo}/addImage#imgSection"
 				method="post" enctype="multipart/form-data">
 
-				<div
-					style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-					<label style="margin: 0; font-weight: bold;">이미지 추가</label>
+				<div class="is-productEditForm-13">
+					<label class="is-productEditForm-14">이미지 추가</label>
 					<button type="submit" class="btn btn-primary">사진 추가</button>
 				</div>
 
 				<input type="file" class="form-input" name="imgFiles" multiple
 					onchange="previewImages(this)">
-				<div id="preview-container"
-					style="display: flex; gap: 10px; flex-wrap: wrap; margin-top: 10px;"></div>
+				<div id="preview-container" class="is-productEditForm-15"></div>
 			</form>
 
 		</div>
 
 		<!-- 수정 완료 / 취소 버튼 (맨 아래) -->
-		<div style="margin-top: 20px; display: flex; gap: 10px;">
+		<div class="is-productEditForm-16">
 			<button type="button" class="btn btn-primary btn-block"
 				onclick="document.getElementById('editForm').submit()">수정
 				완료</button>

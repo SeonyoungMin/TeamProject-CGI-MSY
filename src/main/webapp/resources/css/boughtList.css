@@ -1,0 +1,106 @@
+.bought-grid {
+	display: grid;
+	grid-template-columns: repeat(5, 1fr);
+	gap: 14px;
+}
+
+.bought-card {
+	border: 1px solid #eee;
+	border-radius: 10px;
+	overflow: hidden;
+	cursor: pointer;
+	background: #fff;
+	transition: 0.2s;
+}
+
+.bought-card:hover {
+	transform: translateY(-3px);
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.bought-thumb {
+	height: 140px;
+	background: #f4f4f4;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	overflow: hidden;
+}
+
+.bought-thumb img {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+}
+
+.bought-info {
+	padding: 10px 12px;
+}
+
+.bought-name {
+	font-weight: bold;
+	font-size: 13px;
+	margin-bottom: 5px;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.bought-price {
+	color: #ff8a3d;
+	font-weight: bold;
+	font-size: 14px;
+}
+
+.bought-status {
+	font-size: 12px;
+	color: #999;
+	margin-top: 5px;
+}
+
+.bought-pagination {
+	text-align: center;
+	margin-top: 28px;
+	display: flex;
+	justify-content: center;
+	gap: 8px;
+}
+
+.bought-pagination a {
+	padding: 5px 12px;
+	border: 1px solid #ddd;
+	text-decoration: none;
+	color: #333;
+	border-radius: 4px;
+	background: #fff;
+}
+
+.bought-pagination .current {
+	background: #121212;
+	color: #fff;
+	border-color: #121212;
+}
+
+.is-boughtList-1 {
+    display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 2px solid #121212; padding-bottom: 10px;
+}
+
+.is-boughtList-2 {
+    margin: 0; border-bottom: none !important;
+}
+
+.is-boughtList-3 {
+    font-size: 14px; color: #999; font-weight: normal;
+}
+
+.is-boughtList-4 {
+    font-size: 14px; color: #666;
+}
+
+.is-boughtList-5 {
+    text-align: center; color: #999; padding: 40px;
+}
+
+.is-boughtList-6 {
+    color: #ccc;
+}

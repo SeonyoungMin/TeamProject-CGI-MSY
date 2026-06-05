@@ -7,12 +7,13 @@
 <head>
 <meta charset="UTF-8">
 <title>회원가입</title>
+<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/signup.css">
 </head>
 <body>
 
 <%@ include file="/WEB-INF/views/header.jsp"%>
 
-<div class="app-container" style="max-width:600px;">
+<div class="app-container is-signup-1">
 
 	<h2 class="section-title">회원가입</h2>
 
@@ -59,8 +60,8 @@
 
 		<button type="submit" class="btn btn-primary btn-block">회원가입 완료</button>
 
-		<div style="margin-top:15px; text-align:center; font-size:13px;">
-			이미 계정이 있으신가요? <a href="${ctx}/login" style="font-weight:bold;">로그인</a>
+		<div class="is-signup-2">
+			이미 계정이 있으신가요? <a href="${ctx}/login" class="is-signup-3">로그인</a>
 		</div>
 	</form>
 

@@ -8,125 +8,7 @@
 <head>
 <meta charset="UTF-8">
 <title>입금 대기 중</title>
-<style>
-.waiting-container {
-	max-width: 600px;
-	margin: 40px auto;
-	padding: 20px;
-	font-family: 'Pretendard', sans-serif;
-}
-
-.status-icon {
-	width: 64px;
-	height: 64px;
-	border-radius: 50%;
-	background: #fef3c7;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	margin: 0 auto 16px;
-	font-size: 32px;
-	color: #92400e;
-}
-
-.status-title {
-	text-align: center;
-	font-size: 22px;
-	font-weight: bold;
-	margin: 0 0 8px;
-}
-
-.status-desc {
-	text-align: center;
-	color: #666;
-	line-height: 1.6;
-	margin: 0 0 30px;
-}
-
-.info-card {
-	background: #fff;
-	border: 1px solid #eee;
-	border-radius: 12px;
-	padding: 20px;
-	margin-bottom: 16px;
-}
-
-.info-row {
-	display: flex;
-	justify-content: space-between;
-	padding: 8px 0;
-	font-size: 14px;
-	border-bottom: 1px solid #f5f5f5;
-}
-
-.info-row:last-child {
-	border-bottom: none;
-}
-
-.info-label {
-	color: #888;
-}
-
-.info-value {
-	font-weight: 500;
-}
-
-.account-box {
-	background: #f8f9fa;
-	border-radius: 12px;
-	padding: 16px 20px;
-	margin-bottom: 16px;
-	display: flex;
-	justify-content: space-between;
-	align-items: center;
-}
-
-.copy-btn {
-	padding: 6px 12px;
-	background: #fff;
-	border: 1px solid #ddd;
-	border-radius: 6px;
-	cursor: pointer;
-	font-size: 13px;
-}
-
-.notice-box {
-	background: #e6f1fb;
-	border-radius: 12px;
-	padding: 14px 18px;
-	margin-bottom: 24px;
-	color: #0c447c;
-	font-size: 13px;
-	line-height: 1.6;
-}
-
-.btn-group {
-	display: flex;
-	gap: 10px;
-}
-
-.btn {
-	flex: 1;
-	padding: 14px;
-	border: none;
-	border-radius: 8px;
-	font-size: 15px;
-	font-weight: bold;
-	cursor: pointer;
-	text-align: center;
-	text-decoration: none;
-}
-
-.btn-line {
-	background: #f0f0f0;
-	color: #555;
-}
-
-.btn-dark {
-	background: #121212;
-	color: #fff;
-}
-</style>
+<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/orderWaiting.css">
 </head>
 <body>
 
@@ -159,32 +41,31 @@
 
 		<div class="account-box">
 			<div>
-				<div style="font-size: 12px; color: #666; margin-bottom: 4px;">입금
+				<div class="is-orderWaiting-1">입금
 					계좌</div>
-				<div style="font-weight: bold; font-size: 15px;" id="accountInfo">
+				<div id="accountInfo" class="is-orderWaiting-2">
 					${seller.userBankName} ${seller.userAccountNumber}</div>
-				<div style="font-size: 13px; color: #666; margin-top: 2px;">
+				<div class="is-orderWaiting-3">
 					예금주: ${seller.userAccountHolder}</div>
 			</div>
 			<button type="button" class="copy-btn" onclick="copyAccount()">복사</button>
 		</div>
 
 		<div class="info-card">
-			<div style="font-size: 13px; color: #666; margin-bottom: 8px;">배송지</div>
-			<div style="font-weight: 500; margin-bottom: 4px;">
+			<div class="is-orderWaiting-4">배송지</div>
+			<div class="is-orderWaiting-5">
 				${order.receiverName} · ${order.receiverPhone}</div>
-			<div style="font-size: 13px; color: #666;">(${order.zipCode})
+			<div class="is-orderWaiting-6">(${order.zipCode})
 				${order.address} ${order.addressDetail}</div>
 			<c:if test="${not empty order.deliveryRequest}">
-				<div style="font-size: 13px; color: #666; margin-top: 6px;">
-					요청사항: <span style="color: #222;">${order.deliveryRequest}</span>
+				<div class="is-orderWaiting-7">
+					요청사항: <span class="is-orderWaiting-8">${order.deliveryRequest}</span>
 				</div>
 			</c:if>
 		</div>
 
 		<c:if test="${param.notified == '1'}">
-			<div class="notice-box"
-				style="background: #dcfce7; color: #166534;">
+			<div class="notice-box is-orderWaiting-9">
 				✓ 송금 완료 알림이 판매자에게 전달되었습니다.
 			</div>
 		</c:if>
@@ -194,9 +75,8 @@
 			· 송금을 마쳤다면 아래 <strong>송금 완료 알리기</strong> 버튼을 눌러주세요. 판매자가 확인 후 거래를 완료합니다.
 		</div>
 
-		<form action="${ctx}/order/${order.orderNo}/notify-deposit" method="post"
-			style="margin: 0 0 10px;">
-			<button type="submit" class="btn btn-dark" style="width: 100%;">송금 완료 알리기</button>
+		<form action="${ctx}/order/${order.orderNo}/notify-deposit" method="post" class="is-orderWaiting-10">
+			<button type="submit" class="btn btn-dark is-orderWaiting-11">송금 완료 알리기</button>
 		</form>
 
 		<div class="btn-group">

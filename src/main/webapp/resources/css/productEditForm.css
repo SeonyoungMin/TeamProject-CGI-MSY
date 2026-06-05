@@ -1,0 +1,63 @@
+.is-productEditForm-1 {
+    max-width: 700px;
+}
+
+.is-productEditForm-2 {
+    display: flex; gap: 15px; flex-wrap: wrap; margin-bottom: 20px;
+}
+
+.is-productEditForm-3 {
+    text-align: center; width: 120px; flex: 0 0 auto;
+}
+
+.is-productEditForm-4 {
+    width: 120px; height: 120px; object-fit: cover; border: 1px solid #ddd; border-radius: 4px;
+}
+
+.is-productEditForm-5 {
+    margin-top: 6px; display: flex; flex-direction: column; gap: 4px; align-items: center;
+}
+
+.is-productEditForm-6 {
+    font-size: 12px !important; color: #121212; font-weight: bold;
+}
+
+.is-productEditForm-7 {
+    font-size: 12px !important; padding: 4px 10px !important;
+}
+
+.is-productEditForm-8 {
+    margin: 0;
+}
+
+.is-productEditForm-9 {
+    font-size: 12px !important; padding: 4px 10px !important;
+}
+
+.is-productEditForm-10 {
+    margin: 0;
+}
+
+.is-productEditForm-11 {
+    font-size: 12px !important; padding: 4px 10px !important;
+}
+
+.is-productEditForm-12 {
+    margin: 20px 0;
+}
+
+.is-productEditForm-13 {
+    display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;
+}
+
+.is-productEditForm-14 {
+    margin: 0; font-weight: bold;
+}
+
+.is-productEditForm-15 {
+    display: flex; gap: 10px; flex-wrap: wrap; margin-top: 10px;
+}
+
+.is-productEditForm-16 {
+    margin-top: 20px; display: flex; gap: 10px;
+}

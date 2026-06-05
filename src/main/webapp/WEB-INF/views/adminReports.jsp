@@ -8,105 +8,7 @@
 <head>
 <meta charset="UTF-8">
 <title>신고 관리</title>
-<style>
-.report-container {
-	max-width: 1300px;
-	margin: 30px auto;
-	padding: 20px;
-	font-family: 'Pretendard', sans-serif;
-}
-
-.tab-bar {
-	display: flex;
-	gap: 8px;
-	margin-bottom: 20px;
-	border-bottom: 2px solid #eee;
-	padding-bottom: 10px;
-}
-
-.tab-btn {
-	padding: 8px 18px;
-	border: 1px solid #ddd;
-	border-radius: 4px;
-	background: #fff;
-	color: #555;
-	font-size: 14px;
-	cursor: pointer;
-	text-decoration: none;
-}
-
-.tab-btn.active {
-	background: #121212;
-	color: #fff;
-	border-color: #121212;
-}
-
-.report-table {
-	width: 100%;
-	border-collapse: collapse;
-	font-size: 14px;
-	table-layout: fixed;
-}
-
-.report-table th {
-	background: #f5f5f5;
-	padding: 12px;
-	text-align: center;
-	border-bottom: 2px solid #ddd;
-	font-weight: bold;
-	color: #333;
-}
-
-.report-table td {
-	padding: 12px;
-	border-bottom: 1px solid #eee;
-	vertical-align: middle;
-	text-align: center;
-}
-
-.report-table tr:hover td {
-	background: #fafafa;
-}
-
-.status-badge {
-	display: inline-block;
-	padding: 3px 10px;
-	border-radius: 12px;
-	font-size: 12px;
-	font-weight: bold;
-}
-
-.status-pending {
-	background: #fff3cd;
-	color: #856404;
-}
-
-.status-done {
-	background: #d4edda;
-	color: #155724;
-}
-
-.ai-high {
-	color: #e74c3c;
-	font-weight: bold;
-}
-
-.ai-suspicious {
-	color: #e67e22;
-	font-weight: bold;
-}
-
-.ai-clean {
-	color: #27ae60;
-}
-
-.empty-msg {
-	text-align: center;
-	padding: 40px 0;
-	color: #bbb;
-	font-size: 15px;
-}
-</style>
+<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/adminReports.css">
 </head>
 <body>
 	<%@ include file="/WEB-INF/views/header.jsp"%>
@@ -114,9 +16,8 @@
 	<div class="report-container">
 		<h2 class="section-title">신고 관리</h2>
 
-		<div
-			style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-			<div class="tab-bar" style="margin-bottom: 0;">
+		<div class="is-adminReports-1">
+			<div class="tab-bar is-adminReports-2">
 				<a href="${ctx}/admin/reports"
 					class="tab-btn ${empty selectedType ? 'active' : ''}">전체</a> <a
 					href="${ctx}/admin/reports?type=user"
@@ -127,8 +28,7 @@
 					class="tab-btn ${'board' eq selectedType ? 'active' : ''}">게시글
 					신고</a>
 			</div>
-			<select onchange="location.href=this.value"
-				style="padding: 8px 12px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px; cursor: pointer;">
+			<select onchange="location.href=this.value" class="is-adminReports-3">
 				<option value="${ctx}/admin/reports"
 					${empty selectedStatus ? 'selected' : ''}>전체</option>
 				<option value="${ctx}/admin/reports?status=대기"
@@ -200,7 +100,7 @@
 											<c:otherwise>${r.reasonType}</c:otherwise>
 										</c:choose>
 									</div> <c:if test="${not empty r.reasonDetail}">
-										<div style="font-size: 12px; color: #888; margin-top: 3px;">${r.reasonDetail}</div>
+										<div class="is-adminReports-4">${r.reasonDetail}</div>
 									</c:if>
 								</td>
 								<%-- 위험 점수: 건별 ai_score --%>
@@ -245,13 +145,12 @@
 									</c:choose></td>
 								<td><c:choose>
 										<c:when test="${empty r.appealContent}">
-											<span style="color: #bbb; font-size: 12px;">미제출</span>
+											<span class="is-adminReports-5">미제출</span>
 										</c:when>
 										<c:otherwise>
-											<a href="${ctx}/admin/reports/${r.reportNo}/appeal"
-												style="font-size: 13px; color: #3498db;">소명 보기</a>
+											<a href="${ctx}/admin/reports/${r.reportNo}/appeal" class="is-adminReports-6">소명 보기</a>
 											<c:if test="${r.appealStatus == '검토중'}">
-												<br><span style="font-size: 11px; color: #f39c12;">검토중</span>
+												<br><span class="is-adminReports-7">검토중</span>
 											</c:if>
 										</c:otherwise>
 									</c:choose></td>
@@ -262,24 +161,22 @@
 								<td><c:choose>
 										<c:when test="${r.status == '대기' and not empty r.appealContent and r.appealStatus == '검토중'}">
 											<a href="${ctx}/admin/reports/${r.reportNo}/appeal"
-												class="btn btn-primary" style="font-size: 12px; padding: 4px 10px;">소명 확인</a>
+												class="btn btn-primary is-adminReports-8">소명 확인</a>
 										</c:when>
 										<c:otherwise>
 											<form action="${ctx}/admin/reports/${r.reportNo}/process"
-												method="post" style="margin: 0;">
+												method="post" class="is-adminReports-9">
 												<c:if test="${not empty selectedType}">
 													<input type="hidden" name="type" value="${selectedType}">
 												</c:if>
 												<c:choose>
 													<c:when test="${r.status == '대기'}">
-														<button type="submit" class="btn btn-primary"
-															style="font-size: 12px; padding: 4px 10px;"
+														<button type="submit" class="btn btn-primary is-adminReports-10"
 															onclick="return confirm('처리완료로 변경하시겠습니까?')">처리완료</button>
 													</c:when>
 													<c:otherwise>
 														<input type="hidden" name="revert" value="true" />
-														<button type="submit" class="btn"
-															style="font-size: 12px; padding: 4px 10px;"
+														<button type="submit" class="btn is-adminReports-11"
 															onclick="return confirm('대기 상태로 되돌리시겠습니까?')">대기로 변경</button>
 													</c:otherwise>
 												</c:choose>
@@ -294,16 +191,16 @@
 		</table>
 
 		<c:if test="${totalPages > 1}">
-			<div style="display: flex; justify-content: center; gap: 6px; margin-top: 20px;">
+			<div class="is-adminReports-12">
 				<c:if test="${currentPage > 1}">
-					<a href="${ctx}/admin/reports?page=${currentPage - 1}${not empty selectedType ? '&type='.concat(selectedType) : ''}${not empty selectedStatus ? '&status='.concat(selectedStatus) : ''}" class="btn" style="padding: 6px 12px; font-size: 13px;">이전</a>
+					<a href="${ctx}/admin/reports?page=${currentPage - 1}${not empty selectedType ? '&type='.concat(selectedType) : ''}${not empty selectedStatus ? '&status='.concat(selectedStatus) : ''}" class="btn is-adminReports-13">이전</a>
 				</c:if>
 				<c:forEach var="i" begin="1" end="${totalPages}">
 					<a href="${ctx}/admin/reports?page=${i}${not empty selectedType ? '&type='.concat(selectedType) : ''}${not empty selectedStatus ? '&status='.concat(selectedStatus) : ''}"
-						class="btn" style="padding: 6px 12px; font-size: 13px; ${i == currentPage ? 'background:#121212; color:#fff;' : ''}">${i}</a>
+						class="btn is-adminReports-14 ${i == currentPage ? 'page-active' : ''}">${i}</a>
 				</c:forEach>
 				<c:if test="${currentPage < totalPages}">
-					<a href="${ctx}/admin/reports?page=${currentPage + 1}${not empty selectedType ? '&type='.concat(selectedType) : ''}${not empty selectedStatus ? '&status='.concat(selectedStatus) : ''}" class="btn" style="padding: 6px 12px; font-size: 13px;">다음</a>
+					<a href="${ctx}/admin/reports?page=${currentPage + 1}${not empty selectedType ? '&type='.concat(selectedType) : ''}${not empty selectedStatus ? '&status='.concat(selectedStatus) : ''}" class="btn is-adminReports-15">다음</a>
 				</c:if>
 			</div>
 		</c:if>

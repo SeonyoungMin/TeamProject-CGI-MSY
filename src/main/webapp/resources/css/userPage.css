@@ -1,0 +1,356 @@
+/* 기본 레이아웃 */
+.app-container {
+	max-width: 1100px;
+	margin: 0 auto;
+	padding: 20px;
+	font-family: 'Pretendard', sans-serif;
+}
+
+/* 프로필 섹션 (지역/온도 제외) */
+.profile-section {
+	padding: 40px 0;
+	display: flex;
+	align-items: center;
+	gap: 20px;
+	border-bottom: 1px solid #eee;
+}
+
+.profile-img {
+	width: 80px;
+	height: 80px;
+	border-radius: 50%;
+	background: #eee;
+	object-fit: cover;
+	border: 1px solid #eee;
+}
+
+/* 섹션 공통 헤더 */
+.section-header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin: 30px 0 20px;
+}
+
+.section-title {
+	font-size: 18px;
+	font-weight: bold;
+	color: #121212;
+}
+
+.item-count {
+	font-size: 13px;
+	color: #999;
+	font-weight: normal;
+}
+
+/* 상품 그리드 */
+.product-grid {
+	display: grid;
+	grid-template-columns: repeat(4, 1fr);
+	gap: 14px;
+}
+
+.product-card {
+	position: relative;
+	text-decoration: none;
+	color: inherit;
+	border: 1px solid #f0f0f0;
+	border-radius: 10px;
+	overflow: hidden;
+	transition: 0.2s;
+	background: #fff;
+	text-decoration: none;
+}
+
+.product-card:hover {
+	transform: translateY(-3px);
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.product-card img {
+	width: 100%;
+	height: 140px;
+	object-fit: cover;
+	background: #fafafa;
+}
+
+.product-info {
+	padding: 10px 12px;
+}
+
+.product-name {
+	font-size: 13px;
+	margin-bottom: 6px;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	color: #333;
+}
+
+.product-price {
+	font-weight: bold;
+	font-size: 14px;
+	color: #111;
+}
+
+/* 후기 리스트 */
+.review-container {
+	margin-top: 50px;
+	border-top: 1px solid #eee;
+	padding-top: 30px;
+}
+
+.review-item {
+	padding: 20px;
+	border-radius: 10px;
+	background: #f9f9f9;
+	margin-bottom: 15px;
+	border: 1px solid #f0f0f0;
+}
+
+.review-top {
+	display: flex;
+	justify-content: space-between;
+	margin-bottom: 10px;
+	font-size: 13px;
+	color: #777;
+}
+
+.review-product-name {
+	font-weight: bold;
+	color: #444;
+}
+
+.review-content {
+	font-size: 14px;
+	color: #333;
+	line-height: 1.6;
+}
+
+.review-buyer {
+	margin-top: 12px;
+	font-size: 12px;
+	color: #999;
+	display: flex;
+	align-items: center;
+	gap: 5px;
+}
+
+.buyer-circle {
+	width: 20px;
+	height: 20px;
+	border-radius: 50%;
+	background: #ddd;
+}
+
+/* 판매 유저 페이지에서 판매 완료 된 상품 구분 */
+.sold-overlay {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 140px;
+	background: rgba(0, 0, 0, 0.45);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	border-radius: 10px 10px 0 0;
+}
+
+.sold-badge {
+	background: #fff;
+	color: #333;
+	font-size: 13px;
+	font-weight: bold;
+	padding: 6px 14px;
+	border-radius: 20px;
+}
+
+.is-userPage-1 {
+    text-align: right; margin-top: 10px;
+}
+
+.is-userPage-2 {
+    margin-bottom: 20px;
+}
+
+.is-userPage-3 {
+    max-width: 200px; border: 1px solid #ddd;
+}
+
+.is-userPage-4 {
+    color: #999;
+}
+
+.is-userPage-5 {
+    margin: 0; font-size: 22px; color: #121212;
+}
+
+.is-userPage-6 {
+    margin-top: 5px; color: #666; font-size: 14px;
+}
+
+.is-userPage-7 {
+    margin-top: 12px; display: flex; gap: 8px;
+}
+
+.is-userPage-8 {
+    display: inline; margin: 0;
+}
+
+.is-userPage-9 {
+    padding: 60px 0; text-align: center; color: #bbb; border: 1px dashed #eee; border-radius: 10px;
+}
+
+.is-userPage-10 {
+    width: 100%; height: 140px; background: #f5f5f5; display: flex; align-items: center; justify-content: center; color: #ccc;
+}
+
+.is-userPage-11 {
+    text-align: center; margin-top: 20px; display: flex; justify-content: center; gap: 8px;
+}
+
+.is-userPage-12 {
+    padding: 5px 12px; border: 1px solid #ddd; text-decoration: none; color: #333; border-radius: 4px
+}
+
+.is-userPage-13 {
+    margin-top: 50px; border-top: 1px solid #eee; padding-top: 30px;
+}
+
+.is-userPage-14 {
+    margin-bottom: 20px;
+}
+
+.is-userPage-15 {
+    font-size: 18px; font-weight: bold;
+}
+
+.is-userPage-16 {
+    font-size: 13px; color: #999;
+}
+
+.is-userPage-17 {
+    text-align: center; padding: 20px; color: #888; border: 1px solid #eee; border-radius: 8px;
+}
+
+.is-userPage-18 {
+    padding: 20px; background: #fff5f0; border-radius: 8px; border: 1px solid #ffd9c0; margin-bottom: 30px; text-align: center;
+}
+
+.is-userPage-19 {
+    margin: 0; font-size: 16px; color: #ff8a3d;
+}
+
+.is-userPage-20 {
+    margin-top: 8px; color: #888; font-size: 13px;
+}
+
+.is-userPage-21 {
+    display: inline-block; margin-top: 12px; background: #ff8a3d; color: #fff !important; padding: 8px 18px; border-radius: 6px; text-decoration: none; font-weight: bold; font-size: 13px;
+}
+
+.is-userPage-22 {
+    padding: 20px; background: #f9f9f9; border-radius: 8px; border: 1px solid #eee; margin-bottom: 30px;
+}
+
+.is-userPage-23 {
+    margin-top: 0; margin-bottom: 15px; font-size: 16px;
+}
+
+.is-userPage-24 {
+    color: #ff8a3d; font-weight: bold;
+}
+
+.is-userPage-25 {
+    margin-bottom: 15px;
+}
+
+.is-userPage-26 {
+    font-size: 13px; color: #666; display: block; margin-bottom: 5px;
+}
+
+.is-userPage-27 {
+    width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px !important;
+}
+
+.is-userPage-28 {
+    margin-bottom: 10px;
+}
+
+.is-userPage-29 {
+    width: 100%; border: 1px solid #ddd; border-radius: 4px !important; padding: 12px; box-sizing: border-box; resize: none;
+}
+
+.is-userPage-30 {
+    text-align: right;
+}
+
+.is-userPage-31 {
+    background: #121212 !important; color: #fff !important; border: none !important; padding: 10px 25px !important; border-radius: 4px !important; cursor: pointer !important;
+}
+
+.is-userPage-32 {
+    margin: 40px 0; border: 0; border-top: 1px solid #eee;
+}
+
+.is-userPage-33 {
+    text-align: center; padding: 50px 0; color: #bbb;
+}
+
+.is-userPage-34 {
+    margin-bottom: 15px; padding: 20px; background: #fff; border: 1px solid #eee; border-radius: 8px;
+}
+
+.is-userPage-35 {
+    display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;
+}
+
+.is-userPage-36 {
+    font-weight: bold; color: #333;
+}
+
+.is-userPage-37 {
+    font-size: 12px !important; color: #999;
+}
+
+.is-userPage-38 {
+    font-size: 14px; color: #444; line-height: 1.6;
+}
+
+.is-userPage-39 {
+    display: flex; justify-content: space-between; align-items: center; margin-top: 8px;
+}
+
+.is-userPage-40 {
+    font-size: 12px !important; color: #aaa;
+}
+
+.is-userPage-41 {
+    display: flex; gap: 6px;
+}
+
+.is-userPage-42 {
+    margin: 0;
+}
+
+.is-userPage-43 {
+    font-size: 12px !important; padding: 4px 10px !important;
+}
+
+.is-userPage-44 {
+    margin: 0;
+}
+
+.is-userPage-45 {
+    font-size: 12px !important; padding: 4px 10px !important;
+}
+
+.is-userPage-46 {
+    text-align: center; margin-top: 20px; display: flex; justify-content: center; gap: 8px;
+}
+
+.is-userPage-47 {
+    padding: 5px 12px; border: 1px solid #ddd; text-decoration: none; color: #333; border-radius: 4px
+}

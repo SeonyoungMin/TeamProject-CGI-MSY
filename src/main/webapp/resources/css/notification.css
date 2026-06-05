@@ -1,0 +1,148 @@
+/* ===== 알림 페이지 전용 스타일 ===== */
+.noti-toolbar {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin-bottom: 16px;
+}
+
+.noti-toolbar-actions {
+	display: flex;
+	gap: 8px;
+}
+
+.noti-list {
+	list-style: none;
+	margin: 0 !important;
+	padding: 0;
+}
+
+.noti-item {
+	display: flex;
+	align-items: flex-start;
+	gap: 14px;
+	padding: 16px 20px;
+	border-bottom: 1px solid #f0f0f0;
+	background: #fff;
+	transition: background 0.1s;
+	cursor: pointer;
+	position: relative;
+}
+
+.noti-item:hover {
+	background: #f9f9f9;
+}
+
+/* 읽지 않은 항목 강조 */
+.noti-item.unread {
+	background: #fffbf0;
+	border-left: 3px solid #f39c12;
+}
+
+.noti-item.unread:hover {
+	background: #fff8e6;
+}
+
+/* 아이콘 원 */
+.noti-icon {
+	flex-shrink: 0;
+	width: 40px;
+	height: 40px;
+	border-radius: 50%;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font-size: 17px;
+	color: #fff;
+}
+
+.noti-icon.favorite { background: #e74c3c; }
+.noti-icon.comment  { background: #3498db; }
+.noti-icon.review   { background: #9b59b6; }
+.noti-icon.sold     { background: #27ae60; }
+.noti-icon.bought   { background: #2980b9; }
+.noti-icon.default  { background: #aaa; }
+
+/* 내용 영역 */
+.noti-body {
+	flex: 1;
+	min-width: 0;
+}
+
+.noti-message {
+	font-size: 14px;
+	color: #222;
+	line-height: 1.5;
+	white-space: pre-line;
+	word-break: break-word;
+}
+
+.noti-meta {
+	font-size: 12px;
+	color: #999;
+	margin-top: 4px;
+}
+
+/* 삭제 버튼 */
+.noti-delete-btn {
+	flex-shrink: 0;
+	background: none;
+	border: none !important;
+	color: #ccc;
+	font-size: 16px;
+	cursor: pointer;
+	padding: 4px;
+	border-radius: 4px;
+	transition: color 0.15s;
+}
+
+.noti-delete-btn:hover {
+	color: #e74c3c;
+}
+
+/* 빈 상태 */
+.noti-empty {
+	text-align: center;
+	padding: 60px 20px;
+	color: #aaa;
+	font-size: 15px;
+}
+
+.noti-empty i {
+	font-size: 48px;
+	display: block;
+	margin-bottom: 16px;
+	color: #ddd;
+}
+
+.is-notification-1 {
+    margin: 0 !important; border: none !important;
+}
+
+.is-notification-2 {
+    margin:0;
+}
+
+.is-notification-3 {
+    font-size:13px; padding: 7px 14px !important;
+}
+
+.is-notification-4 {
+    margin:0;
+}
+
+.is-notification-5 {
+    font-size:13px; padding: 7px 14px !important;
+}
+
+.is-notification-6 {
+    padding: 0; overflow: hidden;
+}
+
+.is-notification-7 {
+    color:#f39c12; font-weight:bold; margin-left:6px;
+}
+
+.is-notification-8 {
+    margin:0;
+}

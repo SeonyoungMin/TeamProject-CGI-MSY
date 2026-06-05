@@ -11,6 +11,7 @@
 <head>
 <meta charset="UTF-8">
 <title>마이페이지</title>
+<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/myPage.css">
 </head>
 <body>
 
@@ -26,9 +27,9 @@
 		</c:if>
 
 		<c:if test="${user.riskScore > 0}">
-			<div class="card" style="margin-bottom: 15px; padding: 12px 16px; border: 1px solid #ddd;">
+			<div class="card is-myPage-1">
 				<strong>누적 신고 점수:</strong> <fmt:formatNumber value="${user.riskScore}" pattern="0.0"/>점
-				<span style="font-size: 12px; color: #888; margin-left: 10px;">
+				<span class="is-myPage-2">
 					(3점: 7일 제한 / 5점: 30일 제한 / 8점: 전체 제한 / 10점: 자동 탈퇴)
 				</span>
 			</div>
@@ -37,20 +38,18 @@
 		<div class="card">
 
 			<!-- 프로필 사진 -->
-			<div style="margin-bottom: 20px;">
+			<div class="is-myPage-3">
 				<c:choose>
 					<c:when test="${not empty profileImage}">
-						<img src="${profileImage.filePath}"
-							style="max-width: 200px; border: 1px solid #ddd;">
+						<img src="${profileImage.filePath}" class="is-myPage-4">
 					</c:when>
 					<c:otherwise>
-						<div style="color: #999;">사진 없음</div>
+						<div class="is-myPage-5">사진 없음</div>
 					</c:otherwise>
 				</c:choose>
 			</div>
 
-			<div
-				style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+			<div class="is-myPage-6">
 				<div>
 					<b>회원번호</b><br>${user.userNo}</div>
 				<div>
@@ -65,11 +64,10 @@
 					<b>등급</b><br>${user.userRole}</div>
 
 				<c:if test="${not empty loginUser.verifiedArea}">
-					<div
-						style="padding: 15px; background-color: #f1f3f5; border-radius: 8px;; margin-top: 10px;">
-						<div style="color: #888; font-size: 13px; margin-bottom: 5px;">동네
+					<div class="is-myPage-7">
+						<div class="is-myPage-8">동네
 							인증 상태</div>
-						<div style="font-weight: 600;">
+						<div class="is-myPage-9">
 							<i class="fa-solid fa-circle-check"></i> 인증 완료
 							(${loginUser.verifiedArea})
 						</div>
@@ -77,11 +75,10 @@
 				</c:if>
 
 				<c:if test="${empty loginUser.verifiedArea}">
-					<div
-						style="padding: 15px; background-color: #fff5f5; border-radius: 8px; margin-top: 10px;">
-						<div style="color: #888; font-size: 13px; margin-bottom: 5px;">동네
+					<div class="is-myPage-10">
+						<div class="is-myPage-11">동네
 							인증 상태</div>
-						<div style="font-weight: 600;">
+						<div class="is-myPage-12">
 							아직 동네인증을 하지 않은 유저입니다.
 							<button type="button" class="btn btn-secondary"
 								onclick="verifyLocation()">지금 인증하기</button>
@@ -89,29 +86,26 @@
 					</div>
 				</c:if>
 			</div>
-			<div
-				style="margin-top: 20px; display: flex; gap: 10px; flex-wrap: wrap;">
+			<div class="is-myPage-13">
 				<a href="${ctx}/users/edit/${user.userNo}" class="btn btn-primary">내
 					정보 수정</a> <a href="${ctx}/mypage/account" class="btn btn-primary">계좌
 					정보 ${empty user.userAccountNumber ? '등록' : '수정'}</a> <a
 					href="${ctx}/order/pending" class="btn btn-primary">거래 관리</a>
 
 				<c:if test="${not empty transferRequests}">
-					<div style="margin-top: 24px;">
+					<div class="is-myPage-14">
 						<h3 class="section-title">계좌 거래 요청</h3>
 
 						<c:forEach var="r" items="${transferRequests}">
-							<div class="card"
-								style="display: flex; justify-content: space-between; align-items: center;">
+							<div class="card is-myPage-15">
 
 								<div>
-									<div style="font-weight: bold;">${r.productName}</div>
-									<div style="font-size: 13px; color: #888;">요청자 :
+									<div class="is-myPage-16">${r.productName}</div>
+									<div class="is-myPage-17">요청자 :
 										${r.buyerNickname}</div>
 								</div>
 
-								<form action="${ctx}/order/transfer/approve" method="post"
-									style="margin: 0;">
+								<form action="${ctx}/order/transfer/approve" method="post" class="is-myPage-18">
 									<input type="hidden" name="orderNo" value="${r.orderNo}">
 									<button class="btn btn-primary">승인</button>
 								</form>
@@ -131,34 +125,27 @@
 
 		<!-- 내 직거래 (예약중) 미니 섹션 -->
 		<c:if test="${not empty myReservedDirects}">
-			<div style="margin-top: 24px;">
-				<div
-					style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-					<h3 style="margin: 0; font-size: 15px; font-weight: 600;">
-						내 직거래 <span
-							style="color: #0c447c; background: #e0f2fe; font-size: 11px; padding: 2px 8px; border-radius: 10px; margin-left: 6px; font-weight: bold;">
+			<div class="is-myPage-19">
+				<div class="is-myPage-20">
+					<h3 class="is-myPage-21">
+						내 직거래 <span class="is-myPage-22">
 							${fn:length(myReservedDirects)}건 예약중 </span>
 					</h3>
-					<a href="${ctx}/order/pending"
-						style="font-size: 12px; color: #666;">거래 관리 &gt;</a>
+					<a href="${ctx}/order/pending" class="is-myPage-23">거래 관리 &gt;</a>
 				</div>
-				<div style="display: flex; flex-direction: column; gap: 8px;">
+				<div class="is-myPage-24">
 					<c:forEach var="d" items="${myReservedDirects}">
 						<c:set var="role"
 							value="${d.buyerNo == user.userNo ? '구매' : '판매'}" />
 						<c:set var="link"
 							value="${d.buyerNo == user.userNo ? ctx.concat('/order/direct/reserved/').concat(d.orderNo) : ctx.concat('/order/pending')}" />
-						<a href="${link}"
-							style="display: flex; align-items: center; gap: 10px; padding: 10px 14px; background: #fff; border: 1px solid #eee; border-radius: 10px; text-decoration: none; color: inherit;">
-							<span
-							style="font-size: 11px; padding: 2px 7px; border-radius: 4px;
-								${role == '구매' ? 'background:#fef3c7; color:#92400e;' : 'background:#dcfce7; color:#166534;'}">
+						<a href="${link}" class="is-myPage-25">
+							<span class="is-myPage-26">
 								${role} </span>
-							<div style="flex: 1; min-width: 0; overflow: hidden;">
-								<div
-									style="font-size: 13px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+							<div class="is-myPage-27">
+								<div class="is-myPage-28">
 									${d.productName}</div>
-								<div style="font-size: 11px; color: #888;">
+								<div class="is-myPage-29">
 									<c:if test="${not empty d.meetingTime}">
 										<fmt:formatDate value="${d.meetingTime}" pattern="MM/dd HH:mm" />
 									</c:if>
@@ -166,7 +153,7 @@
 										· ${d.meetingPlace}
 									</c:if>
 								</div>
-							</div> <span style="color: #aaa; font-size: 12px;">›</span>
+							</div> <span class="is-myPage-30">›</span>
 						</a>
 					</c:forEach>
 				</div>
@@ -174,92 +161,79 @@
 		</c:if>
 
 
-		<div
-			style="display: flex; justify-content: space-between; align-items: center; margin-top: 40px; border-bottom: 2px solid #121212; padding-bottom: 10px; margin-bottom: 20px;">
-			<h3 class="section-title" style="margin: 0; border-bottom: none;">내가
+		<div class="is-myPage-31">
+			<h3 class="section-title is-myPage-32">내가
 				등록한 상품</h3>
-			<a href="${ctx}/product/mylist" style="font-size: 14px; color: #666;">전체보기
+			<a href="${ctx}/product/mylist" class="is-myPage-33">전체보기
 				&gt;</a>
 		</div>
 
 		<c:if test="${empty myProducts}">
-			<div class="card" style="text-align: center; color: #888;">등록한
+			<div class="card is-myPage-34">등록한
 				상품이 없습니다.</div>
 		</c:if>
 
 		<c:forEach var="p" items="${myProducts}">
-			<div class="card"
-				style="display: flex; justify-content: space-between; align-items: center;">
-				<a href="${ctx}/product/${p.productNo}"
-					style="flex: 1; display: flex; align-items: center; gap: 15px;">
-					<span class="btn"
-					style="padding: 2px 8px; font-size: 11px; background: ${p.tradeStatus == '완료' ? '#eee' : '#121212'}; color: ${p.tradeStatus == '완료' ? '#888' : '#fff'}; border: none;">
+			<div class="card is-myPage-35">
+				<a href="${ctx}/product/${p.productNo}" class="is-myPage-36">
+					<span class="btn is-myPage-37 ${p.tradeStatus == '완료' ? 'is-myPage-37-done' : ''}">
 						${p.tradeStatus} </span>
 					<div>
-						<div style="font-weight: 600;">${p.productName}</div>
-						<div style="font-size: 12px; color: #888;">
+						<div class="is-myPage-38">${p.productName}</div>
+						<div class="is-myPage-39">
 							<fmt:formatNumber value="${p.price}" />
 							원
 						</div>
 					</div>
 				</a>
 
-				<div style="display: flex; gap: 5px;">
-					<a href="${ctx}/product/${p.productNo}/edit" class="btn"
-						style="padding: 5px 10px; font-size: 13px;">수정</a>
+				<div class="is-myPage-40">
+					<a href="${ctx}/product/${p.productNo}/edit" class="btn is-myPage-41">수정</a>
 
-					<button type="button" class="btn btn-danger"
-						onclick="deleteProduct('${p.productNo}')"
-						style="padding: 5px 10px; font-size: 13px;">삭제</button>
+					<button type="button" class="btn btn-danger is-myPage-42"
+						onclick="deleteProduct('${p.productNo}')">삭제</button>
 				</div>
 			</div>
 
 		</c:forEach>
 
 
-		<div
-			style="display: flex; justify-content: space-between; align-items: center; margin-top: 40px; border-bottom: 2px solid #121212; padding-bottom: 10px; margin-bottom: 20px;">
-			<h3 class="section-title" style="margin: 0; border-bottom: none;">
-				구매 내역 <span
-					style="font-size: 13px; color: #999; font-weight: normal;">(${totalBought})</span>
+		<div class="is-myPage-43">
+			<h3 class="section-title is-myPage-44">
+				구매 내역 <span class="is-myPage-45">(${totalBought})</span>
 			</h3>
-			<a href="${ctx}/mypage/bought" style="font-size: 14px; color: #666;">전체보기
+			<a href="${ctx}/mypage/bought" class="is-myPage-46">전체보기
 				&gt;</a>
 		</div>
 		<div class="card">
 			<c:choose>
 				<c:when test="${not empty boughtList}">
-					<div class="product-grid"
-						style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px;">
+					<div class="product-grid is-myPage-47">
 
 						<c:forEach var="item" items="${boughtList}">
-							<div class="product-item"
-								style="border: 1px solid #eee; border-radius: 10px; overflow: hidden; cursor: pointer;"
+							<div class="product-item is-myPage-48"
 								onclick="location.href='${ctx}/product/${item.productNo}'">
 
-								<div class="product-img"
-									style="height: 140px; background: #f4f4f4; display: flex; align-items: center; justify-content: center;">
+								<div class="product-img is-myPage-49">
 									<c:choose>
 										<c:when test="${not empty item.imgPath}">
 											<img src="${item.imgPath}"
-												style="width: 100%; height: 100%; object-fit: cover;"
-												onerror="this.onerror=null;this.src='https://via.placeholder.com/150?text=No+Image';">
+												onerror="this.onerror=null;this.src='https://via.placeholder.com/150?text=No+Image';" class="is-myPage-50">
 										</c:when>
 										<c:otherwise>
-											<span style="color: #ccc;">이미지 없음</span>
+											<span class="is-myPage-51">이미지 없음</span>
 										</c:otherwise>
 									</c:choose>
 								</div>
 
-								<div style="padding: 10px;">
-									<div
-										style="font-weight: bold; margin-bottom: 5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+								<div class="is-myPage-52">
+									<div class="is-myPage-53">
 										${item.productName}</div>
-									<div style="font-weight: bold;">
+									<div class="is-myPage-54">
 										<fmt:formatNumber value="${item.price}" pattern="#,###" />
 										원
 									</div>
-									<div style="font-size: 12px; color: #999; margin-top: 5px;">
+									<div class="is-myPage-55">
 										거래 완료</div>
 								</div>
 							</div>
@@ -269,40 +243,36 @@
 				</c:when>
 
 				<c:otherwise>
-					<div style="text-align: center; padding: 40px 0; color: #999;">
+					<div class="is-myPage-56">
 						구매한 내역이 없습니다.</div>
 				</c:otherwise>
 			</c:choose>
 		</div>
 
 		<!-- 받은 후기 -->
-		<div
-			style="display: flex; justify-content: space-between; align-items: center; margin-top: 40px; border-bottom: 2px solid #121212; padding-bottom: 10px; margin-bottom: 20px;">
-			<h3 class="section-title" style="margin: 0; border-bottom: none;">
-				받은 후기 <span
-					style="font-size: 13px; color: #999; font-weight: normal;">(${totalMyReviews})</span>
+		<div class="is-myPage-57">
+			<h3 class="section-title is-myPage-58">
+				받은 후기 <span class="is-myPage-59">(${totalMyReviews})</span>
 			</h3>
-			<a href="${ctx}/mypage/reviews" style="font-size: 14px; color: #666;">전체보기
+			<a href="${ctx}/mypage/reviews" class="is-myPage-60">전체보기
 				&gt;</a>
 		</div>
 		<c:choose>
 			<c:when test="${empty myReviews}">
-				<div class="card" style="text-align: center; color: #888;">아직
+				<div class="card is-myPage-61">아직
 					받은 후기가 없습니다.</div>
 			</c:when>
 			<c:otherwise>
 				<c:forEach var="r" items="${myReviews}">
-					<div class="card" style="padding: 16px 20px; margin-bottom: 10px;">
-						<div
-							style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-							<span style="font-weight: bold; color: #333;">${r.productName}</span>
-							<span style="font-size: 12px; color: #999;"> <fmt:formatDate
+					<div class="card is-myPage-62">
+						<div class="is-myPage-63">
+							<span class="is-myPage-64">${r.productName}</span>
+							<span class="is-myPage-65"> <fmt:formatDate
 									value="${r.createdTime}" pattern="yyyy.MM.dd" />
 							</span>
 						</div>
-						<div style="font-size: 14px; color: #444; line-height: 1.6;">${r.content}</div>
-						<div
-							style="font-size: 12px; color: #aaa; margin-top: 8px; text-align: right;">
+						<div class="is-myPage-66">${r.content}</div>
+						<div class="is-myPage-67">
 							작성자: ${r.sellerNickname}</div>
 					</div>
 				</c:forEach>
@@ -310,40 +280,37 @@
 		</c:choose>
 
 		<!-- 가계부 (최근 5건) -->
-		<div
-			style="display: flex; justify-content: space-between; align-items: center; margin-top: 40px; border-bottom: 2px solid #121212; padding-bottom: 10px; margin-bottom: 20px;">
-			<h3 class="section-title" style="margin: 0; border-bottom: none;">가계부</h3>
-			<a href="${ctx}/accountList" style="font-size: 14px; color: #666;">전체보기
+		<div class="is-myPage-68">
+			<h3 class="section-title is-myPage-69">가계부</h3>
+			<a href="${ctx}/accountList" class="is-myPage-70">전체보기
 				&gt;</a>
 		</div>
 		<c:choose>
 			<c:when test="${empty accountList}">
-				<div class="card" style="text-align: center; color: #888;">구매
+				<div class="card is-myPage-71">구매
 					완료된 내역이 없습니다.</div>
 			</c:when>
 			<c:otherwise>
-				<div
-					style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px;">
+				<div class="is-myPage-72">
 					<c:forEach var="a" items="${accountList}">
 						<div class="card">
-							<div
-								style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
+							<div class="is-myPage-73">
 								<div>
-									<div style="font-weight: 600;">${a.productName}</div>
-									<div style="font-size: 12px; color: #888; margin-top: 4px;">
+									<div class="is-myPage-74">${a.productName}</div>
+									<div class="is-myPage-75">
 										<fmt:formatDate value="${a.createdTime}" pattern="yyyy.MM.dd" />
 									</div>
 								</div>
-								<div style="font-weight: bold;">
+								<div class="is-myPage-76">
 									<fmt:formatNumber value="${a.price}" />
 									원
 								</div>
 							</div>
 							<c:if test="${not empty a.memo}">
-								<div style="font-size: 13px; color: #555; margin-top: 4px;">${a.memo}</div>
+								<div class="is-myPage-77">${a.memo}</div>
 							</c:if>
 							<c:if test="${empty a.memo}">
-								<div style="font-size: 13px; color: #bbb; margin-top: 4px;">메모
+								<div class="is-myPage-78">메모
 									없음</div>
 							</c:if>
 						</div>
@@ -353,56 +320,53 @@
 			</c:otherwise>
 		</c:choose>
 		<%-- 신고 내역 섹션 (최근 5건) --%>
-		<div
-			style="display: flex; justify-content: space-between; align-items: center; margin-top: 40px; border-bottom: 2px solid #121212; padding-bottom: 10px; margin-bottom: 20px;">
-			<h3 class="section-title" style="margin: 0; border-bottom: none;">
-				내 신고 내역 <span style="font-size: 13px; color: #999; font-weight: normal;">(${fn:length(myReports)})</span>
+		<div class="is-myPage-79">
+			<h3 class="section-title is-myPage-80">
+				내 신고 내역 <span class="is-myPage-81">(${fn:length(myReports)})</span>
 			</h3>
-			<a href="${ctx}/mypage/reports" style="font-size: 14px; color: #666;">전체보기 &gt;</a>
+			<a href="${ctx}/mypage/reports" class="is-myPage-82">전체보기 &gt;</a>
 		</div>
 		<c:choose>
 			<c:when test="${empty myReports}">
-				<div class="card" style="text-align: center; color: #888;">신고 내역이 없습니다.</div>
+				<div class="card is-myPage-83">신고 내역이 없습니다.</div>
 			</c:when>
 			<c:otherwise>
 				<div class="card">
-					<table style="width: 100%; border-collapse: collapse; font-size: 14px;">
+					<table class="is-myPage-84">
 						<thead>
-							<tr style="background: #f5f5f5;">
-								<th style="padding: 10px; border-bottom: 2px solid #ddd; text-align: center;">신고번호</th>
-								<th style="padding: 10px; border-bottom: 2px solid #ddd; text-align: center;">신고유형</th>
-								<th style="padding: 10px; border-bottom: 2px solid #ddd; text-align: center;">신고사유</th>
-								<th style="padding: 10px; border-bottom: 2px solid #ddd; text-align: center;">상태</th>
-								<th style="padding: 10px; border-bottom: 2px solid #ddd; text-align: center;">소명상태</th>
-								<th style="padding: 10px; border-bottom: 2px solid #ddd; text-align: center;">소명</th>
+							<tr class="is-myPage-85">
+								<th class="is-myPage-86">신고번호</th>
+								<th class="is-myPage-87">신고유형</th>
+								<th class="is-myPage-88">신고사유</th>
+								<th class="is-myPage-89">상태</th>
+								<th class="is-myPage-90">소명상태</th>
+								<th class="is-myPage-91">소명</th>
 							</tr>
 						</thead>
 						<tbody>
 							<c:forEach var="r" items="${myReports}" end="4">
-								<tr style="border-bottom: 1px solid #eee;">
-									<td style="padding: 10px; text-align: center;">${r.reportNo}</td>
-									<td style="padding: 10px; text-align: center;">${r.targetType}</td>
-									<td style="padding: 10px; text-align: center;">${r.reasonType}</td>
-									<td style="padding: 10px; text-align: center;">${r.status}</td>
-									<td style="padding: 10px; text-align: center;"><c:choose>
+								<tr class="is-myPage-92">
+									<td class="is-myPage-93">${r.reportNo}</td>
+									<td class="is-myPage-94">${r.targetType}</td>
+									<td class="is-myPage-95">${r.reasonType}</td>
+									<td class="is-myPage-96">${r.status}</td>
+									<td class="is-myPage-97"><c:choose>
 											<c:when test="${empty r.appealStatus || r.appealStatus == '미제출'}">
-												<span style="color: #e74c3c;">미제출</span>
+												<span class="is-myPage-98">미제출</span>
 											</c:when>
 											<c:when test="${r.appealStatus == '검토중'}">
-												<span style="color: #f39c12;">검토중</span>
+												<span class="is-myPage-99">검토중</span>
 											</c:when>
 											<c:otherwise>
-												<span style="color: #27ae60;">${r.appealStatus}</span>
+												<span class="is-myPage-100">${r.appealStatus}</span>
 											</c:otherwise>
 										</c:choose></td>
-									<td style="padding: 10px; text-align: center;"><c:choose>
+									<td class="is-myPage-101"><c:choose>
 											<c:when test="${empty r.appealContent}">
-												<a href="${ctx}/appeal/${r.reportNo}" class="btn btn-primary"
-													style="font-size: 12px; padding: 4px 10px;">소명 작성</a>
+												<a href="${ctx}/appeal/${r.reportNo}" class="btn btn-primary is-myPage-102">소명 작성</a>
 											</c:when>
 											<c:otherwise>
-												<a href="${ctx}/appeal/${r.reportNo}" class="btn btn-line"
-													style="font-size: 12px; padding: 4px 10px;">소명 확인</a>
+												<a href="${ctx}/appeal/${r.reportNo}" class="btn btn-line is-myPage-103">소명 확인</a>
 											</c:otherwise>
 										</c:choose></td>
 								</tr>

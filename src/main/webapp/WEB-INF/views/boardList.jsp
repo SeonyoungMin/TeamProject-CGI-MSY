@@ -15,121 +15,7 @@
 <head>
 <meta charset="UTF-8">
 <title>${title}</title>
-<style>
-.board-wrap {
-	max-width: 900px;
-	margin: 30px auto;
-	padding: 0 20px;
-}
-
-.board-tabs {
-	display: flex;
-	gap: 4px;
-	margin-bottom: 16px;
-	border-bottom: 1px solid #eee;
-}
-
-.board-tabs a {
-	padding: 10px 18px;
-	font-size: 14px;
-	color: #777;
-	text-decoration: none;
-	border-bottom: 2px solid transparent;
-}
-
-.board-tabs a.active {
-	color: #121212;
-	font-weight: bold;
-	border-bottom-color: #121212;
-}
-
-.board-tabs a:hover {
-	color: #121212;
-}
-
-.board-item {
-	display: flex;
-	align-items: center;
-	gap: 12px;
-	padding: 12px 4px;
-	border-bottom: 1px solid #f0f0f0;
-	font-size: 14px;
-}
-
-.board-item .title {
-	flex: 1;
-	color: #222;
-	text-decoration: none;
-	white-space: nowrap;
-	overflow: hidden;
-	text-overflow: ellipsis;
-}
-
-.board-item .title:hover {
-	text-decoration: underline;
-}
-
-.board-item .meta {
-	color: #888;
-	font-size: 13px;
-	white-space: nowrap;
-}
-
-.tag {
-	display: inline-block;
-	font-size: 11px;
-	padding: 2px 6px;
-	margin-right: 4px;
-	border-radius: 2px;
-	font-weight: 600;
-}
-
-.tag-notice {
-	background: #fdecec;
-	color: #c0392b;
-}
-
-.tag-inquiry {
-	background: #eef3fb;
-	color: #2c6ab1;
-}
-
-.tag-free {
-	background: #f1f5ee;
-	color: #5a7a3a;
-}
-
-.pin {
-	color: #c0392b;
-	margin-right: 4px;
-}
-
-.pagination {
-	margin-top: 20px;
-	text-align: center;
-}
-
-.pagination a, .pagination strong {
-	display: inline-block;
-	padding: 6px 12px;
-	margin: 0 2px;
-	border: 1px solid #ddd;
-	border-radius: 4px;
-	text-decoration: none;
-	color: #555;
-}
-
-.pagination strong {
-	background: #121212;
-	color: #fff;
-	border-color: #121212;
-}
-
-.write-btn-wrap {
-	text-align: right;
-	margin: 16px 0;
-}
-</style>
+<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/boardList.css">
 </head>
 <body>
 	<%@ include file="/WEB-INF/views/header.jsp"%>
@@ -156,7 +42,7 @@
 
 		<c:choose>
 			<c:when test="${empty list}">
-				<p style="color: #888; text-align: center; padding: 40px 0;">등록된
+				<p class="is-boardList-1">등록된
 					글이 없습니다.</p>
 			</c:when>
 			<c:otherwise>

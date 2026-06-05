@@ -1,3 +1,4 @@
+<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/chatBot.css">
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="jakarta.tags.core"%>
 <c:set var="ctx" value="${pageContext.request.contextPath}" />
@@ -127,7 +128,7 @@ function appendBotMessage(msg) {
 function showAdminRequestBtn() {
     if (chatLoginUser == 0) {
         document.getElementById('adminRequestArea').innerHTML =
-            '<div style="text-align:center; padding: 8px; font-size:12px; color:#888;">관리자 상담은 로그인 후 이용 가능합니다.</div>';
+            '<div class="is-chatBot-1">관리자 상담은 로그인 후 이용 가능합니다.</div>';
         return;
     }
     document.getElementById('adminRequestArea').innerHTML =
@@ -136,9 +137,9 @@ function showAdminRequestBtn() {
 
 function showAppealBtn() {
     document.getElementById('adminRequestArea').innerHTML =
-        '<div style="padding: 8px 16px; display: flex; flex-direction: column; gap: 6px;">' +
-        '<a href="${ctx}/mypage" class="admin-request-btn" style="text-align:center; text-decoration:none;">마이페이지에서 소명 작성하기</a>' +
-        '<a href="https://open.kakao.com/o/minimarket" target="_blank" class="admin-request-btn" style="text-align:center; text-decoration:none; border-color:#FEE500; color:#3C1E1E; background:#FEE500;">카카오 오픈채팅 상담</a>' +
+        '<div class="is-chatBot-2">' +
+        '<a href="${ctx}/mypage" class="admin-request-btn is-chatBot-3">마이페이지에서 소명 작성하기</a>' +
+        '<a href="https://open.kakao.com/o/minimarket" target="_blank" class="admin-request-btn is-chatBot-4">카카오 오픈채팅 상담</a>' +
         '</div>';
 }
 
@@ -147,9 +148,9 @@ function requestAdmin() {
         if (result !== 'fail') {
             chatRoomNo = parseInt(result);
             document.getElementById('adminRequestArea').innerHTML =
-                '<div style="text-align:center; padding: 8px; font-size:12px; color:#888;">관리자에게 알림을 보냈습니다. 잠시만 기다려주세요.</div>';
+                '<div class="is-chatBot-5">관리자에게 알림을 보냈습니다. 잠시만 기다려주세요.</div>';
             document.getElementById('endChatArea').innerHTML =
-                '<button class="admin-request-btn" style="border-color: #e74c3c; color: #e74c3c;" onclick="endChat()">상담 종료</button>';
+                '<button class="admin-request-btn is-chatBot-6" onclick="endChat()">상담 종료</button>';
             connectWebSocket();
         }
     });

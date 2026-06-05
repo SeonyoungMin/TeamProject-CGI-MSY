@@ -7,12 +7,13 @@
 <head>
 <meta charset="UTF-8">
 <title>상품 등록</title>
+<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/productAddForm.css">
 </head>
 <body>
 
 	<%@ include file="/WEB-INF/views/header.jsp"%>
 
-	<div class="app-container" style="max-width: 700px;">
+	<div class="app-container is-productAddForm-1">
 
 		<h2 class="section-title">상품 등록</h2>
 
@@ -41,10 +42,9 @@
 				id="productImages" multiple accept="image/*"
 				onchange="previewAddImages(this)" required>
 
-			<div id="image-preview-container"
-				style="display: flex; gap: 10px; flex-wrap: wrap; margin-top: 10px;"></div>
+			<div id="image-preview-container" class="is-productAddForm-2"></div>
 
-			<div style="margin-top: 20px; display: flex; gap: 10px;">
+			<div class="is-productAddForm-3">
 				<button type="submit" class="btn btn-primary btn-block">등록</button>
 				<a href="${ctx}/productList" class="btn btn-block">취소</a>
 			</div>

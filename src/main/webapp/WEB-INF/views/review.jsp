@@ -6,6 +6,7 @@
 <head>
 <meta charset="UTF-8">
 <title>구매 후기 테스트</title>
+<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/review.css">
 </head>
 <body>
 	<h3>구매 후기</h3>
@@ -48,7 +49,7 @@
 					</form>
 
 					<!-- 삭제 폼 -->
-					<form action="/minimarket/review/${r.boardNo}" method="post" style="display:inline;">
+					<form action="/minimarket/review/${r.boardNo}" method="post" class="is-review-1">
 						<input type="hidden" name="_method" value="DELETE">
 						<button type="submit" onclick="return confirm('삭제하시겠습니까?')">삭제</button>
 					</form>

@@ -7,12 +7,13 @@
 <head>
 <meta charset="UTF-8">
 <title>로그인</title>
+<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/login.css">
 </head>
 <body>
 
 	<%@ include file="/WEB-INF/views/header.jsp"%>
 
-	<div class="app-container" style="max-width: 480px;">
+	<div class="app-container is-login-1">
 
 		<h2 class="section-title">로그인</h2>
 
@@ -24,20 +25,18 @@
 
 			<button type="submit" class="btn btn-primary btn-block">로그인</button>
 
-			<div style="margin-top: 15px; text-align: center; font-size: 13px;">
-				계정이 없으신가요? <a href="${ctx}/signup" style="font-weight: bold;">회원가입</a>
+			<div class="is-login-2">
+				계정이 없으신가요? <a href="${ctx}/signup" class="is-login-3">회원가입</a>
 			</div>
 		</form>
 		
 		<hr>
 		<!-- 구글 로그인 -->
-		<a href="/minimarket/oauth2/authorization/google"
-			style="display: block; padding: 10px; background: #4285f4; color: #fff; text-align: center; border-radius: 4px; margin-top: 10px;">
+		<a href="/minimarket/oauth2/authorization/google" class="is-login-4">
 			Google로 로그인 </a>
 
 		<!-- 카카오 로그인 -->
-		<a href="https://kauth.kakao.com/oauth/authorize?client_id=a933e91e3b0fedfcea1130e48a0c9ad9&redirect_uri=http://localhost:8080/minimarket/login/kakao/callback&response_type=code"
-			style="display: block; padding: 10px; background: #FEE500; color: #000; text-align: center; border-radius: 4px; margin-top: 10px; font-weight: bold;">
+		<a href="https://kauth.kakao.com/oauth/authorize?client_id=a933e91e3b0fedfcea1130e48a0c9ad9&redirect_uri=http://localhost:8080/minimarket/login/kakao/callback&response_type=code" class="is-login-5">
 			카카오로 로그인 </a>
 	</div>
 

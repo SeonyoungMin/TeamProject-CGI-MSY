@@ -7,38 +7,7 @@
 <meta charset="UTF-8">
 <title>동네 인증</title>
 
-<style>
-.container {
-	max-width: 500px;
-	margin: 80px auto;
-	text-align: center;
-	padding: 30px;
-	border: 1px solid #eee;
-	border-radius: 12px;
-	background: #fff;
-	font-family: Arial;
-}
-
-.btn {
-	padding: 12px 20px;
-	border: none;
-	background: #000;
-	color: #fff;
-	border-radius: 8px;
-	cursor: pointer;
-	margin-top: 20px;
-}
-
-.btn:hover {
-	background: #333;
-}
-
-.info {
-	color: #666;
-	font-size: 14px;
-	margin-top: 10px;
-}
-</style>
+<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/locationAuth.css">
 </head>
 
 <%@ include file="/WEB-INF/views/header.jsp"%>

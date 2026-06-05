@@ -7,115 +7,23 @@
 <head>
 <meta charset="UTF-8">
 <title>상담 - ${room.userNickname}</title>
-<style>
-.chat-room-container {
-	max-width: 700px;
-	margin: 30px auto;
-	padding: 20px;
-}
-
-.chat-room-container .admin-chat-box {
-	border: 1px solid #eee;
-	border-radius: 10px;
-	overflow: hidden;
-}
-
-.chat-room-container .admin-chat-header {
-	background: #121212;
-	color: #fff;
-	padding: 14px 16px;
-	font-size: 15px;
-	font-weight: bold;
-	display: flex;
-	justify-content: space-between;
-	align-items: center;
-}
-
-.chat-room-container .admin-chat-messages {
-	height: 450px;
-	overflow-y: auto;
-	padding: 16px;
-	display: flex;
-	flex-direction: column;
-	gap: 10px;
-	background: #fafafa;
-}
-
-.chat-room-container .admin-chat-input-area {
-	padding: 10px;
-	border-top: 1px solid #eee;
-	display: flex;
-	gap: 8px;
-	background: #fff;
-}
-
-.chat-room-container .admin-chat-input-area input {
-	flex: 1;
-	padding: 8px 12px;
-	border: 1px solid #ddd;
-	border-radius: 20px;
-	font-size: 13px;
-	outline: none;
-}
-
-.chat-room-container .admin-chat-input-area button {
-	padding: 8px 14px;
-	background: #121212;
-	color: #fff;
-	border: none;
-	border-radius: 20px;
-	cursor: pointer;
-	font-size: 13px;
-}
-
-.chat-room-container .msg-user {
-    background: #e8f4fd;
-    color: #222;
-    align-self: flex-start;
-}
-
-.chat-room-container .msg-admin {
-    background: #121212;
-    color: #fff;
-    align-self: flex-end;
-}
-
-.chat-room-container .msg-bot {
-    background: #f0f0f0;
-    color: #222;
-    align-self: flex-start;
-}
-
-.chat-room-container .msg-label {
-    font-size: 11px;
-    color: #aaa;
-    margin-bottom: 3px;
-    align-self: flex-start;
-}
-
-.chat-room-container .msg-label.right {
-    align-self: flex-end;
-    text-align: right;
-}
-</style>
+<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/adminChatRoom.css">
 </head>
 <body>
 	<%@ include file="/WEB-INF/views/header.jsp"%>
 
 	<div class="chat-room-container">
-		<div style="margin-bottom: 15px;">
+		<div class="is-adminChatRoom-1">
 			<a href="${ctx}/admin/chat" class="btn">← 상담 목록</a>
 		</div>
 
 		<div class="admin-chat-box">
 			<div class="admin-chat-header">
 				<span>${room.userNickname}님과의 상담</span>
-				<div style="display: flex; align-items: center; gap: 10px;">
-					<span style="font-size: 12px; color: #aaa;">${room.status}</span>
-					<form action="${ctx}/admin/chat/${room.roomNo}/end" method="post"
-						style="margin: 0;">
-						<button type="submit" class="btn btn-danger"
-							style="font-size: 12px; padding: 4px 10px;"
+				<div class="is-adminChatRoom-2">
+					<span class="is-adminChatRoom-3">${room.status}</span>
+					<form action="${ctx}/admin/chat/${room.roomNo}/end" method="post" class="is-adminChatRoom-4">
+						<button type="submit" class="btn btn-danger is-adminChatRoom-5"
 							onclick="return confirm('상담을 종료하시겠습니까?')">종료</button>
 					</form>
 				</div>
