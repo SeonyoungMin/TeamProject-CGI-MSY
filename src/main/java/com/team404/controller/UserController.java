@@ -40,9 +40,11 @@ import com.team404.domain.User;
 import com.team404.exception.NoUserFoundException;
 import com.team404.service.AccountService;
 import com.team404.service.BoardService;
+import com.team404.service.CodefService;
 import com.team404.service.GeoService;
 import com.team404.service.ImageService;
 import com.team404.service.KakaoService;
+import com.team404.service.KftcService;
 import com.team404.service.OrderService;
 import com.team404.service.ProductService;
 import com.team404.service.RankingService;
@@ -90,8 +92,14 @@ public class UserController {
 	@Autowired
 	private GeoService geoService;
 
+	@Autowired
+	private CodefService codefService;
+
 	@Value("${kakao.api.key}")
 	private String kakaoApiKey;
+
+	@Autowired
+	private KftcService kftcService;
 
 	// 로그인한 사용자가 관리자인지 검사
 	private boolean isAdmin(HttpSession session) {
@@ -647,6 +655,34 @@ public class UserController {
 		} catch (Exception e) {
 			e.printStackTrace();
 			return "redirect:/login?error=true";
+		}
+	}
+
+//	// 계좌 실명인증
+//	@PostMapping(value = "/mypage/account/verify", produces = "text/plain; charset=UTF-8")
+//	@ResponseBody
+//	public String verifyAccount(@RequestParam("bankCode") String bankCode,
+//			@RequestParam("accountNo") String accountNo) {
+//		try {
+//			String name = codefService.verifyAccountHolder(bankCode, accountNo);
+//			return name != null ? name : "fail";
+//		} catch (Exception e) {
+//			System.out.println("계좌 인증 오류: " + e.getMessage());
+//			return "error";
+//		}
+//	}
+
+	// 계좌 실명인증 (금융결제원 오픈뱅킹)
+	@PostMapping(value = "/mypage/account/verify", produces = "text/plain; charset=UTF-8")
+	@ResponseBody
+	public String verifyAccount(@RequestParam("bankCode") String bankCode, @RequestParam("accountNo") String accountNo,
+			@RequestParam("birthDate") String birthDate) {
+		try {
+			String name = kftcService.verifyRealName(bankCode, accountNo, birthDate);
+			return name != null ? name : "fail";
+		} catch (Exception e) {
+			System.out.println("계좌 인증 오류: " + e.getMessage());
+			return "error";
 		}
 	}
 }

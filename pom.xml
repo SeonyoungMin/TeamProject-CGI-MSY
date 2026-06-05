@@ -118,43 +118,7 @@
 			<artifactId>jackson-databind</artifactId>
 			<version>${jackson.version}</version>
 		</dependency>
-		<!--
-		 ===== Logback + SLF4J ===== 
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-api</artifactId>
-			<version>${slf4j.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>ch.qos.logback</groupId>
-			<artifactId>logback-classic</artifactId>
-			<version>${logback.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>ch.qos.logback</groupId>
-			<artifactId>logback-core</artifactId>
-			<version>${logback.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>jcl-over-slf4j</artifactId>
-			<version>${slf4j.version}</version>
-		</dependency>-->
 
-		<!-- ===== Test ===== -->
-		<!--			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-			<version>4.13.2</version>
-			<scope>test</scope>
-		</dependency>
-<<<<<<< HEAD
-		<dependency>
-			<groupId>com.springmvc</groupId>
-			<artifactId>BookMarket</artifactId>
-			<version>1.0.0-BUILD-SNAPSHOT</version>
-		</dependency>-->
-
-		<!-- @Vaild 어노테이션 오류 때문에 추가-->
 		<!-- Bean Validation API -->
 		<dependency>
 			<groupId>javax.validation</groupId>
@@ -214,6 +178,13 @@
 			<groupId>com.fasterxml.jackson.datatype</groupId>
 			<artifactId>jackson-datatype-jsr310</artifactId>
 			<version>2.17.0</version>
+		</dependency>
+		
+		<!-- 은행 계좌 CODEF api 샌드박스 -->
+		<dependency>
+			<groupId>io.codef.api</groupId>
+			<artifactId>easycodef-java</artifactId>
+			<version>1.0.6</version>
 		</dependency>
 	</dependencies>
 

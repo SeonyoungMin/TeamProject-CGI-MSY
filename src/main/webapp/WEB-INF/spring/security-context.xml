@@ -19,6 +19,7 @@
 			authentication-success-handler-ref="oAuth2SuccessHandler" />
 
 		<!-- 로그인 필요한 경로 -->
+		<intercept-url pattern="/mypage/account/verify" access="permitAll" />
 		<intercept-url pattern="/product/new" access="isAuthenticated()" />
 		<intercept-url pattern="/product/*/edit" access="isAuthenticated()" />
 		<intercept-url pattern="/product/*/delete" access="isAuthenticated()" />

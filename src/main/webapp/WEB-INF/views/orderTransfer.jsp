@@ -143,6 +143,9 @@
 									href="https://www.police.go.kr/www/security/cyber/cyber04.jsp"
 									target="_blank" class="copy-btn is-orderTransfer-15"> 사기계좌 조회
 								</a>
+								<button type="button" class="copy-btn"
+									style="background: #4f46e5; color: #fff; border: none;"
+									onclick="openVerifyModal()">실명 인증</button>
 							</div>
 							<div class="card">
 								<div class="field-row">
@@ -209,12 +212,95 @@
 		</c:choose>
 
 	</div>
-
+	<div id="verifyModal"
+		style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); z-index: 999;">
+		<div
+			style="background: #fff; border-radius: 12px; padding: 30px; max-width: 400px; margin: 100px auto;">
+			<h3 style="margin: 0 0 20px;">계좌 실명 인증</h3>
+			<div style="margin-bottom: 12px;">
+				<label style="font-size: 13px; color: #666;">은행명</label> <input
+					type="text" id="modal-bankName" placeholder="예) 카카오뱅크, 국민"
+					style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; margin-top: 4px; box-sizing: border-box;">
+			</div>
+			<div style="margin-bottom: 12px;">
+				<label style="font-size: 13px; color: #666;">계좌번호</label> <input
+					type="text" id="modal-accountNo" placeholder="- 없이 숫자만"
+					style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; margin-top: 4px; box-sizing: border-box;">
+			</div>
+			<div style="margin-bottom: 20px;">
+				<label style="font-size: 13px; color: #666;">예금주 생년월일 앞 6자리</label>
+				<input type="text" id="modal-birthDate" placeholder="예) 990101"
+					maxlength="6"
+					style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; margin-top: 4px; box-sizing: border-box;">
+			</div>
+			<div style="display: flex; gap: 8px;">
+				<button type="button" onclick="closeVerifyModal()"
+					style="flex: 1; padding: 12px; background: #fff; border: 1px solid #ddd; border-radius: 8px; cursor: pointer;">취소</button>
+				<button type="button" onclick="doVerify()"
+					style="flex: 1; padding: 12px; background: #4f46e5; color: #fff; border: none; border-radius: 8px; font-weight: bold; cursor: pointer;">인증하기</button>
+			</div>
+		</div>
+	</div>
 	<%@ include file="/WEB-INF/views/footer.jsp"%>
 
 	<script
 		src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
 	<script>
+	var bankCodeMap = {
+		    "국민": "004", "kb국민": "004",
+		    "신한": "088", "우리": "020",
+		    "하나": "081", "농협": "011",
+		    "카카오뱅크": "090", "카카오": "090",
+		    "토스뱅크": "092", "토스": "092",
+		    "기업": "003", "sc제일": "023",
+		    "케이뱅크": "089", "부산": "032",
+		    "대구": "031", "경남": "039"
+		};
+
+		function openVerifyModal() {
+		    document.getElementById("verifyModal").style.display = "block";
+		}
+
+		function closeVerifyModal() {
+		    document.getElementById("verifyModal").style.display = "none";
+		}
+
+		function doVerify() {
+		    var bankName = document.getElementById("modal-bankName").value.trim();
+		    var accountNo = document.getElementById("modal-accountNo").value.trim();
+		    var birthDate = document.getElementById("modal-birthDate").value.trim();
+
+		    if (!bankName || !accountNo || !birthDate) {
+		        alert("모든 항목을 입력해주세요.");
+		        return;
+		    }
+
+		    var bankCode = bankCodeMap[bankName.toLowerCase()] || bankCodeMap[bankName];
+		    if (!bankCode) {
+		        alert("지원하지 않는 은행입니다.\n예) 카카오뱅크, 국민, 신한, 우리, 하나, 농협");
+		        return;
+		    }
+
+		    fetch("${ctx}/mypage/account/verify", {
+		        method: "POST",
+		        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+		        body: "bankCode=" + bankCode
+		            + "&accountNo=" + encodeURIComponent(accountNo)
+		            + "&birthDate=" + birthDate
+		    })
+		    .then(res => res.text())
+		    .then(result => {
+		        if (result !== "fail" && result !== "error") {
+		            alert("인증 성공!\n예금주명: " + result);
+		            closeVerifyModal();
+		        } else {
+		            alert("인증 실패\n계좌 정보를 다시 확인해주세요.");
+		        }
+		    })
+		    .catch(() => {
+		        alert("인증 중 오류가 발생했습니다.");
+		    });
+		}
 		function searchAddress() {
 			new daum.Postcode({
 				oncomplete : function(data) {
